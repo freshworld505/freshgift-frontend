@@ -20,7 +20,7 @@ const fetchUserFromBackend = async (firebaseUser: FirebaseUser): Promise<User> =
   try {
     const idToken = await firebaseUser.getIdToken();
 
-    const res = await fetch('https://your-backend.com/api/firebase/verify', {
+    const res = await fetch('https://freshgiftbackend.onrender.com/api/auth/verify', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${idToken}`,
