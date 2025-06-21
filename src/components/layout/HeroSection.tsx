@@ -64,7 +64,7 @@ export default function HeroSection() {
               className="px-8 py-4 text-lg font-semibold rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300"
               asChild
             >
-              <Link href="/deals">
+              <Link href="/products">
                 <Zap className="h-5 w-5 mr-2" />
                 View Deals
               </Link>
