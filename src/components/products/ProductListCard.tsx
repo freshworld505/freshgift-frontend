@@ -1,0 +1,393 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import type { Product } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useCartStore, useAuthStore } from "@/lib/store";
+import { ShoppingCart, Heart, Star, Minus, Plus } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
+import { addToCart } from "@/api/cartApi";
+
+interface ProductListCardProps {
+  product: Product;
+  viewMode?: "grid" | "list";
+}
+
+export default function ProductListCard({
+  product,
+  viewMode = "grid",
+}: ProductListCardProps) {
+  const { fetchCart, items, updateQuantity } = useCartStore();
+  const { user, isAuthenticated, addToWishlist, removeFromWishlist } =
+    useAuthStore();
+
+  const isInWishlist = isAuthenticated && user?.wishlist?.includes(product.id);
+
+  const isInStock = (product.stock ?? 0) > 0;
+
+  // Check if product is in cart and get quantity
+  const cartItem = items.find((item) => item.product.id === product.id);
+  const isInCart = !!cartItem;
+  const cartQuantity = cartItem?.quantity || 0;
+
+  // Handle product images using new schema
+  const getProductImage = () => {
+    // Check if productImages array exists and has items
+    if (
+      product.productImages &&
+      Array.isArray(product.productImages) &&
+      product.productImages.length > 0
+    ) {
+      const imageUrl = product.productImages[0];
+      // Ensure the image URL is not empty or just whitespace
+      return imageUrl && typeof imageUrl === "string" && imageUrl.trim()
+        ? imageUrl.trim()
+        : null;
+    }
+    // Return null if no image is available - this will prevent empty src error
+    return null;
+  };
+
+  const imageUrl = getProductImage();
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to add items to your wishlist.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (isInWishlist) {
+      removeFromWishlist(product.id);
+      toast({
+        title: `${product.productName} removed from wishlist.`,
+      });
+    } else {
+      addToWishlist(product.id);
+      toast({
+        title: `${product.productName} added to wishlist!`,
+      });
+    }
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to add items to your cart.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Call the API to add to cart
+      await addToCart(product.id, 1);
+
+      // Refresh cart from backend to get updated data
+      await fetchCart();
+
+      toast({
+        title: `${product.productName} added to cart!`,
+        description: "Item successfully added to your cart.",
+      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast({
+        title: "Error adding to cart",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleIncreaseQuantity = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      await updateQuantity(product.id, cartQuantity + 1);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  const handleDecreaseQuantity = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      if (cartQuantity > 1) {
+        await updateQuantity(product.id, cartQuantity - 1);
+      } else {
+        // Remove item if quantity would become 0
+        await updateQuantity(product.id, 0);
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  if (viewMode === "list") {
+    return (
+      <Card className="overflow-hidden border border-border/50 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 group rounded-xl">
+        <div className="flex">
+          {/* Image Section */}
+          <div className="relative w-32 h-32 flex-shrink-0">
+            <Link href={`/products/${product.id}`}>
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={product.productName || "Product"}
+                  fill
+                  sizes="128px"
+                  className={`object-cover rounded-l-xl transition-transform duration-300 group-hover:scale-105 ${
+                    !isInStock ? "grayscale" : ""
+                  }`}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 rounded-l-xl flex items-center justify-center">
+                  <span className="text-gray-400 text-xs">No Image</span>
+                </div>
+              )}
+            </Link>
+            {/* Wishlist Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 bg-white/90 hover:bg-white border-0 rounded-lg text-red-500 hover:text-red-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 w-8 h-8"
+              onClick={handleWishlistToggle}
+            >
+              <Heart
+                className={`h-4 w-4 transition-all duration-300 ${
+                  isInWishlist
+                    ? "fill-red-500 stroke-red-500"
+                    : "stroke-red-500"
+                }`}
+              />
+            </Button>
+          </div>
+
+          {/* Content Section */}
+          <div className="flex-1 flex flex-col justify-between p-4">
+            <div>
+              <Link href={`/products/${product.id}`}>
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-300 line-clamp-1">
+                      {product.productName}
+                    </h3>
+                    <Badge variant="secondary" className="text-xs mt-1">
+                      {product.category}
+                    </Badge>
+                  </div>
+                  <p className="text-xl font-bold text-primary ml-4">
+                    {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
+                  </p>
+                </div>
+              </Link>
+              {product.description && (
+                <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                  {product.description}
+                </p>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center space-x-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className="h-3 w-3 fill-yellow-400 text-yellow-400"
+                  />
+                ))}
+                <span className="text-xs text-muted-foreground ml-1">
+                  (4.5)
+                </span>
+              </div>
+              {!isInStock ? (
+                <Button
+                  size="sm"
+                  className="bg-gray-400 text-gray-600 cursor-not-allowed font-medium rounded-lg"
+                  disabled
+                >
+                  <ShoppingCart className="mr-1 h-4 w-4" />
+                  Out of Stock
+                </Button>
+              ) : isInCart ? (
+                <div className="flex items-center gap-1 bg-primary/10 rounded-lg p-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 rounded-md hover:bg-primary/20 transition-colors"
+                    onClick={handleDecreaseQuantity}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  <span className="min-w-[2rem] text-center text-sm font-semibold text-primary">
+                    {cartQuantity}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 rounded-md hover:bg-primary/20 transition-colors"
+                    onClick={handleIncreaseQuantity}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-white hover:scale-105 font-medium rounded-lg transition-all duration-300"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="mr-1 h-4 w-4" />
+                  Add
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  // Grid view
+  return (
+    <Card className="overflow-hidden border border-border/50 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col h-full group hover:-translate-y-1 rounded-xl">
+      {/* Image Section */}
+      <div className="relative aspect-square overflow-hidden rounded-t-xl">
+        <Link href={`/products/${product.id}`}>
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={product.productName || "Product"}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+              className={`object-cover transition-transform duration-500 group-hover:scale-110 ${
+                !isInStock ? "grayscale" : ""
+              }`}
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400 text-sm">No Image</span>
+            </div>
+          )}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </Link>
+
+        {/* Wishlist Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 bg-white/90 hover:bg-white border-0 rounded-lg text-red-500 hover:text-red-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 w-7 h-7"
+          onClick={handleWishlistToggle}
+        >
+          <Heart
+            className={`h-3.5 w-3.5 transition-all duration-300 ${
+              isInWishlist ? "fill-red-500 stroke-red-500" : "stroke-red-500"
+            }`}
+          />
+        </Button>
+
+        {/* Category Badge */}
+        <Badge
+          variant="secondary"
+          className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-medium py-0.5 px-2"
+        >
+          {product.category}
+        </Badge>
+      </div>
+
+      {/* Content Section */}
+      <CardContent className="p-3 flex-grow">
+        <Link href={`/products/${product.id}`}>
+          <h3 className="font-semibold text-sm group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-2 leading-tight">
+            {product.productName}
+          </h3>
+        </Link>
+
+        {product.description && (
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+            {product.description}
+          </p>
+        )}
+
+        {/* Rating */}
+        <div className="flex items-center space-x-1 mb-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <Star
+              key={star}
+              className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400"
+            />
+          ))}
+          <span className="text-xs text-muted-foreground ml-1">(4.5)</span>
+        </div>
+
+        {/* Price */}
+        <div className="flex items-center justify-between">
+          <p className="text-base font-bold text-primary">
+            {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
+          </p>
+        </div>
+      </CardContent>
+
+      {/* Footer with Add to Cart */}
+      <CardFooter className="p-3 pt-0 mt-auto">
+        {!isInStock ? (
+          <Button
+            className="w-full bg-gray-400 text-gray-600 cursor-not-allowed font-medium py-1.5 text-sm rounded-lg"
+            disabled
+          >
+            <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
+            Out of Stock
+          </Button>
+        ) : isInCart ? (
+          <div className="flex items-center gap-2 w-full bg-primary/10 rounded-lg p-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 rounded-md hover:bg-primary/20 transition-colors"
+              onClick={handleDecreaseQuantity}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="flex-1 text-center text-sm font-semibold text-primary">
+              {cartQuantity} in cart
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 rounded-md hover:bg-primary/20 transition-colors"
+              onClick={handleIncreaseQuantity}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <Button
+            className="w-full bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1.5 text-sm rounded-lg transition-all duration-300 shadow-sm"
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart className="mr-1.5 h-3.5 w-3.5" />
+            Add to Cart
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
+}
