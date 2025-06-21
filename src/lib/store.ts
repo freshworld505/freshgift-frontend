@@ -157,7 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await signOutUser();
       set({ user: null, isAuthenticated: false });
-      toast({ title: "You have been logged out."});
+      //toast({ title: "You have been logged out."});
     } catch (error) {
       console.error('Error logging out:', error);
       toast({ 
