@@ -4,7 +4,7 @@ A modern, AI-powered grocery delivery app specializing in fresh fruits and veget
 
 ## 🌟 Features .
 
-.
+...
 
 ### Core Functionality
 
