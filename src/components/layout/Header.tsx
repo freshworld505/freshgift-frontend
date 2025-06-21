@@ -183,6 +183,39 @@ export default function Header() {
             </div>
           </form>
         </div>
+
+        {/* Mobile Auth Buttons - Only show when not authenticated */}
+        {!isAuthenticated && (
+          <div className="sm:hidden pb-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                asChild
+                className="flex-1 h-10 rounded-full border-border/50 hover:bg-muted/50 transition-colors"
+              >
+                <Link
+                  href="/login"
+                  className="flex items-center justify-center gap-2 font-medium"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Link>
+              </Button>
+              <Button
+                asChild
+                className="flex-1 h-10 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Link
+                  href="/signup"
+                  className="flex items-center justify-center gap-2"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Sign Up
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
