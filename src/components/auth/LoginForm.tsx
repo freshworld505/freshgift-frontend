@@ -27,6 +27,7 @@ import { useState } from "react";
 import { signInWithEmail, signInWithGoogle, resetPassword } from "@/lib/auth";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Mail } from "lucide-react";
+import { getAuth } from "firebase/auth";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address."),
@@ -41,6 +42,9 @@ export default function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
+  const auth = getAuth();
+  const afterLoginUser = auth.currentUser;
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -54,6 +58,24 @@ export default function LoginForm() {
     try {
       const user = await signInWithEmail(values.email, values.password);
       login(user);
+
+      if (afterLoginUser) {
+        afterLoginUser
+          .getIdToken(/* forceRefresh */ true)
+          .then((idToken) => {
+            fetch("https://freshgiftbackend.onrender.com/api/auth/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`,
+              },
+            });
+          })
+          .catch((error) => {
+            // Handle error
+            console.error("Error getting ID token:", error);
+          });
+      }
 
       // Redirect to the page they were trying to access, or to home page
       const redirectTo = searchParams.get("redirect") || "/";
@@ -87,6 +109,24 @@ export default function LoginForm() {
     try {
       const user = await signInWithGoogle();
       login(user);
+
+      if (afterLoginUser) {
+        afterLoginUser
+          .getIdToken(/* forceRefresh */ true)
+          .then((idToken) => {
+            fetch("https://freshgiftbackend.onrender.com/api/auth/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`,
+              },
+            });
+          })
+          .catch((error) => {
+            // Handle error
+            console.error("Error getting ID token:", error);
+          });
+      }
 
       const redirectTo = searchParams.get("redirect") || "/";
       router.push(redirectTo);

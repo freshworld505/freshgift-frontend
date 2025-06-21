@@ -29,6 +29,7 @@ import { useState } from "react";
 import { signUpWithEmail, signInWithGoogle } from "@/lib/auth";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { getAuth } from "firebase/auth";
 
 const signupSchema = z
   .object({
@@ -49,6 +50,9 @@ export default function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+  const auth = getAuth();
+  const afterLoginUser = auth.currentUser;
+
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -68,6 +72,24 @@ export default function SignupForm() {
         values.name
       );
       signup(user);
+
+      if (afterLoginUser) {
+        afterLoginUser
+          .getIdToken(/* forceRefresh */ true)
+          .then((idToken) => {
+            fetch("https://freshgiftbackend.onrender.com/api/auth/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`,
+              },
+            });
+          })
+          .catch((error) => {
+            // Handle error
+            console.error("Error getting ID token:", error);
+          });
+      }
 
       // Redirect to the page they were trying to access, or to home page
       const redirectTo = searchParams.get("redirect") || "/";
@@ -100,6 +122,24 @@ export default function SignupForm() {
     try {
       const user = await signInWithGoogle();
       signup(user);
+
+      if (afterLoginUser) {
+        afterLoginUser
+          .getIdToken(/* forceRefresh */ true)
+          .then((idToken) => {
+            fetch("https://freshgiftbackend.onrender.com/api/auth/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`,
+              },
+            });
+          })
+          .catch((error) => {
+            // Handle error
+            console.error("Error getting ID token:", error);
+          });
+      }
 
       // Redirect to the page they were trying to access, or to home page
       const redirectTo = searchParams.get("redirect") || "/";
