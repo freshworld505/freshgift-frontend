@@ -34,6 +34,9 @@ export default function ProductListCard({
   const isInCart = !!cartItem;
   const cartQuantity = cartItem?.quantity || 0;
 
+  // Check if we can add more items (cart quantity hasn't reached stock limit)
+  const canAddMore = cartQuantity < (product.stock ?? 0);
+
   // Handle product images using new schema
   const getProductImage = () => {
     // Check if productImages array exists and has items
@@ -115,6 +118,16 @@ export default function ProductListCard({
   const handleIncreaseQuantity = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Check if we can add more items
+    if (cartQuantity >= (product.stock ?? 0)) {
+      toast({
+        title: "Stock limit reached",
+        description: `Only ${product.stock} items available in stock.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       await updateQuantity(product.id, cartQuantity + 1);
@@ -242,8 +255,9 @@ export default function ProductListCard({
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-7 w-7 p-0 rounded-md hover:bg-primary/20 transition-colors"
+                    className="h-7 w-7 p-0 rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleIncreaseQuantity}
+                    disabled={!canAddMore}
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
@@ -372,8 +386,9 @@ export default function ProductListCard({
             <Button
               size="sm"
               variant="ghost"
-              className="h-8 w-8 p-0 rounded-md hover:bg-primary/20 transition-colors"
+              className="h-8 w-8 p-0 rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleIncreaseQuantity}
+              disabled={!canAddMore}
             >
               <Plus className="h-4 w-4" />
             </Button>

@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import ProductList from "@/components/products/ProductList";
 import HeroSection from "@/components/layout/HeroSection";
 import WhyChooseUsSection from "@/components/layout/WhyChooseUsSection";
-import type { Product } from "@/lib/types";
+import { useHomepageProducts } from "@/hooks/use-products";
 import {
   Sun,
   Sprout,
@@ -15,203 +14,31 @@ import {
   Coffee,
   Cake,
   Milk,
-  Cookie,
-  Snowflake,
   ShoppingBasket,
   Zap,
   TrendingUp,
 } from "lucide-react";
-import {
-  searchProducts,
-  getProductsByCategory,
-  getProductsByCategoryAndSubcategory,
-  getProductsByTag,
-} from "@/api/productApi";
 
 export default function HomePage() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [seasonalSpotlightProducts, setSeasonalSpotlightProducts] = useState<
-    Product[]
-  >([]);
-  const [leafyGreensProducts, setLeafyGreensProducts] = useState<Product[]>([]);
-  const [organicProducts, setOrganicProducts] = useState<Product[]>([]);
-  const [freshFruits, setFreshFruits] = useState<Product[]>([]);
-  const [beveragesProducts, setBeveragesProducts] = useState<Product[]>([]);
-  const [bakeryProducts, setBakeryProducts] = useState<Product[]>([]);
-  const [dairyProducts, setDairyProducts] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const [onSaleProducts, setOnSaleProducts] = useState<Product[]>([]);
-  const [instantDelivery, setInstantDelivery] = useState<Product[]>([]);
-  const [rootVegetables, setRootVegetables] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const {
+    allProducts,
+    featuredProducts,
+    seasonalSpotlightProducts,
+    leafyGreensProducts,
+    organicProducts,
+    freshFruits,
+    newArrivals,
+    onSaleProducts,
+    beveragesProducts,
+    bakeryProducts,
+    dairyProducts,
+    rootVegetables,
+    instantDelivery,
+    isLoading,
+    error,
+  } = useHomepageProducts();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-
-        // Helper function to safely fetch with detailed error handling
-        const safeFetch = async (
-          fetchFunction: () => Promise<any>,
-          name: string
-        ): Promise<any[]> => {
-          try {
-            console.log(`🔄 Starting to fetch ${name}...`);
-            const result = await fetchFunction();
-            const count = Array.isArray(result)
-              ? result.length
-              : result?.products?.length || 0;
-            console.log(`✅ ${name} fetched successfully: ${count} items`);
-            return Array.isArray(result) ? result : result?.products || [];
-          } catch (error: any) {
-            console.warn(`⚠️ ${name} failed:`, {
-              message: error?.message,
-              status: error?.response?.status,
-              statusText: error?.response?.statusText,
-              url: error?.config?.url,
-              data: error?.response?.data,
-            });
-            return [];
-          }
-        };
-
-        // Fetch all products for the full range section
-        const allProductsResult = await safeFetch(
-          () => searchProducts("", 1, 100),
-          "All products"
-        );
-
-        // safeFetch already extracts the products array, so we can use it directly
-        if (allProductsResult && allProductsResult.length > 0) {
-          setAllProducts(allProductsResult);
-          console.log(
-            "✅ All products loaded successfully:",
-            allProductsResult.length
-          );
-        } else {
-          console.log("⚠️ No products found");
-        }
-
-        // Fetch fresh fruits by category (confirmed exists: "Fruits")
-        const fruitsProducts = await safeFetch(
-          () => getProductsByCategory("Fruits", 1, 8),
-          "Fresh fruits category"
-        );
-        setFreshFruits(fruitsProducts);
-
-        // Fetch featured products with Top Pick tag
-        const featuredProducts = await safeFetch(
-          () => getProductsByTag("Top Pick", 1, 4),
-          "Top Pick tagged products"
-        );
-        setFeaturedProducts(featuredProducts);
-
-        // Fetch herbs by category (confirmed exists: "Herbs")
-        const herbsProducts = await safeFetch(
-          () => getProductsByCategory("Herbs", 1, 4),
-          "Herbs category"
-        );
-        setOrganicProducts(herbsProducts);
-
-        // Fetch organic products by tag
-        const organicTagged = await safeFetch(
-          () => getProductsByTag("Organic", 1, 4),
-          "Organic tagged products"
-        );
-        setSeasonalSpotlightProducts(organicTagged);
-
-        // Fetch fresh products by tag
-        const freshTagged = await safeFetch(
-          () => getProductsByTag("Fresh", 1, 4),
-          "Fresh tagged products"
-        );
-        setNewArrivals(freshTagged);
-
-        // Fetch new arrival products by tag
-        const newArrivalProducts = await safeFetch(
-          () => getProductsByTag("New Arrival", 1, 4),
-          "New Arrival tagged products"
-        );
-        setBeveragesProducts(newArrivalProducts);
-
-        // Fetch on sale products by tag
-        const onSaleProducts = await safeFetch(
-          () => getProductsByTag("On Sale", 1, 4),
-          "On Sale tagged products"
-        );
-        setOnSaleProducts(onSaleProducts);
-
-        // Fetch instant delivery products by tag
-        const instantProducts = await safeFetch(
-          () => getProductsByTag("Instant Delivery", 1, 4),
-          "Instant Delivery tagged products"
-        );
-        setInstantDelivery(instantProducts);
-
-        // Fetch imported products by tag
-        const importedProducts = await safeFetch(
-          () => getProductsByTag("Imported", 1, 4),
-          "Imported tagged products"
-        );
-        setBakeryProducts(importedProducts);
-
-        // Fetch products by subcategory (Fruits + Leafy Greens)
-        const leafyGreens = await safeFetch(
-          () =>
-            getProductsByCategoryAndSubcategory("Fruits", "Leafy Greens", 1, 4),
-          "Fruits Leafy Greens subcategory"
-        );
-        setLeafyGreensProducts(leafyGreens);
-
-        // Fetch products by subcategory (Fruits + Fresh Juices)
-        const freshJuices = await safeFetch(
-          () =>
-            getProductsByCategoryAndSubcategory("Fruits", "Fresh Juices", 1, 4),
-          "Fruits Fresh Juices subcategory"
-        );
-        setDairyProducts(freshJuices);
-
-        // Fetch products by subcategory (Fruits + Seasonal Picks)
-        const seasonalPicks = await safeFetch(
-          () =>
-            getProductsByCategoryAndSubcategory(
-              "Fruits",
-              "Seasonal Picks",
-              1,
-              4
-            ),
-          "Fruits Seasonal Picks subcategory"
-        );
-        setRootVegetables(seasonalPicks);
-
-        console.log("🎉 All product fetching completed successfully!");
-      } catch (error) {
-        console.error("❌ Critical error in fetchProducts:", error);
-        setError("Failed to load products. Please try again later.");
-        // Set empty arrays on error
-        setFeaturedProducts([]);
-        setSeasonalSpotlightProducts([]);
-        setLeafyGreensProducts([]);
-        setOrganicProducts([]);
-        setFreshFruits([]);
-        setBeveragesProducts([]);
-        setBakeryProducts([]);
-        setDairyProducts([]);
-        setNewArrivals([]);
-        setOnSaleProducts([]);
-        setInstantDelivery([]);
-        setRootVegetables([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-12">
         <HeroSection />
@@ -234,7 +61,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={featuredProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No featured products available right now."
             viewMode="grid"
@@ -250,7 +77,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={seasonalSpotlightProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No seasonal products available right now."
             viewMode="grid"
@@ -266,7 +93,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={leafyGreensProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No leafy greens available right now."
             viewMode="grid"
@@ -282,7 +109,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={organicProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No organic products available right now."
             viewMode="grid"
@@ -298,7 +125,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={freshFruits}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No fresh fruits available right now."
             viewMode="grid"
@@ -314,7 +141,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={newArrivals}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No fresh products available right now."
             viewMode="grid"
@@ -330,7 +157,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={onSaleProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No sale items available right now."
             viewMode="grid"
@@ -346,7 +173,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={beveragesProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No new arrivals available right now."
             viewMode="grid"
@@ -362,7 +189,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={bakeryProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No imported products available right now."
             viewMode="grid"
@@ -378,7 +205,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={dairyProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No fresh juices available right now."
             viewMode="grid"
@@ -394,7 +221,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={rootVegetables}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No seasonal picks available right now."
             viewMode="grid"
@@ -410,7 +237,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={instantDelivery}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No instant delivery items available right now."
             viewMode="grid"
@@ -428,7 +255,7 @@ export default function HomePage() {
           </div>
           <ProductList
             products={allProducts}
-            loading={loading}
+            loading={isLoading}
             error={error}
             emptyMessage="No products available right now."
             showCount={true}

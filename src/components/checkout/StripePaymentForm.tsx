@@ -118,13 +118,86 @@ const PaymentForm = ({
       }
     );
 
-    setIsProcessing(false);
-
     if (error) {
+      setIsProcessing(false);
       console.error("Payment error:", error);
       onError(error.message || "Payment failed");
-    } else if (paymentIntent && paymentIntent.status === "succeeded") {
-      onSuccess(paymentIntentId);
+      return;
+    }
+
+    if (paymentIntent) {
+      switch (paymentIntent.status) {
+        case "succeeded":
+          setIsProcessing(false);
+          onSuccess(paymentIntentId);
+          break;
+        case "processing":
+          // Keep processing state true and poll for status
+          console.log("Payment is processing...");
+
+          let pollCount = 0;
+          const maxPollAttempts = 30; // 30 attempts * 2 seconds = 1 minute max
+
+          // Poll every 2 seconds to check payment status
+          const pollPaymentStatus = async () => {
+            pollCount++;
+
+            if (pollCount > maxPollAttempts) {
+              setIsProcessing(false);
+              onError(
+                "Payment verification timeout. Please check your account or contact support."
+              );
+              return;
+            }
+
+            try {
+              const { paymentIntent: updatedIntent } =
+                await stripe.retrievePaymentIntent(clientSecret);
+              if (updatedIntent?.status === "succeeded") {
+                setIsProcessing(false);
+                onSuccess(paymentIntentId);
+              } else if (updatedIntent?.status === "canceled") {
+                setIsProcessing(false);
+                onError("Payment was canceled");
+              } else if (updatedIntent?.status === "processing") {
+                // Show extended processing message after 10 seconds
+                if (pollCount === 5) {
+                  toast({
+                    title: "Payment Processing",
+                    description:
+                      "Your payment is taking longer than usual but is still being processed...",
+                  });
+                }
+                // Continue polling
+                setTimeout(pollPaymentStatus, 2000);
+              } else {
+                setIsProcessing(false);
+                onError("Payment status unknown");
+              }
+            } catch (pollError) {
+              console.error("Error polling payment status:", pollError);
+              setIsProcessing(false);
+              onError("Unable to verify payment status");
+            }
+          };
+          setTimeout(pollPaymentStatus, 2000);
+          break;
+        case "requires_action":
+          // This shouldn't happen with confirmCardPayment, but handle it
+          setIsProcessing(false);
+          onError("Payment requires additional authentication");
+          break;
+        case "canceled":
+          setIsProcessing(false);
+          onError("Payment was canceled");
+          break;
+        default:
+          setIsProcessing(false);
+          onError("Payment failed or status unknown");
+      }
+    } else {
+      setIsProcessing(false);
+      onError("Payment failed - no payment intent returned");
     }
   };
 

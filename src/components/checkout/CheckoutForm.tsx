@@ -196,11 +196,6 @@ export default function CheckoutForm() {
   useEffect(() => {
     setIsClient(true);
     if (items.length === 0) {
-      toast({
-        title: "Your cart is empty!",
-        description: "Please add items before checking out.",
-        variant: "destructive",
-      });
       router.push("/cart");
     }
   }, [items, router]);
