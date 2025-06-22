@@ -25,12 +25,16 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Import the auth helper to map Firebase user to our User type
-          const { mapFirebaseUserToUser } = await import("@/lib/auth");
-          const user = await mapFirebaseUserToUser(firebaseUser);
-          login(user);
+          // Import the auth helper to fetch user from backend
+          const { getCurrentUser } = await import("@/lib/auth");
+          const user = await getCurrentUser();
+          if (user) {
+            login(user);
+          } else {
+            logout();
+          }
         } catch (error) {
-          console.error("Error mapping Firebase user:", error);
+          console.error("Error fetching user from backend:", error);
           logout();
         }
       } else {
