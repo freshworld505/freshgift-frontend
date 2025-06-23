@@ -6,7 +6,15 @@ import CartIcon from "@/components/cart/CartIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/lib/store";
-import { UserCircle2, LogOut, LogIn, UserPlus, Search } from "lucide-react";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
+import {
+  UserCircle2,
+  LogOut,
+  LogIn,
+  UserPlus,
+  Search,
+  Shield,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,13 +24,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAdmin, checkAdminStatus } = useAdminAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
+
+  // Check admin status when user changes
+  useEffect(() => {
+    if (user?.email) {
+      checkAdminStatus(user.email);
+    }
+  }, [user?.email, checkAdminStatus]);
 
   const getUserInitials = () => {
     if (user?.name) {
@@ -130,6 +146,14 @@ export default function Header() {
                       <span className="font-medium">Account</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild className="p-3 cursor-pointer">
+                      <Link href="/admin" className="flex items-center gap-3">
+                        <Shield className="h-4 w-4 text-emerald-600" />
+                        <span className="font-medium">Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     onClick={logout}
                     className="p-3 cursor-pointer text-destructive hover:text-destructive-foreground hover:bg-destructive"
