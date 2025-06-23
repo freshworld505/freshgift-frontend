@@ -111,7 +111,7 @@ export default function AdminUsers() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card>
+        <Card key="total-users">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
           </CardHeader>
@@ -119,7 +119,7 @@ export default function AdminUsers() {
             <div className="text-2xl font-bold">{stats.total}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card key="active-users">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Active Users</CardTitle>
           </CardHeader>
@@ -129,7 +129,7 @@ export default function AdminUsers() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card key="inactive-users">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
               Inactive Users
@@ -141,7 +141,7 @@ export default function AdminUsers() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card key="suspended-users">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Suspended</CardTitle>
           </CardHeader>
@@ -151,13 +151,13 @@ export default function AdminUsers() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card key="total-revenue">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${stats.totalRevenue.toFixed(2)}
+              £{stats.totalRevenue.toFixed(2)}
             </div>
           </CardContent>
         </Card>
@@ -210,8 +210,8 @@ export default function AdminUsers() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredUsers.map((user: any) => (
-                    <TableRow key={user.id || user.uid}>
+                  filteredUsers.map((user: any, index: number) => (
+                    <TableRow key={user.id || user.uid || `user-${index}`}>
                       <TableCell className="font-medium">
                         {user.name || user.displayName || "N/A"}
                       </TableCell>
