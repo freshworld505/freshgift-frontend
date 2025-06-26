@@ -57,7 +57,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   useEffect(() => {
     if (!isLoading) {
       const isPublicRoute =
-        PUBLIC_ROUTES.includes(pathname) || pathname.startsWith("/products/");
+        PUBLIC_ROUTES.includes(pathname) ||
+        pathname.startsWith("/products/") ||
+        pathname.startsWith("/deals");
       const isAuthPage = pathname === "/login" || pathname === "/signup";
 
       if (!isAuthenticated && !isPublicRoute) {
@@ -83,7 +85,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   // Show login prompt for unauthenticated users on protected routes
-  if (!isAuthenticated && !PUBLIC_ROUTES.includes(pathname)) {
+  if (
+    !isAuthenticated &&
+    !PUBLIC_ROUTES.includes(pathname) &&
+    !pathname.startsWith("/products/") &&
+    !pathname.startsWith("/deals")
+  ) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Dialog open={true}>

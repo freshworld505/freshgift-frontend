@@ -263,9 +263,6 @@ export const getProductsByTag = async (tags: string, page: number, limit: number
 // Get product by ID
 export const getProductById = async (productId: string): Promise<Product | null> => {
   try {
-    // Ensure user is authenticated before making the request
-    //await ensureAuthenticated();
-
     if (!productId) {
       console.error("❌ No product ID provided");
       throw new Error("No product ID provided");

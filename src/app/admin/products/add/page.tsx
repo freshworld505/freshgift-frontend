@@ -90,10 +90,26 @@ export default function AddProduct() {
   });
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [field]: value,
+      };
+
+      // Auto-calculate final price when actual price or discount changes
+      if (field === "actualPrice" || field === "discount") {
+        const actualPrice = field === "actualPrice" ? value : prev.actualPrice;
+        const discount = field === "discount" ? value : prev.discount;
+
+        if (actualPrice > 0 && discount >= 0) {
+          const discountAmount = (actualPrice * discount) / 100;
+          const finalPrice = actualPrice - discountAmount;
+          newData.finalPrice = Math.round(finalPrice * 100) / 100; // Round to 2 decimal places
+        }
+      }
+
+      return newData;
+    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -514,7 +530,12 @@ export default function AddProduct() {
                       handleInputChange("finalPrice", isNaN(value) ? 0 : value);
                     }}
                     placeholder="0.00"
+                    className="bg-muted/50"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Auto-calculated from actual price and discount, or enter
+                    manually
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="stock">Stock Quantity</Label>
