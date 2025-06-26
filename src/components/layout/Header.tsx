@@ -200,15 +200,6 @@ export default function Header() {
             <AppLogo />
 
             <div className="flex items-center gap-2">
-              {/* Search Icon */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-9 w-9 p-0 rounded-full hover:bg-muted/50 transition-colors"
-                onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
 
               {/* Products Button */}
               <Button
