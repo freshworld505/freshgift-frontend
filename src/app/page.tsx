@@ -4,6 +4,7 @@ import ProductList from "@/components/products/ProductList";
 import HeroSection from "@/components/layout/HeroSection";
 import WhyChooseUsSection from "@/components/layout/WhyChooseUsSection";
 import { useHomepageProducts } from "@/hooks/use-products";
+import { useCartStore } from "@/lib/store";
 import {
   Sun,
   Sprout,
@@ -18,6 +19,7 @@ import {
   Zap,
   TrendingUp,
 } from "lucide-react";
+import { useEffect } from "react";
 
 export default function HomePage() {
   const {
@@ -37,6 +39,13 @@ export default function HomePage() {
     isLoading,
     error,
   } = useHomepageProducts();
+
+  const { fetchCart } = useCartStore();
+
+  useEffect(() => {
+    // Fetch cart status in background when homepage loads
+    fetchCart();
+  }, [fetchCart]);
 
   if (isLoading) {
     return (
