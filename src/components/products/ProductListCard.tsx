@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { useCartStore, useAuthStore } from "@/lib/store";
 import { ShoppingCart, Heart, Star, Minus, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 import { addToCart } from "@/api/cartApi";
 
 interface ProductListCardProps {
@@ -207,7 +206,7 @@ export default function ProductListCard({
                     </Badge>
                   </div>
                   <p className="text-sm sm:text-xl font-bold text-primary ml-2 sm:ml-4">
-                    {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
+                    £{product.finalPrice || 0}
                   </p>
                 </div>
               </Link>
@@ -338,7 +337,7 @@ export default function ProductListCard({
 
         {product.description && (
           <p className="text-xs text-muted-foreground line-clamp-2 mb-1 hidden sm:block">
-            {product.description}
+            {product.description.slice(0, 50) + "..."}
           </p>
         )}
 
@@ -356,7 +355,7 @@ export default function ProductListCard({
         {/* Price */}
         <div className="flex items-center justify-between">
           <p className="text-sm sm:text-base font-bold text-primary">
-            {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
+            £{product.finalPrice || 0}
           </p>
         </div>
       </CardContent>

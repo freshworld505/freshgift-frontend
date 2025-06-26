@@ -37,7 +37,6 @@ import {
 } from "lucide-react";
 import { getProductsByCategory, searchProducts } from "@/api/productApi";
 import { addToCart } from "@/api/cartApi";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 
 type SortOption =
   | "name-asc"
@@ -89,13 +88,13 @@ export default function ProductsPage() {
     return cats.sort();
   }, [products]);
 
-  // Calculate price range (convert to GBP for display)
+  // Calculate price range
   const maxPrice = useMemo(() => {
-    if (products.length === 0) return 12; // Default max price in GBP (100 INR ≈ £1.2)
-    const maxINRPrice = Math.max(
+    if (products.length === 0) return 50; // Default max price in £
+    const maxPrice = Math.max(
       ...products.map((p: Product) => p.finalPrice || 0)
     );
-    return convertINRtoGBP(maxINRPrice);
+    return maxPrice;
   }, [products]);
 
   // Filter and sort products
@@ -112,10 +111,10 @@ export default function ProductsPage() {
         selectedCategories.length === 0 ||
         selectedCategories.includes(product.category);
 
-      // Price filter (convert product price to GBP for comparison)
-      const productPriceGBP = convertINRtoGBP(product.finalPrice || 0);
+      // Price filter
+      const productPrice = product.finalPrice || 0;
       const matchesPrice =
-        productPriceGBP >= priceRange[0] && productPriceGBP <= priceRange[1];
+        productPrice >= priceRange[0] && productPrice <= priceRange[1];
 
       return matchesSearch && matchesCategory && matchesPrice;
     });
@@ -141,14 +140,13 @@ export default function ProductsPage() {
     return filtered;
   }, [products, searchTerm, selectedCategories, priceRange, sortBy]);
 
-  // Update price range when products are loaded (convert to GBP)
+  // Update price range when products are loaded
   useEffect(() => {
     if (products.length > 0) {
-      const maxINRPrice = Math.max(
+      const maxPrice = Math.max(
         ...products.map((p: Product) => p.finalPrice || 0)
       );
-      const maxGBPPrice = convertINRtoGBP(maxINRPrice);
-      setPriceRange([0, maxGBPPrice]);
+      setPriceRange([0, maxPrice]);
     }
   }, [products]);
 
@@ -568,8 +566,8 @@ function DesktopFilters({
             className="w-full"
           />
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>{formatCurrency(priceRange[0])}</span>
-            <span>{formatCurrency(priceRange[1])}</span>
+            <span>£{priceRange[0]}</span>
+            <span>£{priceRange[1]}</span>
           </div>
         </div>
       </div>
@@ -645,8 +643,8 @@ function MobileFilters({
             className="w-full"
           />
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>{formatCurrency(priceRange[0])}</span>
-            <span>{formatCurrency(priceRange[1])}</span>
+            <span>£{priceRange[0]}</span>
+            <span>£{priceRange[1]}</span>
           </div>
         </div>
       </div>
