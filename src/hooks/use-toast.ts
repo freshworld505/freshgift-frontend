@@ -9,8 +9,8 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 0.4 * 1000 // 400 milliseconds
-
+const TOAST_REMOVE_DELAY = 10000
+const TOAST_DISPLAY_DURATION = 1000 // 1000 second display time
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
@@ -163,6 +163,11 @@ function toast({ ...props }: Toast) {
       },
     },
   })
+
+  // Auto-dismiss after TOAST_DISPLAY_DURATION
+  setTimeout(() => {
+    dismiss()
+  }, TOAST_DISPLAY_DURATION)
 
   return {
     id: id,
