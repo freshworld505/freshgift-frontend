@@ -196,35 +196,36 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-8 max-w-[1600px]">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-[1600px]">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
-              <Leaf className="h-8 w-8 text-primary-foreground" />
+        <div className="mb-4 sm:mb-8">
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
+              <Leaf className="h-6 w-6 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 Fresh Products
               </h1>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-sm sm:text-lg hidden sm:block">
                 Discover our collection of fresh, organic produce
               </p>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
             <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="p-2 bg-primary/20 rounded-lg">
-                  <Leaf className="h-5 w-5 text-primary" />
+              <CardContent className="p-2 sm:p-4 flex items-center gap-2 sm:gap-3">
+                <div className="p-1 sm:p-2 bg-primary/20 rounded-lg">
+                  <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Total Products
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    <span className="hidden sm:inline">Total Products</span>
+                    <span className="sm:hidden">Products</span>
                   </p>
-                  <p className="text-2xl font-bold text-primary">
+                  <p className="text-lg sm:text-2xl font-bold text-primary">
                     {loading ? "..." : products.length}
                   </p>
                 </div>
@@ -232,13 +233,15 @@ export default function ProductsPage() {
             </Card>
 
             <Card className="bg-gradient-to-r from-accent/10 to-accent/5 border-accent/20">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="p-2 bg-accent/20 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-accent" />
+              <CardContent className="p-2 sm:p-4 flex items-center gap-2 sm:gap-3">
+                <div className="p-1 sm:p-2 bg-accent/20 rounded-lg">
+                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Categories</p>
-                  <p className="text-2xl font-bold text-accent">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Categories
+                  </p>
+                  <p className="text-lg sm:text-2xl font-bold text-accent">
                     {loading ? "..." : categories.length}
                   </p>
                 </div>
@@ -246,13 +249,15 @@ export default function ProductsPage() {
             </Card>
 
             <Card className="bg-gradient-to-r from-secondary/20 to-secondary/10 border-secondary/20">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="p-2 bg-secondary/30 rounded-lg">
-                  <Star className="h-5 w-5 text-secondary-foreground" />
+              <CardContent className="p-2 sm:p-4 flex items-center gap-2 sm:gap-3">
+                <div className="p-1 sm:p-2 bg-secondary/30 rounded-lg">
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-secondary-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Showing</p>
-                  <p className="text-2xl font-bold text-secondary-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Showing
+                  </p>
+                  <p className="text-lg sm:text-2xl font-bold text-secondary-foreground">
                     {filteredProducts.length}
                   </p>
                 </div>
@@ -262,35 +267,36 @@ export default function ProductsPage() {
         </div>
 
         {/* Search and Controls */}
-        <div className="mb-8 space-y-4">
+        <div className="mb-4 sm:mb-8 space-y-3 sm:space-y-4">
           {/* Search Bar */}
           <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10 pointer-events-none" />
+            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground z-10 pointer-events-none" />
             <Input
               type="search"
-              placeholder="Search for fresh fruits, vegetables, herbs..."
-              className="pl-12 pr-4 h-14 bg-background/50 backdrop-blur-sm border-border/50 rounded-2xl text-lg focus:bg-background focus:border-primary/50 shadow-lg transition-all duration-200"
+              placeholder="Search fresh products..."
+              className="pl-10 sm:pl-12 pr-4 h-10 sm:h-14 bg-background/50 backdrop-blur-sm border-border/50 rounded-xl sm:rounded-2xl text-sm sm:text-lg focus:bg-background focus:border-primary/50 shadow-lg transition-all duration-200"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           {/* Controls Row */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Mobile Filter Button */}
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
                     variant="outline"
-                    className="lg:hidden h-10 px-4 rounded-full border-border/50 hover:bg-primary/10"
+                    className="lg:hidden h-8 sm:h-10 px-3 sm:px-4 rounded-full border-border/50 hover:bg-primary/10 text-xs sm:text-sm"
                   >
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
+                    <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Filters</span>
+                    <span className="sm:hidden">Filter</span>
                     {activeFiltersCount > 0 && (
                       <Badge
                         variant="secondary"
-                        className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                        className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5 p-0 flex items-center justify-center text-xs"
                       >
                         {activeFiltersCount}
                       </Badge>
@@ -321,8 +327,8 @@ export default function ProductsPage() {
                 value={sortBy}
                 onValueChange={(value: SortOption) => setSortBy(value)}
               >
-                <SelectTrigger className="w-48 h-10 rounded-full border-border/50 hover:bg-primary/10">
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-32 sm:w-48 h-8 sm:h-10 rounded-full border-border/50 hover:bg-primary/10 text-xs sm:text-sm">
+                  <SlidersHorizontal className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -341,31 +347,34 @@ export default function ProductsPage() {
                 <Button
                   variant="ghost"
                   onClick={clearAllFilters}
-                  className="h-10 px-4 rounded-full hover:bg-destructive/10 text-destructive"
+                  className="h-8 sm:h-10 px-2 sm:px-4 rounded-full hover:bg-destructive/10 text-destructive text-xs sm:text-sm"
                 >
-                  <X className="h-4 w-4 mr-2" />
-                  Clear ({activeFiltersCount})
+                  <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">
+                    Clear ({activeFiltersCount})
+                  </span>
+                  <span className="sm:hidden">Clear</span>
                 </Button>
               )}
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-full">
+            <div className="flex items-center gap-1 bg-muted/30 p-0.5 sm:p-1 rounded-full">
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
-                className="h-8 w-8 p-0 rounded-full"
+                className="h-6 w-6 sm:h-8 sm:w-8 p-0 rounded-full"
               >
-                <Grid3X3 className="h-4 w-4" />
+                <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("list")}
-                className="h-8 w-8 p-0 rounded-full"
+                className="h-6 w-6 sm:h-8 sm:w-8 p-0 rounded-full"
               >
-                <List className="h-4 w-4" />
+                <List className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
@@ -388,11 +397,11 @@ export default function ProductsPage() {
           )}
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex gap-3 sm:gap-6">
           {/* Desktop Sidebar */}
-          <div className="hidden lg:block w-72 shrink-0">
+          <div className="hidden lg:block w-64 shrink-0">
             <Card className="sticky top-24 bg-background/50 backdrop-blur-sm border-border/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <DesktopFilters
                   categories={categories}
                   selectedCategories={selectedCategories}
@@ -464,10 +473,10 @@ export default function ProductsPage() {
               </Card>
             ) : (
               <div
-                className={`grid gap-4 ${
+                className={`grid ${
                   viewMode === "grid"
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
-                    : "grid-cols-1"
+                    ? "grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 lg:gap-4 xl:grid-cols-5 2xl:grid-cols-6"
+                    : "grid-cols-1 gap-4"
                 }`}
               >
                 {filteredProducts.map((product) => (

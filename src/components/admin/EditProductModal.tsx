@@ -39,10 +39,22 @@ interface Product {
   subCategory: string;
   tags: string | string[]; // Can be either string or array
   actualPrice: number;
+  discount?: number;
   finalPrice: number;
   stock: number;
   productCode: string;
+  rating?: number;
+  isFeatured?: boolean;
+  isTrending?: boolean;
+  isNew?: boolean;
   isActive: boolean;
+  expiryDate?: string;
+  harvestDate?: string;
+  shelfLife?: number;
+  returnable?: boolean;
+  storageInstructions?: string;
+  maxPurchaseLimit?: number;
+  deliveryType?: string;
   images: string[];
   productImages?: string[]; // Add productImages field
 }
@@ -72,10 +84,22 @@ export default function EditProductModal({
     subCategory: "",
     tags: [] as string[],
     actualPrice: 0,
+    discount: 0,
     finalPrice: 0,
     stock: 0,
     productCode: "",
+    rating: 0,
+    isFeatured: false,
+    isTrending: false,
+    isNew: false,
     isActive: true,
+    expiryDate: "",
+    harvestDate: "",
+    shelfLife: 0,
+    returnable: true,
+    storageInstructions: "",
+    maxPurchaseLimit: 0,
+    deliveryType: "Instant",
     images: [] as string[],
   });
 
@@ -95,10 +119,23 @@ export default function EditProductModal({
             : []
           : [],
         actualPrice: product.actualPrice || 0,
+        discount: product.discount || 0,
         finalPrice: product.finalPrice || 0,
         stock: product.stock || 0,
         productCode: product.productCode || "",
+        rating: product.rating || 0,
+        isFeatured: product.isFeatured || false,
+        isTrending: product.isTrending || false,
+        isNew: product.isNew || false,
         isActive: product.isActive !== undefined ? product.isActive : true,
+        expiryDate: product.expiryDate || "",
+        harvestDate: product.harvestDate || "",
+        shelfLife: product.shelfLife || 0,
+        returnable:
+          product.returnable !== undefined ? product.returnable : true,
+        storageInstructions: product.storageInstructions || "",
+        maxPurchaseLimit: product.maxPurchaseLimit || 0,
+        deliveryType: product.deliveryType || "Instant",
         images: product.images || product.productImages || [],
       });
       setImagePreviews(product.images || []);
@@ -173,18 +210,24 @@ export default function EditProductModal({
         productCode: formData.productCode || undefined,
         description: formData.description || undefined,
         actualPrice: formData.actualPrice || undefined,
+        discount: formData.discount || undefined,
         finalPrice: formData.finalPrice || undefined,
         stock: formData.stock || undefined,
         category: formData.category || undefined,
         subCategory: formData.subCategory || undefined,
-        tags: formData.tags.length > 0 ? formData.tags : undefined, // Send as array, not string
-        isFeatured: formData.isActive, // Map isActive to isFeatured for now
-        productImages: allImages.length > 0 ? allImages : undefined, // Use productImages, not images
-        // Add common fields that might be expected by the API
-        isTrending: false,
-        isNew: false,
-        returnable: true,
-        deliveryType: "Instant",
+        tags: formData.tags.length > 0 ? formData.tags : undefined,
+        rating: formData.rating || undefined,
+        isFeatured: formData.isFeatured,
+        isTrending: formData.isTrending,
+        isNew: formData.isNew,
+        expiryDate: formData.expiryDate || undefined,
+        harvestDate: formData.harvestDate || undefined,
+        shelfLife: formData.shelfLife || undefined,
+        returnable: formData.returnable,
+        storageInstructions: formData.storageInstructions || undefined,
+        maxPurchaseLimit: formData.maxPurchaseLimit || undefined,
+        deliveryType: formData.deliveryType || "Instant",
+        productImages: allImages.length > 0 ? allImages : undefined,
       };
 
       // Filter out undefined values but keep 0, false, empty strings as valid values
@@ -315,7 +358,7 @@ export default function EditProductModal({
           </div>
 
           {/* Pricing & Stock */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="actualPrice">Actual Price (£) *</Label>
               <Input
@@ -329,6 +372,21 @@ export default function EditProductModal({
                   handleInputChange("actualPrice", isNaN(value) ? 0 : value);
                 }}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="discount">Discount (%)</Label>
+              <Input
+                id="discount"
+                type="number"
+                step="0.01"
+                value={formData.discount || ""}
+                onChange={(e) => {
+                  const value =
+                    e.target.value === "" ? 0 : parseFloat(e.target.value);
+                  handleInputChange("discount", isNaN(value) ? 0 : value);
+                }}
               />
             </div>
 
@@ -364,6 +422,119 @@ export default function EditProductModal({
             </div>
           </div>
 
+          {/* Additional Product Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="rating">Rating</Label>
+              <Input
+                id="rating"
+                type="number"
+                step="0.1"
+                min="0"
+                max="5"
+                value={formData.rating || ""}
+                onChange={(e) => {
+                  const value =
+                    e.target.value === "" ? 0 : parseFloat(e.target.value);
+                  handleInputChange("rating", isNaN(value) ? 0 : value);
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="shelfLife">Shelf Life (days)</Label>
+              <Input
+                id="shelfLife"
+                type="number"
+                value={formData.shelfLife || ""}
+                onChange={(e) => {
+                  const value =
+                    e.target.value === "" ? 0 : parseInt(e.target.value);
+                  handleInputChange("shelfLife", isNaN(value) ? 0 : value);
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="maxPurchaseLimit">Max Purchase Limit</Label>
+              <Input
+                id="maxPurchaseLimit"
+                type="number"
+                value={formData.maxPurchaseLimit || ""}
+                onChange={(e) => {
+                  const value =
+                    e.target.value === "" ? 0 : parseInt(e.target.value);
+                  handleInputChange(
+                    "maxPurchaseLimit",
+                    isNaN(value) ? 0 : value
+                  );
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="harvestDate">Harvest Date</Label>
+              <Input
+                id="harvestDate"
+                type="date"
+                value={formData.harvestDate}
+                onChange={(e) =>
+                  handleInputChange("harvestDate", e.target.value)
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="expiryDate">Expiry Date</Label>
+              <Input
+                id="expiryDate"
+                type="date"
+                value={formData.expiryDate}
+                onChange={(e) =>
+                  handleInputChange("expiryDate", e.target.value)
+                }
+              />
+            </div>
+          </div>
+
+          {/* Delivery Type */}
+          <div className="space-y-2">
+            <Label>Delivery Type</Label>
+            <Select
+              value={formData.deliveryType}
+              onValueChange={(value) =>
+                handleInputChange("deliveryType", value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select delivery type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Instant">Instant</SelectItem>
+                <SelectItem value="Standard">Standard</SelectItem>
+                <SelectItem value="Express">Express</SelectItem>
+                <SelectItem value="Scheduled">Scheduled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Storage Instructions */}
+          <div className="space-y-2">
+            <Label htmlFor="storageInstructions">Storage Instructions</Label>
+            <Textarea
+              id="storageInstructions"
+              value={formData.storageInstructions}
+              onChange={(e) =>
+                handleInputChange("storageInstructions", e.target.value)
+              }
+              rows={2}
+              placeholder="e.g., Store in a cool, dry place"
+            />
+          </div>
+
           {/* Tags */}
           <div className="space-y-2">
             <Label>Tags</Label>
@@ -378,6 +549,64 @@ export default function EditProductModal({
                   {tag}
                 </Badge>
               ))}
+            </div>
+          </div>
+
+          {/* Product Status Toggles */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isFeatured"
+                checked={formData.isFeatured}
+                onCheckedChange={(checked) =>
+                  handleInputChange("isFeatured", checked)
+                }
+              />
+              <Label htmlFor="isFeatured">Featured</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isTrending"
+                checked={formData.isTrending}
+                onCheckedChange={(checked) =>
+                  handleInputChange("isTrending", checked)
+                }
+              />
+              <Label htmlFor="isTrending">Trending</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isNew"
+                checked={formData.isNew}
+                onCheckedChange={(checked) =>
+                  handleInputChange("isNew", checked)
+                }
+              />
+              <Label htmlFor="isNew">New</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="returnable"
+                checked={formData.returnable}
+                onCheckedChange={(checked) =>
+                  handleInputChange("returnable", checked)
+                }
+              />
+              <Label htmlFor="returnable">Returnable</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isActive"
+                checked={formData.isActive}
+                onCheckedChange={(checked) =>
+                  handleInputChange("isActive", checked)
+                }
+              />
+              <Label htmlFor="isActive">Active</Label>
             </div>
           </div>
 
@@ -429,18 +658,6 @@ export default function EditProductModal({
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Active Status */}
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isActive"
-              checked={formData.isActive}
-              onCheckedChange={(checked) =>
-                handleInputChange("isActive", checked)
-              }
-            />
-            <Label htmlFor="isActive">Active</Label>
           </div>
 
           {/* Submit Buttons */}

@@ -329,25 +329,25 @@ export default function ProductListCard({
       </div>
 
       {/* Content Section */}
-      <CardContent className="p-2 sm:p-3 flex-grow">
+      <CardContent className="p-1.5 sm:p-3 flex-grow">
         <Link href={`/products/${product.id}`}>
-          <h3 className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-1 sm:mb-2 leading-tight">
+          <h3 className="font-semibold text-xs sm:text-sm group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-1 leading-tight">
             {product.productName}
           </h3>
         </Link>
 
         {product.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-1 sm:mb-2 hidden sm:block">
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-1 hidden sm:block">
             {product.description}
           </p>
         )}
 
-        {/* Rating */}
-        <div className="flex items-center space-x-1 mb-1 sm:mb-2">
+        {/* Rating - hide on mobile */}
+        <div className="hidden sm:flex items-center space-x-1 mb-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <Star
               key={star}
-              className="h-2 w-2 sm:h-2.5 sm:w-2.5 fill-yellow-400 text-yellow-400"
+              className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400"
             />
           ))}
           <span className="text-xs text-muted-foreground ml-1">(4.5)</span>
@@ -356,23 +356,24 @@ export default function ProductListCard({
         {/* Price */}
         <div className="flex items-center justify-between">
           <p className="text-sm sm:text-base font-bold text-primary">
-            £{product.finalPrice || 0}
+            {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
           </p>
         </div>
       </CardContent>
 
       {/* Footer with Add to Cart */}
-      <CardFooter className="p-2 sm:p-3 pt-0 mt-auto">
+      <CardFooter className="p-1.5 sm:p-3 pt-0 mt-auto">
         {!isInStock ? (
           <Button
-            className="w-full bg-gray-400 text-gray-600 cursor-not-allowed font-medium py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg"
+            className="w-full bg-gray-400 text-gray-600 cursor-not-allowed font-medium py-1 text-xs rounded-lg"
             disabled
           >
-            <ShoppingCart className="mr-1 sm:mr-1.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            Out of Stock
+            <ShoppingCart className="mr-1 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden sm:inline">Out of Stock</span>
+            <span className="sm:hidden">Out</span>
           </Button>
         ) : isInCart ? (
-          <div className="flex items-center gap-1 sm:gap-2 w-full bg-primary/10 rounded-lg p-1 sm:p-2">
+          <div className="flex items-center gap-1 w-full bg-primary/10 rounded-lg p-1">
             <Button
               size="sm"
               variant="ghost"
@@ -396,11 +397,12 @@ export default function ProductListCard({
           </div>
         ) : (
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg transition-all duration-300 shadow-sm"
+            className="w-full bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1 text-xs rounded-lg transition-all duration-300 shadow-sm"
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="mr-1 sm:mr-1.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            Add to Cart
+            <ShoppingCart className="mr-1 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden sm:inline">Add to Cart</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         )}
       </CardFooter>
