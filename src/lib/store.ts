@@ -5,6 +5,7 @@ import { signOutUser, updateUserProfile as updateFirebaseProfile } from '@/lib/a
 import { addToCart, getCart, updateCartItem, removeCartItem } from '@/api/cartApi';
 import { getAllMyOrders, getOrderById, createOrder, cancelOrder, updateOrderDeliveryAddress } from '@/api/orderApi';
 import { getAllCoupons, applyCoupon, redeemCoupon } from '@/api/couponApi';
+import { getProductById } from '@/api/productApi';
 
 interface CartState {
   items: CartItem[];
@@ -59,7 +60,7 @@ export const useCartStore = create<CartState>((set, get) => ({
       } else {
         newItems = [...state.items, { product, quantity }];
       }
-      toast({ title: `${product.productName} added to cart!`, description: `Quantity: ${quantity}` });
+      toast({ title: `A new item added to cart!`, description: `Quantity: ${quantity}` });
       return { items: newItems, lastAddedItem: product };
     });
   },
@@ -606,4 +607,50 @@ export const useCouponStore = create<CouponState>((set, get) => ({
     const availableCoupons = get().getAvailableCoupons();
     return availableCoupons.find(userCoupon => userCoupon.coupon.code === couponCode) || null;
   }
+}));
+
+// Store for Product Management
+interface ProductState {
+  product: Product | null;
+  isLoading: boolean;
+  error: string | null;
+  fetchProductById: (productId: string) => Promise<void>;
+  clearError: () => void;
+}
+
+export const useProductStore = create<ProductState>((set, get) => ({
+  product: null,
+  isLoading: false,
+  error: null,
+
+  fetchProductById: async (productId: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      const product = await getProductById(productId);
+      
+      if (product === null) {
+        // Product not found, but not an error - set state accordingly
+        set({ product: null, isLoading: false, error: null });
+      } else {
+        // Product found successfully
+        set({ product, isLoading: false });
+      }
+    } catch (error) {
+      console.error(`Failed to fetch product ${productId}:`, error);
+      set({ 
+        product: null,
+        error: error instanceof Error ? error.message : 'Failed to fetch product',
+        isLoading: false 
+      });
+      toast({
+        title: "Error fetching product",
+        description: "Failed to load product details. Please try again.",
+        variant: "destructive"
+      });
+    }
+  },
+
+  clearError: () => {
+    set({ error: null });
+  },
 }));

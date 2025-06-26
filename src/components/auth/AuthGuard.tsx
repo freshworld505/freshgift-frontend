@@ -5,8 +5,16 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/config/firebase";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 import FloatingAiAssistant from "@/components/ai/FloatingAiAssistant";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = ["/login", "/signup", "/", "/products"];
@@ -78,20 +86,50 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   if (!isAuthenticated && !PUBLIC_ROUTES.includes(pathname)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="mb-6">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Loader2 className="h-8 w-8 text-primary" />
+        <Dialog open={true}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="h-8 w-8 text-primary" />
+              </div>
+              <DialogTitle className="text-center text-2xl">
+                Authentication Required
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                Please sign in to access FreshGift and start shopping for fresh
+                produce.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col space-y-3 mt-6">
+              <Button
+                onClick={() =>
+                  router.push(`/login?redirect=${encodeURIComponent(pathname)}`)
+                }
+                className="w-full"
+              >
+                Sign In
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  router.push(
+                    `/signup?redirect=${encodeURIComponent(pathname)}`
+                  )
+                }
+                className="w-full"
+              >
+                Create Account
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => router.push("/")}
+                className="w-full"
+              >
+                Go to Home
+              </Button>
             </div>
-            <h2 className="text-2xl font-semibold mb-2">
-              Authentication Required
-            </h2>
-            <p className="text-muted-foreground">
-              Please sign in to access FreshGift and start shopping for fresh
-              produce.
-            </p>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

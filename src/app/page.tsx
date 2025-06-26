@@ -69,7 +69,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Today's Top Picks</h2>
           </div>
           <ProductList
-            products={featuredProducts}
+            products={featuredProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No featured products available right now."
@@ -85,7 +85,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Seasonal Spotlight</h2>
           </div>
           <ProductList
-            products={seasonalSpotlightProducts}
+            products={seasonalSpotlightProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No seasonal products available right now."
@@ -101,7 +101,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Leafy Greens</h2>
           </div>
           <ProductList
-            products={leafyGreensProducts}
+            products={leafyGreensProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No leafy greens available right now."
@@ -117,7 +117,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Organic Choices</h2>
           </div>
           <ProductList
-            products={organicProducts}
+            products={organicProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No organic products available right now."
@@ -133,7 +133,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Fresh Fruits</h2>
           </div>
           <ProductList
-            products={freshFruits}
+            products={freshFruits.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No fresh fruits available right now."
@@ -149,7 +149,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Fresh Selection</h2>
           </div>
           <ProductList
-            products={newArrivals}
+            products={newArrivals.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No fresh products available right now."
@@ -165,7 +165,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">On Sale</h2>
           </div>
           <ProductList
-            products={onSaleProducts}
+            products={onSaleProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No sale items available right now."
@@ -181,7 +181,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">New Arrivals</h2>
           </div>
           <ProductList
-            products={beveragesProducts}
+            products={beveragesProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No new arrivals available right now."
@@ -197,7 +197,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Imported Selection</h2>
           </div>
           <ProductList
-            products={bakeryProducts}
+            products={bakeryProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No imported products available right now."
@@ -213,7 +213,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Fresh Juices</h2>
           </div>
           <ProductList
-            products={dairyProducts}
+            products={dairyProducts.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No fresh juices available right now."
@@ -229,7 +229,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Seasonal Picks</h2>
           </div>
           <ProductList
-            products={rootVegetables}
+            products={rootVegetables.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No seasonal picks available right now."
@@ -245,7 +245,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-semibold">Instant Delivery</h2>
           </div>
           <ProductList
-            products={instantDelivery}
+            products={instantDelivery.slice(0, 4)}
             loading={isLoading}
             error={error}
             emptyMessage="No instant delivery items available right now."

@@ -23,6 +23,14 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useState } from "react";
 import { signInWithEmail, signInWithGoogle, resetPassword } from "@/lib/auth";
 import { toast } from "@/hooks/use-toast";
@@ -41,6 +49,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   const auth = getAuth();
   const afterLoginUser = auth.currentUser;
@@ -85,7 +94,8 @@ export default function LoginForm() {
       let errorMessage = "Failed to sign in. Please check your credentials.";
 
       if (error.code === "auth/user-not-found") {
-        errorMessage = "No account found with this email address.";
+        setShowSignupModal(true);
+        return; // Don't show toast, show modal instead
       } else if (error.code === "auth/wrong-password") {
         errorMessage = "Incorrect password. Please try again.";
       } else if (error.code === "auth/user-disabled") {
@@ -380,6 +390,59 @@ export default function LoginForm() {
           </div>
         </CardFooter>
       </Card>
+
+      {/* Signup Modal */}
+      <Dialog open={showSignupModal} onOpenChange={setShowSignupModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              Account Not Found
+            </DialogTitle>
+            <DialogDescription className="text-left">
+              We couldn't find an account with the email address{" "}
+              <span className="font-medium text-foreground">
+                {form.getValues("email")}
+              </span>
+              . Would you like to create a new account instead?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowSignupModal(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                const redirectTo = searchParams.get("redirect") || "/";
+                router.push(
+                  `/signup?redirect=${encodeURIComponent(redirectTo)}`
+                );
+              }}
+              className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+            >
+              Create Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -158,6 +158,7 @@ export default function ProductListCard({
         <div className="flex">
           {/* Image Section */}
           <div className="relative w-20 h-20 sm:w-32 sm:h-32 flex-shrink-0">
+            {" "}
             <Link href={`/products/${product.id}`}>
               {imageUrl ? (
                 <Image
@@ -355,7 +356,7 @@ export default function ProductListCard({
         {/* Price */}
         <div className="flex items-center justify-between">
           <p className="text-sm sm:text-base font-bold text-primary">
-            {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
+            £{product.finalPrice || 0}
           </p>
         </div>
       </CardContent>

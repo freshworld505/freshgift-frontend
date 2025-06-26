@@ -259,3 +259,63 @@ export const getProductsByTag = async (tags: string, page: number, limit: number
     return [];
   }
 }
+
+// Get product by ID
+export const getProductById = async (productId: string): Promise<Product | null> => {
+  try {
+    // Ensure user is authenticated before making the request
+    //await ensureAuthenticated();
+
+    if (!productId) {
+      console.error("❌ No product ID provided");
+      throw new Error("No product ID provided");
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/${productId}`);
+    
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+    
+    console.log("✅ Product fetched successfully:", response.data);
+
+    // Handle the new backend response format: { message: string, product: Product }
+    const apiData = response.data;
+    let product: any = null;
+
+    if (apiData.product) {
+      // New format with wrapper object
+      product = apiData.product;
+    } else if (apiData.id) {
+      // Fallback: direct product object (old format)
+      product = apiData;
+    } else {
+      console.error("❌ No product data found in response");
+      return null;
+    }
+
+    // Ensure all required fields are present
+    return {
+      ...product,
+      productName: product.productName || '',
+      finalPrice: product.finalPrice || 0,
+      productImages: product.productImages || [],
+      actualPrice: product.actualPrice || product.finalPrice || 0,
+      productCode: product.productCode || product.id || '',
+      category: product.category || 'other',
+      createdAt: product.createdAt || new Date(),
+      updatedAt: product.updatedAt || new Date()
+    };
+  } catch (error: any) {
+    console.error(`❌ Error fetching product by ID ${productId}:`, {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+
+    // Return null instead of throwing to prevent homepage crash
+    return null;
+  }
+}

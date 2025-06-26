@@ -37,10 +37,22 @@ interface ProductFormData {
   subCategory: string;
   tags: string[];
   actualPrice: number;
+  discount: number;
   finalPrice: number;
   stock: number;
   productCode: string;
+  rating: number;
+  isFeatured: boolean;
+  isTrending: boolean;
+  isNew: boolean;
   isActive: boolean;
+  expiryDate: string;
+  harvestDate: string;
+  shelfLife: number;
+  returnable: boolean;
+  storageInstructions: string;
+  maxPurchaseLimit: number;
+  deliveryType: string;
   images: string[];
 }
 
@@ -58,10 +70,22 @@ export default function AddProduct() {
     subCategory: "",
     tags: [],
     actualPrice: 0,
+    discount: 0,
     finalPrice: 0,
     stock: 0,
     productCode: "",
+    rating: 0,
+    isFeatured: false,
+    isTrending: false,
+    isNew: false,
     isActive: true,
+    expiryDate: "",
+    harvestDate: "",
+    shelfLife: 0,
+    returnable: false,
+    storageInstructions: "",
+    maxPurchaseLimit: 0,
+    deliveryType: "",
     images: [],
   });
 
@@ -341,6 +365,97 @@ export default function AddProduct() {
                 )}
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Specifications</CardTitle>
+                <CardDescription>
+                  Additional product details and specifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="expiryDate">Expiry Date</Label>
+                    <Input
+                      id="expiryDate"
+                      type="date"
+                      value={formData.expiryDate}
+                      onChange={(e) =>
+                        handleInputChange("expiryDate", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="harvestDate">Harvest Date</Label>
+                    <Input
+                      id="harvestDate"
+                      type="date"
+                      value={formData.harvestDate}
+                      onChange={(e) =>
+                        handleInputChange("harvestDate", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="shelfLife">Shelf Life (days)</Label>
+                    <Input
+                      id="shelfLife"
+                      type="number"
+                      value={formData.shelfLife || ""}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === "" ? 0 : parseInt(e.target.value);
+                        handleInputChange(
+                          "shelfLife",
+                          isNaN(value) ? 0 : value
+                        );
+                      }}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="deliveryType">Delivery Type</Label>
+                    <Select
+                      value={formData.deliveryType}
+                      onValueChange={(value) =>
+                        handleInputChange("deliveryType", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select delivery type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Instant Delivery">
+                          Instant Delivery
+                        </SelectItem>
+                        <SelectItem value="Same Day">Same Day</SelectItem>
+                        <SelectItem value="Next Day">Next Day</SelectItem>
+                        <SelectItem value="Standard">Standard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="storageInstructions">
+                    Storage Instructions
+                  </Label>
+                  <Textarea
+                    id="storageInstructions"
+                    value={formData.storageInstructions}
+                    onChange={(e) =>
+                      handleInputChange("storageInstructions", e.target.value)
+                    }
+                    placeholder="Enter storage instructions"
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
@@ -367,6 +482,21 @@ export default function AddProduct() {
                         "actualPrice",
                         isNaN(value) ? 0 : value
                       );
+                    }}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="discount">Discount (%)</Label>
+                  <Input
+                    id="discount"
+                    type="number"
+                    step="0.01"
+                    value={formData.discount || ""}
+                    onChange={(e) => {
+                      const value =
+                        e.target.value === "" ? 0 : parseFloat(e.target.value);
+                      handleInputChange("discount", isNaN(value) ? 0 : value);
                     }}
                     placeholder="0.00"
                   />
@@ -400,15 +530,51 @@ export default function AddProduct() {
                     placeholder="0"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="rating">Rating (1-5)</Label>
+                  <Input
+                    id="rating"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={formData.rating || ""}
+                    onChange={(e) => {
+                      const value =
+                        e.target.value === "" ? 0 : parseFloat(e.target.value);
+                      handleInputChange("rating", isNaN(value) ? 0 : value);
+                    }}
+                    placeholder="0.0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maxPurchaseLimit">Max Purchase Limit</Label>
+                  <Input
+                    id="maxPurchaseLimit"
+                    type="number"
+                    value={formData.maxPurchaseLimit || ""}
+                    onChange={(e) => {
+                      const value =
+                        e.target.value === "" ? 0 : parseInt(e.target.value);
+                      handleInputChange(
+                        "maxPurchaseLimit",
+                        isNaN(value) ? 0 : value
+                      );
+                    }}
+                    placeholder="0"
+                  />
+                </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle>Product Status</CardTitle>
-                <CardDescription>Control product visibility</CardDescription>
+                <CardDescription>
+                  Control product visibility and features
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="isActive"
@@ -418,6 +584,46 @@ export default function AddProduct() {
                     }
                   />
                   <Label htmlFor="isActive">Active</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isFeatured"
+                    checked={formData.isFeatured}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("isFeatured", checked)
+                    }
+                  />
+                  <Label htmlFor="isFeatured">Featured Product</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isTrending"
+                    checked={formData.isTrending}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("isTrending", checked)
+                    }
+                  />
+                  <Label htmlFor="isTrending">Trending</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isNew"
+                    checked={formData.isNew}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("isNew", checked)
+                    }
+                  />
+                  <Label htmlFor="isNew">New Product</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="returnable"
+                    checked={formData.returnable}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("returnable", checked)
+                    }
+                  />
+                  <Label htmlFor="returnable">Returnable</Label>
                 </div>
               </CardContent>
             </Card>

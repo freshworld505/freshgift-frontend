@@ -24,7 +24,6 @@ export default function Footer() {
     { name: "Contact", href: "/contact" },
     { name: "Help Center", href: "/help" },
     { name: "Track Order", href: "/track" },
-    { name: "Returns", href: "/returns" },
   ];
 
   const categories = [
@@ -33,7 +32,6 @@ export default function Footer() {
     { name: "Organic Produce", href: "/products?category=organic" },
     { name: "Seasonal Items", href: "/products?category=seasonal" },
     { name: "Herbs & Spices", href: "/products?category=herbs" },
-    { name: "Bundle Deals", href: "/products?category=bundles" },
   ];
 
   const features = [
