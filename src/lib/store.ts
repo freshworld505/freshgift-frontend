@@ -103,10 +103,10 @@ export const useCartStore = create<CartState>((set, get) => ({
             item.product.id === productId ? { ...item, quantity } : item
           )
         });
-        toast({ 
-          title: `Updated ${itemToUpdate.product.productName} quantity.`, 
-          description: `New quantity: ${quantity}` 
-        });
+        //toast({ 
+        //  title: `Updated ${itemToUpdate.product.productName} quantity.`, 
+        //  description: `New quantity: ${quantity}` 
+        //});
         
         // Then update backend
         await updateCartItem(productId, quantity);
@@ -130,7 +130,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     return get().items.reduce((total, item) => total + item.product.finalPrice * item.quantity, 0);
   },
   getItemCount: () => {
-    return get().items.reduce((count, item) => count + item.quantity, 0);
+    return get().items.length;
   },
   setLastAddedItem: (product) => set({ lastAddedItem: product }),
 }));

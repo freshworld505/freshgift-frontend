@@ -141,34 +141,34 @@ export default function CartDisplay() {
   if (items.length === 0) {
     return (
       <div className="max-w-2xl mx-auto">
-        <Card className="text-center py-16 bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
-          <CardContent className="space-y-6">
+        <Card className="text-center py-8 sm:py-16 bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-xl sm:rounded-2xl">
+          <CardContent className="space-y-4 sm:space-y-6">
             <div className="relative">
-              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-emerald-100 to-lime-100 dark:from-emerald-900 dark:to-lime-900 rounded-full flex items-center justify-center">
-                <ShoppingBag className="h-16 w-16 text-emerald-600" />
+              <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto bg-gradient-to-br from-emerald-100 to-lime-100 dark:from-emerald-900 dark:to-lime-900 rounded-full flex items-center justify-center">
+                <ShoppingBag className="h-12 w-12 sm:h-16 sm:w-16 text-emerald-600" />
               </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
-                <Sparkles className="h-4 w-4 text-yellow-700" />
+              <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
+                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-700" />
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-foreground">
+            <div className="space-y-2 sm:space-y-3">
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                 Your cart is empty
               </h3>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-base sm:text-lg">
                 Start adding some fresh groceries to get started!
               </p>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2 sm:pt-4">
               <Link href="/" passHref>
                 <Button
                   size="lg"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group px-8"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base"
                 >
                   Start Shopping
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -179,110 +179,207 @@ export default function CartDisplay() {
   }
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-4 sm:space-y-8 max-w-4xl mx-auto">
       {/* Cart Items */}
-      <Card className="bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
+      <Card className="bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-xl sm:rounded-2xl overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-emerald-50 to-lime-50 dark:from-emerald-950/20 dark:to-lime-950/20 border-b border-emerald-100 dark:border-emerald-800">
-          <CardTitle className="text-2xl font-bold flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
-              <ShoppingBag className="h-4 w-4 text-white" />
+          <CardTitle className="text-lg sm:text-2xl font-bold flex items-center gap-2 sm:gap-3">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-emerald-600 rounded-full flex items-center justify-center">
+              <ShoppingBag className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
             </div>
             Your Cart ({items.length} item{items.length !== 1 ? "s" : ""})
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="p-6">
-          <div className="space-y-4">
+        <CardContent className="p-3 sm:p-6">
+          <div className="space-y-3 sm:space-y-4">
             {items.map((item) => (
               <div
                 key={item.product.id}
-                className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-white/50 to-gray-50/50 dark:from-gray-900/20 dark:to-gray-800/20 hover:from-emerald-50/50 hover:to-lime-50/50 dark:hover:from-emerald-950/20 dark:hover:to-lime-950/20 transition-all duration-200 border border-gray-200 dark:border-gray-700"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-white/50 to-gray-50/50 dark:from-gray-900/20 dark:to-gray-800/20 hover:from-emerald-50/50 hover:to-lime-50/50 dark:hover:from-emerald-950/20 dark:hover:to-lime-950/20 transition-all duration-200 border border-gray-200 dark:border-gray-700"
               >
-                {/* Product Image */}
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-100 to-lime-100 dark:from-emerald-900 dark:to-lime-900 p-1">
-                    <Image
-                      src={
-                        item.product.productImages?.[0] ||
-                        "/placeholder-product.jpg"
-                      }
-                      alt={item.product.productName || "Product"}
-                      width={80}
-                      height={80}
-                      className="w-full h-full rounded-lg object-cover"
-                    />
+                {/* Mobile Layout */}
+                <div className="flex items-center gap-3 sm:hidden">
+                  {/* Product Image */}
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-100 to-lime-100 dark:from-emerald-900 dark:to-lime-900 p-1">
+                      <Image
+                        src={
+                          item.product.productImages?.[0] ||
+                          "/placeholder-product.jpg"
+                        }
+                        alt={item.product.productName || "Product"}
+                        width={64}
+                        height={64}
+                        className="w-full h-full rounded-lg object-cover"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Product Details */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-lg text-foreground truncate">
-                    {item.product.productName}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge
-                      variant="secondary"
-                      className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
-                    >
-                      {item.product.category}
-                    </Badge>
-                    <span className="text-lg font-bold text-emerald-600">
+                  {/* Product Details */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-foreground truncate">
+                      {item.product.productName}
+                    </h4>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs px-1.5 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                      >
+                        {item.product.category}
+                      </Badge>
+                    </div>
+                    <span className="text-sm font-bold text-emerald-600 mt-1 block">
                       {formatCurrency(item.product.finalPrice || 0, {
                         convertFromINR: true,
                       })}
                     </span>
                   </div>
-                </div>
 
-                {/* Quantity Controls */}
-                <div className="flex items-center gap-3">
+                  {/* Remove Button */}
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      updateQuantity(item.product.id, item.quantity - 1)
-                    }
-                    disabled={item.quantity <= 1}
-                    className="h-10 w-10 rounded-full border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
+                    onClick={() => removeItem(item.product.id)}
+                    className="h-8 w-8 rounded-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:hover:bg-red-900/20"
                   >
-                    <MinusCircle className="h-4 w-4" />
-                  </Button>
-
-                  <span className="min-w-[3rem] text-center font-semibold text-lg">
-                    {item.quantity}
-                  </span>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      updateQuantity(item.product.id, item.quantity + 1)
-                    }
-                    className="h-10 w-10 rounded-full border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
-                  >
-                    <PlusCircle className="h-4 w-4" />
+                    <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
 
-                {/* Item Total */}
-                <div className="text-right min-w-[6rem]">
-                  <div className="text-xl font-bold text-foreground">
-                    {formatCurrency(
-                      (item.product.finalPrice || 0) * item.quantity,
-                      { convertFromINR: true }
-                    )}
+                {/* Mobile Quantity and Total Row */}
+                <div className="flex items-center justify-between sm:hidden">
+                  {/* Quantity Controls */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        updateQuantity(item.product.id, item.quantity - 1)
+                      }
+                      disabled={item.quantity <= 1}
+                      className="h-8 w-8 rounded-full border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
+                    >
+                      <MinusCircle className="h-3 w-3" />
+                    </Button>
+
+                    <span className="min-w-[2rem] text-center font-semibold text-sm">
+                      {item.quantity}
+                    </span>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        updateQuantity(item.product.id, item.quantity + 1)
+                      }
+                      className="h-8 w-8 rounded-full border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
+                    >
+                      <PlusCircle className="h-3 w-3" />
+                    </Button>
+                  </div>
+
+                  {/* Item Total */}
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-foreground">
+                      {formatCurrency(
+                        (item.product.finalPrice || 0) * item.quantity,
+                        { convertFromINR: true }
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Remove Button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeItem(item.product.id)}
-                  className="h-10 w-10 rounded-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:hover:bg-red-900/20"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {/* Desktop Layout */}
+                <div className="hidden sm:flex sm:items-center sm:gap-4 sm:w-full">
+                  {/* Product Image */}
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-emerald-100 to-lime-100 dark:from-emerald-900 dark:to-lime-900 p-1">
+                      <Image
+                        src={
+                          item.product.productImages?.[0] ||
+                          "/placeholder-product.jpg"
+                        }
+                        alt={item.product.productName || "Product"}
+                        width={80}
+                        height={80}
+                        className="w-full h-full rounded-lg object-cover"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-lg text-foreground truncate">
+                      {item.product.productName}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                      >
+                        {item.product.category}
+                      </Badge>
+                      <span className="text-lg font-bold text-emerald-600">
+                        {formatCurrency(item.product.finalPrice || 0, {
+                          convertFromINR: true,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Quantity Controls */}
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        updateQuantity(item.product.id, item.quantity - 1)
+                      }
+                      disabled={item.quantity <= 1}
+                      className="h-10 w-10 rounded-full border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
+                    >
+                      <MinusCircle className="h-4 w-4" />
+                    </Button>
+
+                    <span className="min-w-[3rem] text-center font-semibold text-lg">
+                      {item.quantity}
+                    </span>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        updateQuantity(item.product.id, item.quantity + 1)
+                      }
+                      className="h-10 w-10 rounded-full border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900/20"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* Item Total and Remove Button */}
+                  <div className="flex items-center gap-4">
+                    <div className="text-right min-w-[6rem]">
+                      <div className="text-xl font-bold text-foreground">
+                        {formatCurrency(
+                          (item.product.finalPrice || 0) * item.quantity,
+                          { convertFromINR: true }
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Remove Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeItem(item.product.id)}
+                      className="h-10 w-10 rounded-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:hover:bg-red-900/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -290,18 +387,20 @@ export default function CartDisplay() {
       </Card>
 
       {/* Order Summary */}
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid gap-4 sm:gap-8 grid-cols-1 md:grid-cols-2">
         {/* Left Column - Benefits */}
-        <div className="space-y-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-0 shadow-lg rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <Truck className="h-4 w-4 text-white" />
+        <div className="space-y-3 sm:space-y-4">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-0 shadow-lg rounded-xl sm:rounded-2xl">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <Truck className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
-                <h3 className="font-semibold text-lg">Free Shipping</h3>
+                <h3 className="font-semibold text-base sm:text-lg">
+                  Free Shipping
+                </h3>
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 {subtotalGBP > 6 ? (
                   <span className="text-green-600 font-medium">
                     🎉 You qualify for free shipping!
@@ -315,15 +414,17 @@ export default function CartDisplay() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-0 shadow-lg rounded-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <Shield className="h-4 w-4 text-white" />
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-0 shadow-lg rounded-xl sm:rounded-2xl">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
-                <h3 className="font-semibold text-lg">100% Fresh Guarantee</h3>
+                <h3 className="font-semibold text-base sm:text-lg">
+                  100% Fresh Guarantee
+                </h3>
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 If you're not satisfied, we'll replace or refund your order.
               </p>
             </CardContent>
@@ -331,18 +432,18 @@ export default function CartDisplay() {
         </div>
 
         {/* Right Column - Order Summary */}
-        <Card className="bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold flex items-center gap-3">
-              <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
-                <Gift className="h-3 w-3 text-white" />
+        <Card className="bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-xl sm:rounded-2xl">
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-lg sm:text-xl font-bold flex items-center gap-2 sm:gap-3">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-emerald-600 rounded-full flex items-center justify-center">
+                <Gift className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" />
               </div>
               Order Summary
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            <div className="flex justify-between text-lg">
+          <CardContent className="space-y-3 sm:space-y-4">
+            <div className="flex justify-between text-base sm:text-lg">
               <span>Subtotal:</span>
               <span className="font-semibold">
                 {formatCurrency(subtotalGBP)}
@@ -350,16 +451,17 @@ export default function CartDisplay() {
             </div>
 
             {/* Coupon Application Section */}
-            <div className="space-y-3 p-4 bg-gradient-to-r from-emerald-50/50 to-lime-50/50 dark:from-emerald-950/10 dark:to-lime-950/10 rounded-xl border border-emerald-200 dark:border-emerald-800">
-              {" "}
+            <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 bg-gradient-to-r from-emerald-50/50 to-lime-50/50 dark:from-emerald-950/10 dark:to-lime-950/10 rounded-xl border border-emerald-200 dark:border-emerald-800">
               <div className="flex items-center gap-2 mb-2">
-                <Tag className="h-4 w-4 text-emerald-600" />
-                <span className="font-medium text-sm">Have a coupon?</span>
+                <Tag className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+                <span className="font-medium text-xs sm:text-sm">
+                  Have a coupon?
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowAvailableCoupons(!showAvailableCoupons)}
-                  className="ml-auto h-6 px-2 text-xs text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                  className="ml-auto h-5 sm:h-6 px-1.5 sm:px-2 text-xs text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
                 >
                   {showAvailableCoupons
                     ? "Hide"
@@ -485,7 +587,7 @@ export default function CartDisplay() {
             </div>
 
             {discountAmountGBP > 0 && (
-              <div className="flex justify-between text-lg text-green-600">
+              <div className="flex justify-between text-base sm:text-lg text-green-600">
                 <span>Discount Applied:</span>
                 <span className="font-semibold">
                   -{formatCurrency(discountAmountGBP)}
@@ -493,7 +595,7 @@ export default function CartDisplay() {
               </div>
             )}
 
-            <div className="flex justify-between text-lg">
+            <div className="flex justify-between text-base sm:text-lg">
               <span>Shipping:</span>
               <span
                 className={`font-semibold ${
@@ -505,7 +607,7 @@ export default function CartDisplay() {
             </div>
 
             {savings > 0 && (
-              <div className="flex justify-between text-lg text-green-600">
+              <div className="flex justify-between text-base sm:text-lg text-green-600">
                 <span>Savings:</span>
                 <span className="font-semibold">
                   -{formatCurrency(savings)}
@@ -515,7 +617,7 @@ export default function CartDisplay() {
 
             <hr className="border-emerald-200 dark:border-emerald-700" />
 
-            <div className="flex justify-between text-xl font-bold">
+            <div className="flex justify-between text-lg sm:text-xl font-bold">
               <span>Total:</span>
               <span className="text-emerald-600">
                 {formatCurrency(totalGBP)}
@@ -523,25 +625,25 @@ export default function CartDisplay() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-col gap-3 pt-6">
+          <CardFooter className="flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-6">
             <Button
               asChild
               size="lg"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group text-sm sm:text-base py-2 sm:py-3"
             >
               <Link
                 href="/checkout"
                 className="flex items-center justify-center"
               >
                 Proceed to Checkout
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
 
             <Button
               variant="outline"
               size="lg"
-              className="w-full rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:hover:bg-red-900/20"
+              className="w-full rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:hover:bg-red-900/20 text-sm sm:text-base py-2 sm:py-3"
               onClick={clearCart}
             >
               Clear Cart

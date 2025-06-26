@@ -80,10 +80,10 @@ export default function ProductList({
       )}
 
       <div
-        className={`grid gap-6 ${
+        className={`grid ${
           viewMode === "list"
-            ? "grid-cols-1"
-            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            ? "grid-cols-1 gap-4"
+            : "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"
         }`}
       >
         {products.map((product) => (
