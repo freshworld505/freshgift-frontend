@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ["/login", "/signup", "/", "/products"];
+const PUBLIC_ROUTES = ["/login", "/signup", "/", "/products", "/categories"];
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -59,6 +59,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       const isPublicRoute =
         PUBLIC_ROUTES.includes(pathname) ||
         pathname.startsWith("/products/") ||
+        pathname.startsWith("/categories/") ||
         pathname.startsWith("/deals");
       const isAuthPage = pathname === "/login" || pathname === "/signup";
 
@@ -89,6 +90,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     !isAuthenticated &&
     !PUBLIC_ROUTES.includes(pathname) &&
     !pathname.startsWith("/products/") &&
+    !pathname.startsWith("/categories/") &&
     !pathname.startsWith("/deals")
   ) {
     return (

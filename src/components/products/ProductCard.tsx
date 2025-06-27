@@ -17,7 +17,6 @@ import { ShoppingCart, Heart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useRef, useEffect } from "react";
 import { addToCart } from "@/api/cartApi";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 
 interface ProductCardProps {
   product: Product;
@@ -245,7 +244,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
             <div className="flex items-center justify-between mb-4">
               <p className="text-2xl font-bold text-primary bg-primary/10 px-3 py-1 rounded-lg">
-                {formatCurrency(convertINRtoGBP(product.finalPrice || 0))}
+                £{product.finalPrice || 0}
               </p>
             </div>
 

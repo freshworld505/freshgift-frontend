@@ -18,7 +18,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Eye, RefreshCw } from "lucide-react";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 
 export default function OrderHistory() {
   const { user } = useAuthStore();
@@ -196,12 +195,11 @@ export default function OrderHistory() {
                 <TableCell>
                   <div className="space-y-1">
                     <div className="font-semibold text-gray-800">
-                      {formatCurrency(convertINRtoGBP(order.totalAmount))}
+                      £{order.totalAmount}
                     </div>
                     {order.discountAmount > 0 && (
                       <div className="text-sm text-green-600 font-medium">
-                        Saved{" "}
-                        {formatCurrency(convertINRtoGBP(order.discountAmount))}
+                        Saved £{order.discountAmount}
                       </div>
                     )}
                   </div>

@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 
 export default function OrderTracker() {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -205,9 +204,7 @@ export default function OrderTracker() {
                   Payment
                 </h4>
                 <div className="text-sm space-y-1">
-                  <p>
-                    Total: {formatCurrency(convertINRtoGBP(order.totalAmount))}
-                  </p>
+                  <p>Total: £{order.totalAmount}</p>
                   <Badge
                     variant={order.isPaid ? "default" : "destructive"}
                     className="text-xs"
@@ -297,16 +294,11 @@ export default function OrderTracker() {
                 </Button>
               </div>
               <div className="text-sm text-muted-foreground">
-                Total value:{" "}
-                {formatCurrency(
-                  convertINRtoGBP(
-                    order.items.reduce((sum, item) => sum + item.totalPrice, 0)
-                  )
-                )}
+                Total value: £
+                {order.items.reduce((sum, item) => sum + item.totalPrice, 0)}
                 {order.discountAmount > 0 && (
                   <span className="text-green-600 ml-2">
-                    (Saved{" "}
-                    {formatCurrency(convertINRtoGBP(order.discountAmount))})
+                    (Saved £{order.discountAmount})
                   </span>
                 )}
               </div>

@@ -1,15 +1,13 @@
 "use client";
 
-import HeroSection from "@/components/layout/HeroSection";
-import WhyChooseUsSection from "@/components/layout/WhyChooseUsSection";
-import { useCartStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Sun,
   Sprout,
   Star,
-  LayoutGrid,
   Leaf,
   Apple,
   Coffee,
@@ -19,20 +17,12 @@ import {
   Zap,
   TrendingUp,
   ArrowRight,
-  Clock,
+  ArrowLeft,
   Percent,
 } from "lucide-react";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
-export default function HomePage() {
-  const { fetchCart } = useCartStore();
+export default function CategoriesPage() {
   const router = useRouter();
-
-  useEffect(() => {
-    // Fetch cart status in background when homepage loads
-    fetchCart();
-  }, [fetchCart]);
 
   // Define categories with their details
   const categories = [
@@ -175,21 +165,37 @@ export default function HomePage() {
   };
 
   return (
-    <div className="space-y-16">
-      <HeroSection />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50/50 to-white">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-8">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6 px-0 hover:bg-transparent"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
 
-      {/* Categories Section */}
-      <section className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Shop by Category
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover fresh, quality products organized just for you
-          </p>
+          {/* Page Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Shop by Category
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover fresh, quality products organized just for you. Browse
+              through our carefully curated categories to find exactly what you
+              need.
+            </p>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-6">
+      {/* Categories Grid */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
@@ -199,99 +205,48 @@ export default function HomePage() {
                 onClick={() => handleCategoryClick(category.id)}
               >
                 <CardHeader
-                  className={`${category.bgColor} rounded-t-lg relative overflow-hidden p-3 md:p-4`}
+                  className={`${category.bgColor} rounded-t-lg relative overflow-hidden`}
                 >
-                  <div className="flex flex-col sm:flex-row items-center sm:justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <div
-                      className={`p-2 md:p-3 rounded-full bg-gradient-to-r ${category.color} shadow-lg mb-2 sm:mb-0`}
+                      className={`p-3 rounded-full bg-gradient-to-r ${category.color} shadow-lg`}
                     >
-                      <IconComponent className="h-4 w-4 md:h-6 md:w-6 text-white" />
+                      <IconComponent className="h-6 w-6 text-white" />
                     </div>
-                    <Badge
-                      className={`${category.badgeColor} border-0 text-xs hidden sm:block`}
-                    >
+                    <Badge className={`${category.badgeColor} border-0`}>
                       {category.badge}
                     </Badge>
                   </div>
 
                   <CardTitle
-                    className={`text-sm md:text-xl font-bold ${category.textColor} group-hover:text-gray-900 transition-colors text-center sm:text-left`}
+                    className={`text-xl font-bold ${category.textColor} group-hover:text-gray-900 transition-colors`}
                   >
                     {category.title}
                   </CardTitle>
 
                   {/* Decorative gradient overlay */}
                   <div
-                    className={`absolute -top-4 -right-4 w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br ${category.color} opacity-10 rounded-full transform group-hover:scale-110 transition-transform duration-300`}
+                    className={`absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br ${category.color} opacity-10 rounded-full transform group-hover:scale-110 transition-transform duration-300`}
                   ></div>
                 </CardHeader>
 
-                <CardContent className="p-3 md:p-6">
-                  <p className="text-xs md:text-base text-gray-600 mb-2 md:mb-4 group-hover:text-gray-700 transition-colors text-center sm:text-left line-clamp-2">
+                <CardContent className="p-6">
+                  <p className="text-gray-600 mb-4 group-hover:text-gray-700 transition-colors">
                     {category.description}
                   </p>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-xs md:text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors hidden sm:block">
+                    <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors">
                       Explore Collection
                     </span>
-                    <span className="text-xs font-medium text-gray-500 group-hover:text-gray-700 transition-colors block sm:hidden">
-                      View
-                    </span>
-                    <ArrowRight className="h-3 w-3 md:h-5 md:w-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
+                    <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
                   </div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
-      </section>
-
-      {/* Quick Access Section */}
-      <section className="container mx-auto px-4">
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl md:rounded-3xl p-4 md:p-8 border border-green-200">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-center">
-            <div className="lg:col-span-2">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
-                Need something specific?
-              </h3>
-              <p className="text-gray-700 text-base md:text-lg mb-4 md:mb-6">
-                Browse our complete product range or search for exactly what you
-                need.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                <Card
-                  className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 bg-white border border-green-200"
-                  onClick={() => router.push("/products")}
-                >
-                  <CardContent className="p-3 md:p-4 flex items-center space-x-3">
-                    <div className="p-2 rounded-full bg-green-100">
-                      <LayoutGrid className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 text-sm md:text-base">
-                        All Products
-                      </p>
-                      <p className="text-xs md:text-sm text-gray-600">
-                        Browse everything
-                      </p>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-gray-400" />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <div className="text-center lg:text-right">
-              <div className="inline-flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full shadow-2xl">
-                <ShoppingBasket className="h-12 w-12 md:h-16 md:w-16 text-white" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <WhyChooseUsSection />
+      </div>
     </div>
   );
 }

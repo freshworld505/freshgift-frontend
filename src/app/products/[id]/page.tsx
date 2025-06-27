@@ -22,10 +22,12 @@ import {
   Minus,
   Plus,
   Star,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
-import { getProductById } from "@/api/productApi";
+import { getProductById, getProductsByCategory } from "@/api/productApi";
 import { Badge } from "@/components/ui/badge";
 
 export default function ProductDetailPage() {
@@ -39,6 +41,8 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(false);
 
   const productIdParam = params.id;
   const productId = Array.isArray(productIdParam)
@@ -60,6 +64,8 @@ export default function ProductDetailPage() {
       } else {
         // Product found successfully
         setProduct(productData);
+        // Fetch related products based on category
+        fetchRelatedProducts(productData.category, id);
       }
     } catch (err) {
       console.error(`Failed to fetch product ${id}:`, err);
@@ -71,6 +77,26 @@ export default function ProductDetailPage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Function to fetch related products
+  const fetchRelatedProducts = async (
+    category: string,
+    currentProductId: string
+  ) => {
+    try {
+      setIsLoadingRelated(true);
+      const products = await getProductsByCategory(category, 1, 8);
+      // Filter out the current product and limit to 6 items
+      const filteredProducts = products
+        .filter((p) => p.id !== currentProductId)
+        .slice(0, 6);
+      setRelatedProducts(filteredProducts);
+    } catch (error) {
+      console.error("Error fetching related products:", error);
+    } finally {
+      setIsLoadingRelated(false);
     }
   };
 
@@ -383,9 +409,7 @@ export default function ProductDetailPage() {
               {isInStock && (
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-green-700 font-medium">
-                    {product.stock} items available
-                  </span>
+                  <span className="text-green-700 font-medium">In Stock</span>
                 </div>
               )}
             </div>
@@ -574,6 +598,275 @@ export default function ProductDetailPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-12 sm:mt-16">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                Similar Products
+              </h2>
+              <p className="text-gray-600 text-sm sm:text-base">
+                More great products from this category
+              </p>
+            </div>
+
+            <div className="relative">
+              {/* Horizontal Scrolling Container */}
+              <div className="flex gap-3 sm:gap-6 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory scrollbar-hide">
+                {relatedProducts.map((relatedProduct) => {
+                  const relatedIsInStock = (relatedProduct.stock ?? 0) > 0;
+                  const relatedCartItem = items.find(
+                    (item) => item.product.id === relatedProduct.id
+                  );
+                  const relatedIsInCart = !!relatedCartItem;
+
+                  return (
+                    <Card
+                      key={relatedProduct.id}
+                      className="min-w-[220px] sm:min-w-[280px] lg:min-w-[320px] bg-white border border-gray-200 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer snap-start"
+                      onClick={() =>
+                        router.push(`/products/${relatedProduct.id}`)
+                      }
+                    >
+                      <div className="relative aspect-square rounded-t-xl sm:rounded-t-2xl overflow-hidden">
+                        <Image
+                          src={
+                            relatedProduct.productImages?.[0] ||
+                            "/placeholder-product.jpg"
+                          }
+                          alt={relatedProduct.productName}
+                          fill
+                          sizes="(max-width: 640px) 220px, (max-width: 1024px) 280px, 320px"
+                          className={`object-cover transition-all duration-300 ${
+                            !relatedIsInStock ? "grayscale" : ""
+                          }`}
+                        />
+
+                        {/* Category Badge */}
+                        <Badge className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-white/95 backdrop-blur-sm text-gray-700 border-0 shadow-sm text-xs sm:text-sm px-2 sm:px-3 py-1">
+                          {relatedProduct.category}
+                        </Badge>
+
+                        {/* Discount Badge */}
+                        {relatedProduct.actualPrice >
+                          relatedProduct.finalPrice && (
+                          <Badge
+                            variant="destructive"
+                            className="absolute top-2 sm:top-3 right-2 sm:right-3 shadow-sm font-bold text-xs sm:text-sm px-2 sm:px-3 py-1"
+                          >
+                            {relatedProduct.discount}% OFF
+                          </Badge>
+                        )}
+
+                        {/* Out of Stock Overlay */}
+                        {!relatedIsInStock && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <Badge
+                              variant="destructive"
+                              className="text-xs sm:text-sm py-1 px-2 sm:px-3"
+                            >
+                              Out of Stock
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+
+                      <CardContent className="p-3 sm:p-6">
+                        <div className="space-y-2 sm:space-y-3">
+                          <h3 className="font-bold text-sm sm:text-lg text-gray-900 line-clamp-2 leading-tight">
+                            {relatedProduct.productName}
+                          </h3>
+
+                          <div className="flex items-center space-x-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400"
+                              />
+                            ))}
+                            <span className="text-xs sm:text-sm text-gray-500 ml-1">
+                              (4.5)
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <span className="text-lg sm:text-2xl font-bold text-green-600">
+                              £{relatedProduct.finalPrice}
+                            </span>
+                            {relatedProduct.actualPrice >
+                              relatedProduct.finalPrice && (
+                              <span className="text-sm sm:text-lg text-gray-500 line-through">
+                                £{relatedProduct.actualPrice}
+                              </span>
+                            )}
+                          </div>
+
+                          {relatedIsInStock && (
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full"></div>
+                              <span className="text-xs sm:text-sm text-green-600 font-medium">
+                                In Stock
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+
+                      <CardFooter className="p-3 sm:p-6 pt-0">
+                        {!relatedIsInStock ? (
+                          <Button
+                            className="w-full bg-gray-100 text-gray-500 cursor-not-allowed text-xs sm:text-sm h-8 sm:h-10"
+                            disabled
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Out of Stock
+                          </Button>
+                        ) : relatedIsInCart ? (
+                          <div
+                            className="w-full bg-green-50 border border-green-200 rounded-lg p-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-6 w-6 sm:h-8 sm:w-8 rounded-full border-green-300 hover:bg-green-100 transition-colors flex-shrink-0"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    if (relatedCartItem!.quantity > 1) {
+                                      await updateQuantity(
+                                        relatedProduct.id,
+                                        relatedCartItem!.quantity - 1
+                                      );
+                                    } else {
+                                      await updateQuantity(
+                                        relatedProduct.id,
+                                        0
+                                      );
+                                    }
+                                  } catch (error) {
+                                    console.error(
+                                      "Error updating quantity:",
+                                      error
+                                    );
+                                  }
+                                }}
+                              >
+                                <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                              <div className="text-center flex-1">
+                                <div className="text-sm sm:text-base font-bold text-green-700">
+                                  {relatedCartItem!.quantity}
+                                </div>
+                              </div>
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-6 w-6 sm:h-8 sm:w-8 rounded-full border-green-300 hover:bg-green-100 transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  if (
+                                    relatedCartItem!.quantity >=
+                                    (relatedProduct.stock ?? 0)
+                                  ) {
+                                    toast({
+                                      title: "Stock limit reached",
+                                      description: `Only ${relatedProduct.stock} items available in stock.`,
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  try {
+                                    await updateQuantity(
+                                      relatedProduct.id,
+                                      relatedCartItem!.quantity + 1
+                                    );
+                                  } catch (error) {
+                                    console.error(
+                                      "Error updating quantity:",
+                                      error
+                                    );
+                                  }
+                                }}
+                                disabled={
+                                  relatedCartItem!.quantity >=
+                                  (relatedProduct.stock ?? 0)
+                                }
+                              >
+                                <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <Button
+                            className="w-full bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm h-8 sm:h-10"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              if (!isAuthenticated) {
+                                toast({
+                                  title: "Login Required",
+                                  description:
+                                    "Please log in to add items to your cart.",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+                              try {
+                                await addToCart(relatedProduct.id, 1);
+                                await fetchCart();
+                                toast({
+                                  title: `${relatedProduct.productName} added to cart!`,
+                                  description:
+                                    "Item successfully added to your cart.",
+                                });
+                              } catch (error) {
+                                console.error("Error adding to cart:", error);
+                                toast({
+                                  title: "Error adding to cart",
+                                  description:
+                                    "Failed to add item to cart. Please try again.",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                          >
+                            <ShoppingCart className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                            Add to Cart
+                          </Button>
+                        )}
+                      </CardFooter>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Scroll Indicators */}
+              {relatedProducts.length > 3 && (
+                <div className="flex justify-center mt-6">
+                  <div className="flex space-x-2">
+                    {Array.from({
+                      length: Math.ceil(relatedProducts.length / 3),
+                    }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="w-2 h-2 rounded-full bg-gray-300"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Loading State for Related Products */}
+            {isLoadingRelated && (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

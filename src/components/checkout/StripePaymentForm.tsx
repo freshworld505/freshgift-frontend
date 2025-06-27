@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { CreditCard, Lock } from "lucide-react";
-import { formatCurrency } from "@/lib/currency";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -259,7 +258,7 @@ const PaymentForm = ({
               <div className="flex justify-between items-center text-lg font-semibold">
                 <span>Total Amount:</span>
                 <span className="text-emerald-600">
-                  {formatCurrency(amount / 100)}
+                  £{(amount / 100).toFixed(2)}
                 </span>
               </div>
 
@@ -276,7 +275,7 @@ const PaymentForm = ({
                 ) : (
                   <>
                     <CreditCard className="mr-2 h-5 w-5" />
-                    Pay {formatCurrency(amount / 100)}
+                    Pay £{(amount / 100).toFixed(2)}
                   </>
                 )}
               </Button>

@@ -24,7 +24,6 @@ import {
 import { useCartStore, useAuthStore } from "@/lib/store";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 
 // Mock deals data - in real app this would come from API
 const generateDeals = () => {
@@ -318,14 +317,10 @@ export default function DealsPage() {
                     {/* Price */}
                     <div className="flex items-center gap-2">
                       <span className="text-2xl font-bold text-emerald-600">
-                        {formatCurrency(
-                          convertINRtoGBP(product.deal.discountedPrice)
-                        )}
+                        £{product.deal.discountedPrice}
                       </span>
                       <span className="text-lg text-muted-foreground line-through">
-                        {formatCurrency(
-                          convertINRtoGBP(product.deal.originalPrice)
-                        )}
+                        £{product.deal.originalPrice}
                       </span>
                     </div>
 
