@@ -26,7 +26,6 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
 import { getProductById } from "@/api/productApi";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
 
 export default function ProductDetailPage() {
@@ -228,224 +227,354 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="inline-flex items-center text-primary hover:underline mb-6 px-0 hover:bg-transparent"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
-      </Button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50/50 to-white">
+      {/* Header with Back Button */}
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 px-0 hover:bg-transparent group"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+            Back to Products
+          </Button>
+        </div>
+      </div>
 
-      <Card className="overflow-hidden shadow-xl border border-border/50 bg-white/80 backdrop-blur-sm">
-        <div className="grid md:grid-cols-2 gap-0">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Main Product Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           {/* Image Section */}
-          <div className="relative aspect-square w-full min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
-            <Image
-              src={product.productImages?.[0] || "/placeholder-product.jpg"}
-              alt={product.productName || "Product"}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className={`object-cover ${!isInStock ? "grayscale" : ""}`}
-              priority
-              data-ai-hint={product.dataAiHint || "product detail image"}
-            />
+          <div className="space-y-4">
+            {/* Main Product Image */}
+            <div className="relative aspect-square w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden group">
+              <Image
+                src={product.productImages?.[0] || "/placeholder-product.jpg"}
+                alt={product.productName || "Product"}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className={`object-cover transition-all duration-700 group-hover:scale-105 ${
+                  !isInStock ? "grayscale" : ""
+                }`}
+                priority
+                data-ai-hint={product.dataAiHint || "product detail image"}
+              />
 
-            {/* Category Badge */}
-            <Badge
-              variant="secondary"
-              className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-sm font-medium py-1 px-3"
-            >
-              {product.category}
-            </Badge>
-
-            {!isInStock && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <Badge variant="destructive" className="text-lg py-2 px-4">
-                  Out of Stock
-                </Badge>
-              </div>
-            )}
-          </div>
-
-          {/* Content Section */}
-          <div className="flex flex-col">
-            <CardHeader className="p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <CardTitle className="text-3xl lg:text-4xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
-                    {product.productName}
-                  </CardTitle>
-                  <CardDescription className="text-lg text-muted-foreground mb-4">
-                    {product.subCategory || product.category}
-                  </CardDescription>
-
-                  {/* Rating */}
-                  <div className="flex items-center space-x-1 mb-4">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                      />
-                    ))}
-                    <span className="text-sm text-muted-foreground ml-2">
-                      (4.5)
-                    </span>
-                  </div>
+              {/* Floating Action Badges */}
+              <div className="absolute top-6 left-6 right-6 flex justify-between items-start">
+                <div className="space-y-2">
+                  <Badge className="bg-white/95 backdrop-blur-sm text-gray-700 border-0 shadow-lg font-medium px-4 py-2">
+                    {product.category}
+                  </Badge>
+                  {product.actualPrice > product.finalPrice && (
+                    <Badge
+                      variant="destructive"
+                      className="shadow-lg font-bold px-4 py-2"
+                    >
+                      {product.discount}% OFF
+                    </Badge>
+                  )}
                 </div>
 
-                {/* Wishlist Button */}
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="icon"
-                  className="text-red-500 hover:text-red-600 rounded-full hover:bg-red-50 mt-1 transition-all duration-300 hover:scale-110"
+                  className="rounded-full bg-white/95 backdrop-blur-sm hover:bg-white shadow-lg transition-all duration-300 hover:scale-110 w-12 h-12 border-0"
                   onClick={handleWishlistToggle}
                   aria-label={
                     isInWishlist ? "Remove from wishlist" : "Add to wishlist"
                   }
                 >
                   <Heart
-                    className={`h-7 w-7 transition-all duration-300 ${
+                    className={`h-5 w-5 transition-all duration-300 ${
                       isInWishlist
                         ? "fill-red-500 stroke-red-500"
-                        : "stroke-red-500"
+                        : "stroke-gray-600 hover:stroke-red-500"
                     }`}
                   />
                 </Button>
               </div>
 
-              {/* Price */}
-              <div className="flex items-center gap-3 mb-4">
-                <p className="text-3xl lg:text-4xl font-extrabold text-primary">
-                  £{product.finalPrice || 0}
-                </p>
-                {product.actualPrice > product.finalPrice && (
-                  <>
-                    <p className="text-xl text-muted-foreground line-through">
-                      £{product.actualPrice || 0}
-                    </p>
-                    <Badge variant="destructive" className="text-sm">
-                      {product.discount}% OFF
-                    </Badge>
-                  </>
-                )}
-              </div>
-
-              {/* Stock Info */}
-              {isInStock && (
-                <p className="text-sm text-muted-foreground mb-4">
-                  {product.stock} items in stock
-                </p>
-              )}
-            </CardHeader>
-
-            <CardContent className="p-6 pt-0 flex-grow">
-              <h3 className="text-xl font-semibold mb-3">
-                Product Description
-              </h3>
-              <p className="text-base text-foreground leading-relaxed mb-4">
-                {product.description || "No description available."}
-              </p>
-
-              {/* Tags */}
-              {product.tags && product.tags.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2">Tags:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {product.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
+              {/* Out of Stock Overlay */}
+              {!isInStock && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                  <Badge
+                    variant="destructive"
+                    className="text-lg py-3 px-8 shadow-xl font-bold"
+                  >
+                    Out of Stock
+                  </Badge>
                 </div>
               )}
+            </div>
 
-              {/* Additional Info */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                {product.deliveryType && (
-                  <div>
-                    <span className="font-medium">Delivery:</span>
-                    <p className="text-muted-foreground">
-                      {product.deliveryType}
-                    </p>
+            {/* Thumbnail Images */}
+            {product.productImages && product.productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-3">
+                {product.productImages.slice(1, 5).map((image, index) => (
+                  <div
+                    key={index}
+                    className="relative aspect-square rounded-xl overflow-hidden bg-white border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+                  >
+                    <Image
+                      src={image}
+                      alt={`${product.productName} view ${index + 2}`}
+                      fill
+                      sizes="120px"
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                )}
-                {product.shelfLife && (
-                  <div>
-                    <span className="font-medium">Shelf Life:</span>
-                    <p className="text-muted-foreground">
-                      {product.shelfLife} days
-                    </p>
-                  </div>
-                )}
-                {product.returnable !== undefined && (
-                  <div>
-                    <span className="font-medium">Returnable:</span>
-                    <p className="text-muted-foreground">
-                      {product.returnable ? "Yes" : "No"}
-                    </p>
-                  </div>
-                )}
-                {product.storageInstructions &&
-                  product.storageInstructions !== "NA" && (
-                    <div>
-                      <span className="font-medium">Storage:</span>
-                      <p className="text-muted-foreground">
-                        {product.storageInstructions}
-                      </p>
-                    </div>
-                  )}
+                ))}
               </div>
-            </CardContent>
+            )}
+          </div>
 
-            {/* Footer with Add to Cart */}
-            <CardFooter className="p-6 border-t">
+          {/* Product Information */}
+          <div className="space-y-8">
+            {/* Header Section */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                  {product.productName}
+                </h1>
+                <p className="text-xl text-gray-600">
+                  {product.subCategory || product.category}
+                </p>
+              </div>
+
+              {/* Rating & Reviews */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className="h-5 w-5 fill-yellow-400 text-yellow-400"
+                    />
+                  ))}
+                </div>
+                <span className="text-lg font-medium text-gray-700">4.5</span>
+                <span className="text-gray-400">•</span>
+                <span className="text-gray-600">128 reviews</span>
+              </div>
+            </div>
+
+            {/* Price Section */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+              <div className="flex items-baseline gap-4 mb-3">
+                <span className="text-5xl font-bold text-green-700">
+                  £{product.finalPrice || 0}
+                </span>
+                {product.actualPrice > product.finalPrice && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl text-gray-500 line-through">
+                      £{product.actualPrice || 0}
+                    </span>
+                    <Badge className="bg-green-100 text-green-800 border-green-300 px-3 py-1">
+                      Save £
+                      {(product.actualPrice - product.finalPrice || 0).toFixed(
+                        2
+                      )}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+
+              {isInStock && (
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-700 font-medium">
+                    {product.stock} items available
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Add to Cart Section */}
+            <div className="space-y-4">
               {!isInStock ? (
                 <Button
-                  className="w-full bg-gray-400 text-gray-600 cursor-not-allowed font-medium py-3 text-lg"
+                  className="w-full h-16 bg-gray-100 text-gray-500 cursor-not-allowed font-semibold text-lg rounded-2xl"
                   disabled
                 >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  <ShoppingCart className="mr-3 h-6 w-6" />
                   Out of Stock
                 </Button>
               ) : isInCart ? (
-                <div className="flex items-center gap-4 w-full bg-primary/10 rounded-lg p-3">
-                  <Button
-                    size="lg"
-                    variant="ghost"
-                    className="h-10 w-10 p-0 rounded-md hover:bg-primary/20 transition-colors"
-                    onClick={handleDecreaseQuantity}
-                  >
-                    <Minus className="h-5 w-5" />
-                  </Button>
-                  <span className="flex-1 text-center text-lg font-semibold text-primary">
-                    {cartQuantity} in cart
-                  </span>
-                  <Button
-                    size="lg"
-                    variant="ghost"
-                    className="h-10 w-10 p-0 rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleIncreaseQuantity}
-                    disabled={!canAddMore}
-                  >
-                    <Plus className="h-5 w-5" />
-                  </Button>
+                <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+                  <p className="text-center text-green-700 font-semibold mb-4">
+                    Item in cart
+                  </p>
+                  <div className="flex items-center justify-center gap-6">
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="h-14 w-14 rounded-full border-2 border-green-300 hover:bg-green-100 transition-colors"
+                      onClick={handleDecreaseQuantity}
+                    >
+                      <Minus className="h-5 w-5" />
+                    </Button>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-700">
+                        {cartQuantity}
+                      </div>
+                      <div className="text-sm text-green-600">in cart</div>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="h-14 w-14 rounded-full border-2 border-green-300 hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleIncreaseQuantity}
+                      disabled={!canAddMore}
+                    >
+                      <Plus className="h-5 w-5" />
+                    </Button>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <span className="text-green-700 font-semibold">
+                      Total: £
+                      {((product.finalPrice || 0) * cartQuantity).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <Button
-                  className="w-full bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] hover:shadow-md font-medium py-3 text-lg transition-all duration-300"
+                  className="w-full h-16 bg-green-600 hover:bg-green-700 text-white font-semibold text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                   onClick={handleAddToCart}
                   aria-label={`Add ${product.productName} to cart`}
                 >
-                  <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                  <ShoppingCart className="mr-3 h-6 w-6" />
+                  Add to Cart
                 </Button>
               )}
-            </CardFooter>
+            </div>
+
+            {/* Quick Info Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              {product.deliveryType && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <ShoppingCart className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <p className="font-semibold text-blue-900">
+                    {product.deliveryType}
+                  </p>
+                  <p className="text-sm text-blue-700">Delivery</p>
+                </div>
+              )}
+
+              {product.returnable !== undefined && (
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <ArrowLeft className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <p className="font-semibold text-purple-900">
+                    {product.returnable ? "Yes" : "No"}
+                  </p>
+                  <p className="text-sm text-purple-700">Returnable</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </Card>
+
+        {/* Product Details Section */}
+        <div className="mt-16">
+          <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-3xl shadow-xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 p-8">
+              <CardTitle className="text-3xl font-bold text-gray-900">
+                Product Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {/* Description & Tags */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                      Description
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed text-lg">
+                      {product.description || "No description available."}
+                    </p>
+                  </div>
+
+                  {/* Tags */}
+                  {product.tags && product.tags.length > 0 && (
+                    <div>
+                      <h4 className="text-xl font-semibold text-gray-900 mb-3">
+                        Tags
+                      </h4>
+                      <div className="flex flex-wrap gap-3">
+                        {product.tags.map((tag, index) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100 px-4 py-2 text-sm font-medium"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Specifications */}
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                    Specifications
+                  </h3>
+                  <div className="space-y-4">
+                    {product.shelfLife && (
+                      <div className="flex justify-between items-center py-4 border-b border-gray-200">
+                        <span className="font-semibold text-gray-700">
+                          Shelf Life
+                        </span>
+                        <span className="text-gray-900 font-medium">
+                          {product.shelfLife} days
+                        </span>
+                      </div>
+                    )}
+
+                    {product.storageInstructions &&
+                      product.storageInstructions !== "NA" && (
+                        <div className="flex justify-between items-center py-4 border-b border-gray-200">
+                          <span className="font-semibold text-gray-700">
+                            Storage Instructions
+                          </span>
+                          <span className="text-gray-900 font-medium text-right max-w-xs">
+                            {product.storageInstructions}
+                          </span>
+                        </div>
+                      )}
+
+                    {product.maxPurchaseLimit && (
+                      <div className="flex justify-between items-center py-4 border-b border-gray-200">
+                        <span className="font-semibold text-gray-700">
+                          Max Purchase Limit
+                        </span>
+                        <span className="text-gray-900 font-medium">
+                          {product.maxPurchaseLimit} items
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center py-4 border-b border-gray-200">
+                      <span className="font-semibold text-gray-700">
+                        Product Code
+                      </span>
+                      <span className="text-gray-900 font-mono">
+                        {product.productCode || product.id}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
