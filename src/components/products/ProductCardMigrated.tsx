@@ -20,6 +20,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { useCartStore, useAuthStore } from "@/lib/store";
+import { useWishlistStore } from "@/hooks/use-wishlist";
 import { ShoppingCart, Heart, Star, Tag } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
@@ -31,10 +32,14 @@ interface ProductCardProps {
 
 export default function ProductCardMigrated({ product }: ProductCardProps) {
   const { fetchCart } = useCartStore();
-  const { user, isAuthenticated, addToWishlist, removeFromWishlist } =
-    useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist: checkIsInWishlist,
+  } = useWishlistStore();
 
-  const isInWishlist = isAuthenticated && user?.wishlist?.includes(product.id);
+  const isInWishlist = checkIsInWishlist(product.id);
 
   // Get product images directly from new schema
   const images = product.productImages || [];
@@ -98,15 +103,6 @@ export default function ProductCardMigrated({ product }: ProductCardProps) {
   };
 
   const handleWishlistToggle = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Login required",
-        description: "Please login to add items to your wishlist.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (isInWishlist) {
       removeFromWishlist(product.id);
       toast({

@@ -13,6 +13,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { useCartStore, useAuthStore } from "@/lib/store";
+import { useWishlistStore } from "@/hooks/use-wishlist";
 import { ShoppingCart, Heart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useRef, useEffect } from "react";
@@ -24,10 +25,14 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { fetchCart } = useCartStore();
-  const { user, isAuthenticated, addToWishlist, removeFromWishlist } =
-    useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist: checkIsInWishlist,
+  } = useWishlistStore();
 
-  const isInWishlist = isAuthenticated && user?.wishlist?.includes(product.id);
+  const isInWishlist = checkIsInWishlist(product.id);
 
   const isInStock = (product.stock ?? 0) > 0;
 
@@ -101,14 +106,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent link navigation when clicking heart
     e.stopPropagation(); // Prevent event bubbling to parent Link
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to add items to your wishlist.",
-        variant: "destructive",
-      });
-      return;
-    }
+
     if (isInWishlist) {
       removeFromWishlist(product.id);
       toast({ title: `${product.productName} removed from wishlist.` });

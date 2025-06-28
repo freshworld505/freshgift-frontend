@@ -30,6 +30,12 @@ type UpdateAddressResponse = {
   address: BackendAddress;
 };
 
+// Backend response type for create address
+type CreateAddressResponse = {
+  message: string;
+  address: BackendAddress;
+};
+
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
 
 // API function to get all user addresses
@@ -75,20 +81,33 @@ export const createAddress = async (addressData: Omit<Address, 'id'>): Promise<A
         isDefault: addressData.isDefault || false,
       };
 
-      const response = await axios.post<BackendAddress>(`${API_BASE_URL}/address/add`, backendAddressData);
+      const response = await axios.post<CreateAddressResponse>(`${API_BASE_URL}/address/add`, backendAddressData);
       console.log("✅ Successfully created new address");
+      console.log("🔍 Raw backend response:", response.data);
+      console.log("🔍 Backend response message:", response.data.message);
+      console.log("🔍 Backend address object:", response.data.address);
+      console.log("🆔 Backend addressId:", response.data.address?.addressId);
       
       // Map backend response to frontend Address type
+      const backendAddress = response.data.address;
+      
+      if (!backendAddress) {
+        throw new Error("No address object in backend response");
+      }
+      
       const newAddress: Address = {
-        id: response.data.addressId,
-        street: response.data.addressLine,
-        city: response.data.city,
-        state: response.data.state,
-        zipCode: response.data.pincode,
-        country: response.data.country,
-        landmark: response.data.landmark,
-        isDefault: response.data.isDefault,
+        id: backendAddress.addressId,
+        street: backendAddress.addressLine,
+        city: backendAddress.city,
+        state: backendAddress.state,
+        zipCode: backendAddress.pincode,
+        country: backendAddress.country,
+        landmark: backendAddress.landmark,
+        isDefault: backendAddress.isDefault,
       };
+      
+      console.log("🏠 Mapped frontend address:", newAddress);
+      console.log("🆔 Frontend address ID:", newAddress.id);
       
       return newAddress;
     } catch (error) {

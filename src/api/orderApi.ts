@@ -38,14 +38,30 @@ export const getOrderById = async (orderId: string): Promise<Order> => {
 export const createOrder = async (orderData: CreateOrderRequest): Promise<Order> => {
   return withAuthentication(async () => {
     try {
+      console.log("🚀 OrderAPI: Creating order with data:", orderData);
       const headers = await getAuthHeaders();
+      console.log("🔑 OrderAPI: Using headers:", headers);
+      
       const response = await axios.post<{ message: string; orderId: string; total: number }>(`${API_BASE_URL}/place`, orderData, { headers });
+      console.log("✅ OrderAPI: Order creation response:", response.data);
       
       // Since the backend doesn't return the full order object, we need to fetch it
+      console.log("📋 OrderAPI: Fetching created order details...");
       const createdOrder = await getOrderById(response.data.orderId);
+      console.log("✅ OrderAPI: Full order details:", createdOrder);
+      
       return createdOrder;
     } catch (error) {
-      console.error("Failed to create order:", error);
+      console.error("❌ OrderAPI: Failed to create order:", error);
+      
+      // Log detailed error information
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as any;
+        console.error("❌ OrderAPI: Error response data:", axiosError.response?.data);
+        console.error("❌ OrderAPI: Error status:", axiosError.response?.status);
+        console.error("❌ OrderAPI: Error status text:", axiosError.response?.statusText);
+      }
+      
       throw error;
     }
   });

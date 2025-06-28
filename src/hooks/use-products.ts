@@ -75,6 +75,19 @@ export const useProductsByTag = (tag: string, page = 1, limit = 4) => {
   });
 };
 
+// Search products hook with debouncing support
+export const useSearchProducts = (searchTerm: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: productQueryKeys.search(searchTerm, 1, 100),
+    queryFn: async () => {
+      const result = await searchProducts(searchTerm, 1, 100);
+      return result; // Return the full response with products and pagination
+    },
+    enabled: enabled && searchTerm.trim().length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes for search results
+  });
+};
+
 // Combined hook for homepage data - executes all queries in parallel
 export const useHomepageProducts = () => {
   const allProducts = useAllProducts(1, 100);

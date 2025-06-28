@@ -22,6 +22,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useCartStore, useAuthStore } from "@/lib/store";
+import { useWishlistStore } from "@/hooks/use-wishlist";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
 
@@ -75,8 +76,12 @@ export default function DealsPage() {
   const [deals, setDeals] = useState<any[]>([]);
   const [timeLeft, setTimeLeft] = useState<{ [key: string]: string }>({});
   const { fetchCart } = useCartStore();
-  const { user, isAuthenticated, addToWishlist, removeFromWishlist } =
-    useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist: checkIsInWishlist,
+  } = useWishlistStore();
 
   useEffect(() => {
     setDeals(generateDeals());
@@ -142,16 +147,7 @@ export default function DealsPage() {
   };
 
   const handleWishlistToggle = (product: Product) => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Login required",
-        description: "Please login to add items to your wishlist.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const isInWishlist = user?.wishlist?.includes(product.id);
+    const isInWishlist = checkIsInWishlist(product.id);
     if (isInWishlist) {
       removeFromWishlist(product.id);
       toast({
@@ -246,8 +242,7 @@ export default function DealsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {deals.map((product) => {
-            const isInWishlist =
-              isAuthenticated && user?.wishlist?.includes(product.id);
+            const isInWishlist = checkIsInWishlist(product.id);
             const progressPercentage = getProgressPercentage(
               product.deal.sold,
               product.deal.total

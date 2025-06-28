@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -9,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BarChart3,
   DollarSign,
@@ -17,8 +17,11 @@ import {
   Users,
   TrendingUp,
   TrendingDown,
+  RefreshCw,
+  Clock,
 } from "lucide-react";
-import { useAdminStore } from "@/hooks/use-admin-store";
+import { useAdminDashboard } from "@/hooks/use-admin-dashboard";
+import { useToast } from "@/hooks/use-toast";
 import {
   SalesChart,
   RevenueChart,
@@ -38,6 +41,7 @@ const defaultStats = {
 };
 
 export default function AdminDashboard() {
+  const { toast } = useToast();
   const {
     stats,
     recentOrders,
@@ -45,71 +49,32 @@ export default function AdminDashboard() {
     orders,
     products,
     statsLoading,
+    isFetching,
     error,
-    fetchStats,
-    fetchRecentOrders,
-    fetchTopProducts,
-    fetchOrders,
-    fetchProducts,
-  } = useAdminStore();
+    refetchAll,
+    queries,
+  } = useAdminDashboard();
 
   // Use actual stats or defaults
   const currentStats = stats || defaultStats;
 
-  useEffect(() => {
-    // Fetch all dashboard data
-    const loadDashboardData = async () => {
-      try {
-        console.log("🔄 Loading dashboard data...");
-
-        // Fetch stats first
-        await fetchStats();
-
-        // Fetch base data (orders and products) first for fallback
-        try {
-          console.log("🔄 Loading base orders and products data...");
-          await Promise.all([fetchOrders(), fetchProducts()]);
-          console.log("✅ Base data loaded successfully");
-        } catch (error) {
-          console.warn("⚠️ Base data loading failed:", error);
-        }
-
-        // Try to fetch recent orders, with fallback
-        try {
-          await fetchRecentOrders(4);
-          console.log("✅ Recent orders loaded successfully");
-        } catch (error) {
-          console.warn(
-            "⚠️ Recent orders API failed, this is expected if endpoint doesn't exist yet"
-          );
-          console.error("Recent orders error:", error);
-        }
-
-        // Try to fetch top products, with fallback
-        try {
-          await fetchTopProducts();
-          console.log("✅ Top products loaded successfully");
-        } catch (error) {
-          console.warn(
-            "⚠️ Top products API failed, this is expected if endpoint doesn't exist yet"
-          );
-          console.error("Top products error:", error);
-        }
-
-        console.log("✅ Dashboard data loading completed");
-      } catch (error) {
-        console.error("❌ Error loading dashboard data:", error);
-      }
-    };
-
-    loadDashboardData();
-  }, [
-    fetchStats,
-    fetchRecentOrders,
-    fetchTopProducts,
-    fetchOrders,
-    fetchProducts,
-  ]);
+  // Handle refresh with toast notification
+  const handleRefresh = async () => {
+    try {
+      await refetchAll();
+      toast({
+        title: "Dashboard Updated",
+        description: "All dashboard data has been refreshed successfully.",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Refresh Failed",
+        description: "Failed to refresh dashboard data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (statsLoading) {
     return (
@@ -139,32 +104,68 @@ export default function AdminDashboard() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
-            Admin Dashboard
-          </h1>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">
-            Error loading dashboard data: {error}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
-          Admin Dashboard
-        </h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
-          Welcome to your FreshGift admin dashboard. Here's what's happening
-          with your store today.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
+              Admin Dashboard
+            </h1>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">
+              Welcome to your FreshGift admin dashboard. Here's what's happening
+              with your store today.
+            </p>
+          </div>
+
+          {/* Refresh Button */}
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+            disabled={isFetching}
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+            />
+            {isFetching ? "Refreshing..." : "Refresh Data"}
+          </Button>
+        </div>
+
+        {/* Cache Status Indicator */}
+        {queries.stats.dataUpdatedAt && (
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <Clock className="h-3 w-3" />
+            <span>
+              Last updated:{" "}
+              {new Date(queries.stats.dataUpdatedAt).toLocaleTimeString()}
+            </span>
+            {isFetching && (
+              <Badge variant="secondary" className="text-xs">
+                Updating...
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Error Display */}
+        {error && (
+          <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-800 dark:text-red-200 text-sm">
+              Error loading dashboard data: {error}
+            </p>
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Stats Cards */}

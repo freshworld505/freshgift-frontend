@@ -35,8 +35,7 @@ import {
   TrendingUp,
   Star,
 } from "lucide-react";
-import { getProductsByCategory, searchProducts } from "@/api/productApi";
-import { addToCart } from "@/api/cartApi";
+import { useAllProducts, useSearchProducts } from "@/hooks/use-products";
 
 type SortOption =
   | "name-asc"
@@ -48,39 +47,37 @@ type ViewMode = "grid" | "list";
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
   const [sortBy, setSortBy] = useState<SortOption>("name-asc");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fetch all products
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await searchProducts("", 1, 100); // Empty search term fetches all products
-
-      if (data && data.products) {
-        setProducts(data.products);
-        console.log("✅ Products fetched successfully:", data);
-      } else {
-        setError("No products found");
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setError("Failed to fetch products. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial fetch
+  // Simple debounce implementation
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Use React Query hooks for data fetching
+  const allProductsQuery = useAllProducts(1, 100);
+  const searchQuery = useSearchProducts(
+    debouncedSearchTerm,
+    debouncedSearchTerm.trim().length > 0
+  );
+
+  // Determine which data to use
+  const currentQuery =
+    debouncedSearchTerm.trim().length > 0 ? searchQuery : allProductsQuery;
+  const products =
+    debouncedSearchTerm.trim().length > 0
+      ? searchQuery.data?.products || []
+      : allProductsQuery.data || [];
+
+  const loading = currentQuery.isLoading;
+  const error = currentQuery.error?.message || null;
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -149,30 +146,6 @@ export default function ProductsPage() {
       setPriceRange([0, maxPrice]);
     }
   }, [products]);
-
-  // Search products with debounce
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchTerm.trim()) {
-        // Search for specific products
-        searchProducts(searchTerm, 1, 100)
-          .then((data) => {
-            if (data && data.products) {
-              setProducts(data.products);
-            }
-          })
-          .catch((error) => {
-            console.error("Error searching products:", error);
-            setError("Failed to search products. Please try again.");
-          });
-      } else {
-        // Fetch all products when search is cleared
-        fetchProducts();
-      }
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
 
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories((prev) =>
@@ -440,7 +413,14 @@ export default function ProductsPage() {
                   </h3>
                   <p className="text-muted-foreground mb-4">{error}</p>
                   <Button
-                    onClick={fetchProducts}
+                    onClick={() => {
+                      // Retry the current query
+                      if (debouncedSearchTerm.trim().length > 0) {
+                        searchQuery.refetch();
+                      } else {
+                        allProductsQuery.refetch();
+                      }
+                    }}
                     variant="outline"
                     className="rounded-full"
                   >

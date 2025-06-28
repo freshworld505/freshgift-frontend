@@ -18,6 +18,7 @@ import {
   X,
   LogOut,
   User,
+  Ticket,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -39,6 +40,11 @@ const sidebarItems = [
     title: "Orders",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    title: "Coupons",
+    href: "/admin/coupons",
+    icon: Ticket,
   },
   {
     title: "Users",

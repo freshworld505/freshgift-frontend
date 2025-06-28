@@ -167,8 +167,7 @@ export type OrdersResponse = {
 
 // Create order request payload
 export type CreateOrderRequest = {
-  addressId?: string; // For saved addresses
-  deliveryAddress?: string; // For manual address entry (fallback)
+  addressId: string; // Required - we always create/use saved addresses now
   deliveryType: OrderDeliveryType;
   paymentMethod: PaymentMethod;
   paymentStatus?: PaymentStatus;

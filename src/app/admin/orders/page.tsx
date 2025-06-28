@@ -48,6 +48,8 @@ export default function AdminOrders() {
     (order: any) =>
       order.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.userEmail?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -263,12 +265,14 @@ export default function AdminOrders() {
                         {order.id || order.orderId}
                       </TableCell>
                       <TableCell>
-                        {order.customer ||
+                        {order.user?.name ||
+                          order.customer ||
                           order.customerName ||
+                          order.user?.email?.split("@")[0] ||
                           order.userEmail?.split("@")[0]}
                       </TableCell>
                       <TableCell className="text-gray-600">
-                        {order.email || order.userEmail}
+                        {order.user?.email || order.email || order.userEmail}
                       </TableCell>
                       <TableCell>
                         {order.items?.length ||

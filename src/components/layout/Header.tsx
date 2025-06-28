@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -34,6 +34,10 @@ export default function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Check if we're on the products page
+  const isProductsPage = pathname === "/products";
 
   // Check admin status when user changes
   useEffect(() => {
@@ -71,21 +75,23 @@ export default function Header() {
         <div className="hidden md:flex items-center justify-between h-20">
           <AppLogo />
 
-          {/* Desktop Search - Available to everyone */}
-          <div className="flex flex-1 max-w-2xl mx-8">
-            <form onSubmit={handleSearchSubmit} className="relative w-full">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search fresh products..."
-                  className="w-full pl-12 pr-4 h-12 bg-muted/30 border-border/50 rounded-full focus:bg-background focus:border-primary/50 transition-all duration-200 shadow-sm"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </form>
-          </div>
+          {/* Desktop Search - Hidden on products page */}
+          {!isProductsPage && (
+            <div className="flex flex-1 max-w-2xl mx-8">
+              <form onSubmit={handleSearchSubmit} className="relative w-full">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search fresh products..."
+                    className="w-full pl-12 pr-4 h-12 bg-muted/30 border-border/50 rounded-full focus:bg-background focus:border-primary/50 transition-all duration-200 shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </form>
+            </div>
+          )}
 
           <nav className="flex items-center gap-4">
             {/* Products button - available to everyone */}
@@ -95,7 +101,7 @@ export default function Header() {
               className="h-10 px-4 rounded-full hover:bg-primary/10 transition-colors"
             >
               <Link href="/products" className="font-medium">
-                Products
+                All Products
               </Link>
             </Button>
 
@@ -200,7 +206,6 @@ export default function Header() {
             <AppLogo />
 
             <div className="flex items-center gap-2">
-
               {/* Products Button */}
               <Button
                 variant="ghost"
@@ -295,8 +300,8 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Expandable Search Row */}
-          {isSearchExpanded && (
+          {/* Expandable Search Row - Hidden on products page */}
+          {isSearchExpanded && !isProductsPage && (
             <div className="pb-2 px-2 animate-in slide-in-from-top-2 duration-200">
               <form onSubmit={handleSearchSubmit} className="relative">
                 <div className="relative">

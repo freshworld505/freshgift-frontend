@@ -202,19 +202,28 @@ export default function OrderDetailsModal({
                 <Label className="text-sm font-medium text-gray-500">
                   Name
                 </Label>
-                <p>{order.customerName || order.userName || "N/A"}</p>
+                <p>
+                  {order.user?.name ||
+                    order.customerName ||
+                    order.userName ||
+                    "N/A"}
+                </p>
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-500">
                   Email
                 </Label>
-                <p>{order.userEmail || order.email || "N/A"}</p>
+                <p>
+                  {order.user?.email || order.userEmail || order.email || "N/A"}
+                </p>
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-500">
                   Phone
                 </Label>
-                <p>{order.userPhone || order.phone || "N/A"}</p>
+                <p>
+                  {order.user?.phone || order.userPhone || order.phone || "N/A"}
+                </p>
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-500">

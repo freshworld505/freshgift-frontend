@@ -29,13 +29,18 @@ import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
 import { getProductById, getProductsByCategory } from "@/api/productApi";
 import { Badge } from "@/components/ui/badge";
+import { useWishlistStore } from "@/hooks/use-wishlist";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { fetchCart, items, updateQuantity } = useCartStore();
-  const { user, isAuthenticated, addToWishlist, removeFromWishlist } =
-    useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist: checkIsInWishlist,
+  } = useWishlistStore();
 
   // Local state for product data
   const [product, setProduct] = useState<Product | null>(null);
@@ -161,7 +166,7 @@ export default function ProductDetailPage() {
     return null;
   }
 
-  const isInWishlist = isAuthenticated && user?.wishlist?.includes(product.id);
+  const isInWishlist = checkIsInWishlist(product.id);
   const isInStock = (product.stock ?? 0) > 0;
 
   // Check if product is in cart and get quantity
@@ -173,14 +178,6 @@ export default function ProductDetailPage() {
   const canAddMore = cartQuantity < (product.stock ?? 0);
 
   const handleWishlistToggle = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to add items to your wishlist.",
-        variant: "destructive",
-      });
-      return;
-    }
     if (isInWishlist) {
       removeFromWishlist(product.id);
       toast({ title: `${product.productName} removed from wishlist.` });

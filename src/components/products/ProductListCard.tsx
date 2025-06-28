@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore, useAuthStore } from "@/lib/store";
+import { useWishlistStore } from "@/hooks/use-wishlist";
 import { ShoppingCart, Heart, Star, Minus, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
@@ -21,10 +22,14 @@ export default function ProductListCard({
   viewMode = "grid",
 }: ProductListCardProps) {
   const { fetchCart, items, updateQuantity } = useCartStore();
-  const { user, isAuthenticated, addToWishlist, removeFromWishlist } =
-    useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist: checkIsInWishlist,
+  } = useWishlistStore();
 
-  const isInWishlist = isAuthenticated && user?.wishlist?.includes(product.id);
+  const isInWishlist = checkIsInWishlist(product.id);
 
   const isInStock = (product.stock ?? 0) > 0;
 
@@ -59,14 +64,7 @@ export default function ProductListCard({
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to add items to your wishlist.",
-        variant: "destructive",
-      });
-      return;
-    }
+
     if (isInWishlist) {
       removeFromWishlist(product.id);
       toast({

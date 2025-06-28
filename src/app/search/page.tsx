@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import ProductList from "@/components/products/ProductList";
-import { sampleProducts } from "@/lib/products";
+import { searchProducts } from "@/api/productApi";
 import type { Product } from "@/lib/types";
 import { useEffect, useState, Suspense } from "react";
 import { SearchX, Lightbulb } from "lucide-react";
@@ -25,22 +25,26 @@ function SearchContent() {
   const { items: cartItems } = useCartStore();
 
   useEffect(() => {
-    setIsLoading(true);
-    setAiSuggestions([]); // Reset AI suggestions on new query
-    if (query) {
-      const lowerCaseQuery = query.toLowerCase();
-      const results = sampleProducts.filter(
-        (product) =>
-          product.productName?.toLowerCase().includes(lowerCaseQuery) ||
-          product.category.toLowerCase().includes(lowerCaseQuery) ||
-          (product.description &&
-            product.description.toLowerCase().includes(lowerCaseQuery))
-      );
-      setFilteredProducts(results);
-    } else {
-      setFilteredProducts([]);
-    }
-    setIsLoading(false);
+    const fetchSearchResults = async () => {
+      setIsLoading(true);
+      setAiSuggestions([]); // Reset AI suggestions on new query
+
+      if (query && query.trim()) {
+        try {
+          // Call the backend search API
+          const searchResponse = await searchProducts(query.trim(), 1, 50); // page 1, limit 50
+          setFilteredProducts(searchResponse.products);
+        } catch (error) {
+          console.error("Error searching products:", error);
+          setFilteredProducts([]);
+        }
+      } else {
+        setFilteredProducts([]);
+      }
+      setIsLoading(false);
+    };
+
+    fetchSearchResults();
   }, [query]);
 
   const handleAiSearch = async () => {
@@ -85,12 +89,10 @@ function SearchContent() {
           ) : (
             <div className="text-center py-12">
               <SearchX className="mx-auto h-24 w-24 text-muted-foreground mb-4" />
-              <h2 className="text-2xl font-semibold mb-2">
-                No Products Found Locally
-              </h2>
+              <h2 className="text-2xl font-semibold mb-2">No Products Found</h2>
               <p className="text-muted-foreground mb-6">
-                We couldn&apos;t find any products matching &quot;{query}&quot;
-                in our current selection.
+                We couldn&apos;t find any products matching &quot;{query}&quot;.
+                Try a different search term or browse our categories.
               </p>
             </div>
           )}

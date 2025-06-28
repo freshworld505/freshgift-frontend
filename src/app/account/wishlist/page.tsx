@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/lib/store";
-import { sampleProducts } from "@/lib/products";
+import { useWishlistStore } from "@/hooks/use-wishlist";
+import { useAllProducts } from "@/hooks/use-products";
 import type { Product } from "@/lib/types";
 import ProductList from "@/components/products/ProductList";
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -11,24 +11,47 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function WishlistPage() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { wishlistItems, addToWishlist, clearWishlist, _hasHydrated } =
+    useWishlistStore();
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (isAuthenticated && user?.wishlist) {
-      const userWishlistIds = user.wishlist;
-      const products = sampleProducts.filter((p) =>
-        userWishlistIds.includes(p.id)
-      );
-      setWishlistProducts(products);
-    } else {
-      setWishlistProducts([]);
-    }
-    setIsLoading(false);
-  }, [user, isAuthenticated]);
+  // Fetch all products from the API
+  const {
+    data: allProducts = [],
+    isLoading: isLoadingProducts,
+    error,
+  } = useAllProducts();
 
-  if (isLoading) {
+  // Debug function to add test items
+  const addTestItems = () => {
+    // Add the first few product IDs from the actual products
+    if (allProducts.length > 0) {
+      addToWishlist(allProducts[0].id);
+      addToWishlist(allProducts[1]?.id);
+      addToWishlist(allProducts[2]?.id);
+    }
+  };
+
+  useEffect(() => {
+    // Only proceed if hydration has completed and products are loaded
+    if (!_hasHydrated || isLoadingProducts || !allProducts.length) return;
+
+    // Debug logging
+    console.log("Wishlist items from store:", wishlistItems);
+    console.log("All products available:", allProducts.length);
+
+    // Filter products based on wishlist items from localStorage
+    const products = allProducts.filter((p: Product) =>
+      wishlistItems.includes(p.id)
+    );
+    console.log("Filtered wishlist products:", products);
+
+    setWishlistProducts(products);
+    setIsLoading(false);
+  }, [wishlistItems, _hasHydrated, allProducts, isLoadingProducts]);
+
+  if (isLoading || !_hasHydrated || isLoadingProducts) {
     return (
       <div className="space-y-6">
         <div className="text-center">
@@ -48,30 +71,6 @@ export default function WishlistPage() {
               <div className="h-4 bg-gray-100 rounded w-2/3 animate-pulse"></div>
             </div>
           ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="text-center py-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
-        <div className="max-w-md mx-auto">
-          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <HeartCrack className="h-10 w-10 text-blue-600" />
-          </div>
-          <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-            Login Required
-          </h3>
-          <p className="text-gray-600 mb-8">
-            Please log in to view and manage your wishlist
-          </p>
-          <Button
-            asChild
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl px-8"
-          >
-            <Link href="/login?redirect=/account/wishlist">Login</Link>
-          </Button>
         </div>
       </div>
     );

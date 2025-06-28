@@ -30,12 +30,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import {
-  formatCurrency,
-  getStripeCompatibleAmount,
-  getCurrencyCode,
-  convertINRtoGBP,
-} from "@/lib/currency";
+import { getStripeCompatibleAmount } from "@/lib/currency";
 import type {
   TimeSlot,
   CreateOrderRequest,
@@ -55,6 +50,7 @@ import {
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { createPaymentIntent, confirmPaymentIntent } from "@/api/payment";
+import { createAddress } from "@/api/addressesApi";
 import StripePaymentForm from "./StripePaymentForm";
 import SelectAddress from "./SelectAddress";
 
@@ -169,6 +165,16 @@ const availableTimeSlots: TimeSlot[] = [
     label: "Day after Tomorrow, 10:00 AM - 6:00 PM",
     date: new Date(Date.now() + 86400000).toISOString().split("T")[0],
   },
+  {
+    id: "ts4",
+    label: "3 days from now, 10:00 AM - 6:00 PM",
+    date: new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0],
+  },
+  {
+    id: "ts5",
+    label: "Next Week, 10:00 AM - 6:00 PM",
+    date: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
+  },
 ];
 
 export default function CheckoutForm() {
@@ -232,6 +238,56 @@ export default function CheckoutForm() {
     form.setValue("country", formData.country);
   };
 
+  // Helper function to create address from form data
+  const createAddressFromForm = async (
+    values: z.infer<typeof checkoutSchema>
+  ): Promise<Address> => {
+    console.log("🏠 Creating address from form values:", values);
+
+    // Validate required fields
+    if (
+      !values.streetAddress ||
+      !values.city ||
+      !values.zipCode ||
+      !values.country
+    ) {
+      throw new Error("Missing required address fields");
+    }
+
+    const newAddressData: Omit<Address, "id"> = {
+      street: values.streetAddress.trim(),
+      city: values.city.trim(),
+      state: values.city.trim(), // Using city as state for simplicity, can be enhanced
+      zipCode: values.zipCode.trim(),
+      country: values.country.trim(),
+      isDefault: false,
+    };
+
+    console.log("📝 Address data to be sent:", newAddressData);
+
+    try {
+      const createdAddress = await createAddress(newAddressData);
+      console.log("✅ Address created successfully:", createdAddress);
+      console.log("🔍 Address object keys:", Object.keys(createdAddress || {}));
+      console.log("🆔 Address ID value:", createdAddress?.id);
+      console.log("🆔 Address ID type:", typeof createdAddress?.id);
+
+      // Validate that we received a proper address with ID
+      if (!createdAddress || !createdAddress.id) {
+        console.error(
+          "❌ Address validation failed - createdAddress:",
+          createdAddress
+        );
+        throw new Error("Address creation returned invalid data");
+      }
+
+      return createdAddress;
+    } catch (error) {
+      console.error("❌ Address creation API failed:", error);
+      throw error;
+    }
+  };
+
   async function onSubmit(
     values: z.infer<typeof checkoutSchema>,
     paymentMethod: PaymentMethod = "Cash"
@@ -253,17 +309,12 @@ export default function CheckoutForm() {
     }
 
     try {
-      const totalAmountINR = getCartTotal();
-      const discountAmountINR = appliedDiscount || 0;
-      const finalAmountINR = totalAmountINR - discountAmountINR;
+      const totalAmount = getCartTotal();
+      const discountAmount = appliedDiscount || 0;
+      const finalAmount = totalAmount - discountAmount;
 
-      // Convert to GBP for payment processing
-      const totalAmountGBP = convertINRtoGBP(totalAmountINR);
-      const discountAmountGBP = convertINRtoGBP(discountAmountINR);
-      const finalAmountGBP = convertINRtoGBP(finalAmountINR);
-
-      // Get Stripe-compatible amount (in pence)
-      const stripeAmount = getStripeCompatibleAmount(finalAmountGBP);
+      // Get Stripe-compatible amount (in pence for GBP)
+      const stripeAmount = getStripeCompatibleAmount(finalAmount);
 
       // Find the selected time slot
       const selectedTimeSlot = availableTimeSlots.find(
@@ -302,12 +353,57 @@ export default function CheckoutForm() {
         return new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
       };
 
+      // Handle address: either use selected address or create new one
+      let addressId: string;
+
+      // Check if we have a valid selected address with an ID
+      const hasValidSelectedAddress =
+        selectedAddress &&
+        typeof selectedAddress === "object" &&
+        selectedAddress.id &&
+        selectedAddress.id.trim() !== "";
+
+      if (hasValidSelectedAddress) {
+        // Use existing selected address
+        addressId = selectedAddress.id;
+        console.log("Using existing address:", addressId);
+      } else {
+        // Create new address from form data
+        console.log("Creating new address from form data...");
+        console.log("selectedAddress is:", selectedAddress);
+        console.log("selectedAddress?.id is:", selectedAddress?.id);
+        console.log("hasValidSelectedAddress:", hasValidSelectedAddress);
+        toast({
+          title: "Saving address...",
+          description: "Creating your delivery address.",
+        });
+
+        try {
+          const newAddress = await createAddressFromForm(values);
+          addressId = newAddress.id;
+          console.log(
+            "✅ Successfully created new address with ID:",
+            addressId
+          );
+          console.log("New address details:", newAddress);
+
+          // Add a small delay to ensure address is fully saved on backend
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        } catch (addressError) {
+          console.error("❌ Failed to create address:", addressError);
+          toast({
+            title: "Address creation failed",
+            description: "Failed to save your address. Please try again.",
+            variant: "destructive",
+          });
+          throw addressError;
+        }
+      }
+
+      console.log("📋 Preparing order data with addressId:", addressId);
+
       const orderData: CreateOrderRequest = {
-        ...(selectedAddress?.id
-          ? { addressId: selectedAddress.id }
-          : {
-              deliveryAddress: `${values.streetAddress}, ${values.city}, ${values.zipCode}, ${values.country}`,
-            }),
+        addressId: addressId, // Always use addressId now
         deliveryType: "Instant" as OrderDeliveryType,
         paymentMethod: paymentMethod,
         paymentStatus:
@@ -319,24 +415,56 @@ export default function CheckoutForm() {
           paymentMethod === "Cash"
             ? ""
             : `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        discountAmount: discountAmountINR,
+        discountAmount: discountAmount,
         scheduledTime: getScheduledTimestamp(selectedTimeSlot),
         userInstructions: `Delivery to: ${values.fullName}`,
       };
 
+      console.log("📤 Sending order data to API:", orderData);
+      console.log("🛒 Current cart items:", items);
+      console.log("💰 Cart total:", totalAmount);
+      console.log("🎫 Applied coupon:", appliedCoupon);
+      console.log("💸 Discount amount:", discountAmount);
+      console.log("👤 Current user:", user);
+      console.log("🔐 Authentication status:", isAuthenticated);
+
       // Create the order using the order store
+      console.log("🚀 Creating order...");
       const newOrder = await createOrder(orderData);
+      console.log("✅ Order created successfully:", newOrder);
 
       // Clear the cart after successful order
       clearCart();
 
+      toast({
+        title: "Order placed successfully!",
+        description: "Your order has been placed and will be delivered soon.",
+      });
+
       // Redirect to order confirmation/history page
       router.push(`/account/orders/${newOrder.orderId}`);
     } catch (error) {
-      console.error("Failed to place order:", error);
+      console.error("❌ Failed to place order:", error);
+
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
+
+      // Check if it's an axios error for more details
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as any;
+        console.error("Axios error response:", axiosError.response?.data);
+        console.error("Axios error status:", axiosError.response?.status);
+        console.error("Axios error headers:", axiosError.response?.headers);
+      }
+
       toast({
         title: "Order placement failed",
-        description: "Failed to place your order. Please try again.",
+        description: `Failed to place your order. ${
+          error instanceof Error ? error.message : "Please try again."
+        }`,
         variant: "destructive",
       });
     }
@@ -348,8 +476,15 @@ export default function CheckoutForm() {
     console.log("Cash payment clicked - Selected address:", selectedAddress);
     console.log("Form values:", values);
 
+    // Check if we have a valid selected address with an ID
+    const hasValidSelectedAddress =
+      selectedAddress &&
+      typeof selectedAddress === "object" &&
+      selectedAddress.id &&
+      selectedAddress.id.trim() !== "";
+
     // If user has selected a saved address, skip address field validation
-    if (selectedAddress?.id) {
+    if (hasValidSelectedAddress) {
       // Only validate non-address fields
       const isNameValid = await form.trigger("fullName");
       const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
@@ -380,9 +515,16 @@ export default function CheckoutForm() {
     console.log("Card payment clicked - Selected address:", selectedAddress);
     console.log("Form values:", values);
 
+    // Check if we have a valid selected address with an ID
+    const hasValidSelectedAddress =
+      selectedAddress &&
+      typeof selectedAddress === "object" &&
+      selectedAddress.id &&
+      selectedAddress.id.trim() !== "";
+
     // If user has selected a saved address, skip address field validation
     let isValid = false;
-    if (selectedAddress?.id) {
+    if (hasValidSelectedAddress) {
       // Only validate non-address fields
       const isNameValid = await form.trigger("fullName");
       const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
@@ -453,9 +595,59 @@ export default function CheckoutForm() {
         return new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
       };
 
-      const deliveryAddress = `${values.streetAddress}, ${values.city}, ${values.zipCode}, ${values.country}`;
       const scheduledTime = getScheduledTimestamp(selectedTimeSlot);
       const userInstructions = `Delivery to: ${values.fullName}`;
+
+      // Handle address: either use selected address or create new one
+      let addressIdentifier: string;
+      let createdAddress: Address | null = null;
+
+      // Check if we have a valid selected address with an ID
+      const hasValidSelectedAddress =
+        selectedAddress &&
+        typeof selectedAddress === "object" &&
+        selectedAddress.id &&
+        selectedAddress.id.trim() !== "";
+
+      if (hasValidSelectedAddress) {
+        // Use existing selected address
+        addressIdentifier = selectedAddress.id;
+        console.log("Using existing address for payment:", addressIdentifier);
+      } else {
+        // Create new address from form data
+        console.log("Creating new address for payment...");
+        console.log("selectedAddress is:", selectedAddress);
+        console.log("selectedAddress?.id is:", selectedAddress?.id);
+        console.log("hasValidSelectedAddress:", hasValidSelectedAddress);
+        toast({
+          title: "Saving address...",
+          description: "Creating your delivery address for payment.",
+        });
+
+        try {
+          createdAddress = await createAddressFromForm(values);
+          addressIdentifier = createdAddress.id;
+          console.log(
+            "✅ Successfully created new address for payment with ID:",
+            addressIdentifier
+          );
+          console.log("New address details:", createdAddress);
+
+          // Add a small delay to ensure address is fully saved on backend
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        } catch (addressError) {
+          console.error(
+            "❌ Failed to create address for payment:",
+            addressError
+          );
+          toast({
+            title: "Address creation failed",
+            description: "Failed to save your address. Please try again.",
+            variant: "destructive",
+          });
+          return; // Exit early if address creation fails
+        }
+      }
 
       // Create payment intent with our API
       toast({
@@ -463,11 +655,8 @@ export default function CheckoutForm() {
         description: "Preparing your payment with Stripe...",
       });
 
-      // Use addressId if available, otherwise fall back to delivery address string
-      const addressIdentifier = selectedAddress?.id || deliveryAddress;
-
       const paymentIntentResponse = await createPaymentIntent(
-        addressIdentifier,
+        addressIdentifier, // Use addressId for payment intent
         appliedCoupon?.coupon.code // couponCode
       );
 
@@ -477,7 +666,7 @@ export default function CheckoutForm() {
         values,
         scheduledTime,
         userInstructions,
-        selectedAddress,
+        selectedAddress: createdAddress || selectedAddress, // Use created address if new, otherwise selected
       });
 
       // Show the Stripe payment form
@@ -501,17 +690,17 @@ export default function CheckoutForm() {
         description: "Payment successful! Creating your order...",
       });
 
-      // Reconstruct delivery address from checkout data
-      const deliveryAddress = `${checkoutData.values.streetAddress}, ${checkoutData.values.city}, ${checkoutData.values.zipCode}, ${checkoutData.values.country}`;
+      // Use the addressId from the stored checkout data
+      const addressIdentifier = checkoutData.selectedAddress?.id;
 
-      // Use addressId if available, otherwise fall back to delivery address string
-      const addressIdentifier =
-        checkoutData.selectedAddress?.id || deliveryAddress;
+      if (!addressIdentifier) {
+        throw new Error("Address ID not found. This should not happen.");
+      }
 
       // Confirm the payment intent with our backend
       await confirmPaymentIntent(
         paymentIntentId,
-        addressIdentifier,
+        addressIdentifier, // Always use addressId now
         "Instant", // Instant or Scheduled,
         checkoutData.scheduledTime,
         checkoutData.userInstructions
@@ -658,6 +847,8 @@ export default function CheckoutForm() {
 
                 {/* Address fields for new address or manual entry */}
                 {(!selectedAddress ||
+                  !selectedAddress.id ||
+                  selectedAddress.id.trim() === "" ||
                   Object.keys(selectedAddress).length === 0) && (
                   <div className="grid gap-6">
                     <FormField
@@ -806,7 +997,7 @@ export default function CheckoutForm() {
                           Items ({items.length})
                         </span>
                         <span className="font-medium">
-                          {formatCurrency(convertINRtoGBP(getCartTotal()))}
+                          £{getCartTotal().toFixed(2)}
                         </span>
                       </div>
                       {appliedCoupon && appliedDiscount > 0 && (
@@ -815,7 +1006,7 @@ export default function CheckoutForm() {
                             Discount ({appliedCoupon.coupon.code})
                           </span>
                           <span className="font-medium text-green-600">
-                            -{formatCurrency(convertINRtoGBP(appliedDiscount))}
+                            -£{appliedDiscount.toFixed(2)}
                           </span>
                         </div>
                       )}
@@ -827,11 +1018,8 @@ export default function CheckoutForm() {
                       <div className="flex justify-between items-center text-xl font-bold">
                         <span>Total</span>
                         <span className="text-emerald-600">
-                          {formatCurrency(
-                            convertINRtoGBP(
-                              getCartTotal() - (appliedDiscount || 0)
-                            )
-                          )}
+                          £
+                          {(getCartTotal() - (appliedDiscount || 0)).toFixed(2)}
                         </span>
                       </div>
                     </div>
