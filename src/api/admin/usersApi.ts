@@ -215,3 +215,49 @@ export const getUserById = async (userId: string): Promise<AdminUser> => {
     throw error;
   }
 }
+
+interface TopUsers {
+  userId: string;
+  name: string;
+  email: string;
+  phone: string | "";
+  totalOrders: number;
+}
+
+interface TopUsersResponse {
+  message: string;
+  topUsers: TopUsers[];
+}
+
+// get top 15 users for coupons page
+export const getTopUsersForCoupons = async (): Promise<TopUsers[]> => {
+  try {
+    await ensureAuthenticated();
+    const response = await axios.get(`https://freshgiftbackend.onrender.com/api/users/admin/top-users`);
+    
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+
+    console.log("✅ Top users for coupons fetched successfully:", response.data);
+    
+    // Handle the response format
+    const apiData = response.data as TopUsersResponse;
+    
+    if (apiData.topUsers && Array.isArray(apiData.topUsers)) {
+      return apiData.topUsers;
+    } else {
+      console.error("❌ Unexpected API response format:", response.data);
+      throw new Error("Unexpected API response format");
+    }
+  } catch (error: any) {
+    console.error("❌ Error fetching top users for coupons:", {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+    throw error;
+  }
+}

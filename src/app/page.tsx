@@ -57,29 +57,39 @@ export default function HomePage() {
         const mostBoughtProducts = await getMostBoughtProducts();
 
         if (mostBoughtProducts && mostBoughtProducts.length > 0) {
-          // Convert MostBoughtProduct to Product format and take first 8
+          // Use the actual product data from MostBoughtProduct and take first 8
           const convertedProducts: Product[] = mostBoughtProducts
             .slice(0, 8)
-            .map((product, index) => ({
-              id: `mb-${index}-${Date.now()}`, // Generate unique ID
-              productCode: `MB-${index}`,
+            .map((product) => ({
+              id: product.id,
+              productCode: product.productCode,
               productName: product.productName,
-              productImages: product.productImages || [],
-              actualPrice: product.actualPrice || 0,
-              finalPrice: product.finalPrice || 0,
-              discount: product.discount || 0,
-              category: product.category || "Other",
-              subCategory: product.subCategory || undefined,
-              stock: product.stock || 0,
-              tags: product.tags || [],
-              rating: product.rating || undefined,
-              isFeatured: true,
-              isTrending: true,
-              isNew: false,
-              returnable: true,
-              deliveryType: "standard" as const,
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              productImages: product.productImages,
+              description: product.description,
+              actualPrice: product.actualPrice,
+              discount: product.discount,
+              finalPrice: product.finalPrice,
+              stock: product.stock,
+              category: product.category,
+              subCategory: product.subCategory,
+              tags: product.tags,
+              rating: product.rating,
+              isFeatured: product.isFeatured,
+              isTrending: product.isTrending,
+              isNew: product.isNew,
+              expiryDate: product.expiryDate
+                ? new Date(product.expiryDate)
+                : undefined,
+              harvestDate: product.harvestDate
+                ? new Date(product.harvestDate)
+                : undefined,
+              shelfLife: product.shelfLife,
+              returnable: product.returnable,
+              storageInstructions: product.storageInstructions || undefined,
+              maxPurchaseLimit: product.maxPurchaseLimit,
+              deliveryType: product.deliveryType || undefined,
+              createdAt: new Date(product.createdAt),
+              updatedAt: new Date(product.updatedAt),
             }));
           setPopularProducts(convertedProducts);
         } else {

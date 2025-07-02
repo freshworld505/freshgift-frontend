@@ -62,14 +62,16 @@ import {
   getAllCoupons,
   createCoupon,
   assignCouponToAllUsers,
+  assignCouponToUserArray,
 } from "@/api/admin/couponAdminApi";
+import { getTopUsersForCoupons } from "@/api/admin/usersApi";
 import { PRODUCT_CATEGORIES } from "@/lib/types";
 
 type Coupon = {
   couponId: string;
   code: string;
   description: string;
-  discountType: "percentage" | "fixed";
+  discountType: "percentage" | "flat";
   discountValue: number;
   discountMaxLimit?: number;
   expiryDate: string;
@@ -83,10 +85,18 @@ type Coupon = {
   updatedAt: string;
 };
 
+type TopUser = {
+  userId: string;
+  name: string;
+  email: string;
+  phone: string | "";
+  totalOrders: number;
+};
+
 type CreateCouponData = {
   code: string;
   description: string;
-  discountType: "percentage" | "fixed";
+  discountType: "percentage" | "flat";
   discountValue: number;
   discountMaxLimit?: number;
   expiryDate: string;
@@ -104,6 +114,11 @@ export default function AdminCoupons() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // State for top users
+  const [topUsers, setTopUsers] = useState<TopUser[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -113,7 +128,7 @@ export default function AdminCoupons() {
   const [formData, setFormData] = useState<CreateCouponData>({
     code: "",
     description: "",
-    discountType: "percentage",
+    discountType: "percentage", // Default to "percentage"
     discountValue: 0,
     discountMaxLimit: undefined,
     expiryDate: "",
@@ -197,6 +212,64 @@ export default function AdminCoupons() {
     }
   };
 
+  const fetchTopUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      const users = await getTopUsersForCoupons();
+      setTopUsers(users);
+    } catch (error) {
+      console.error("Error fetching top users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch top users",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleAssignToSelectedUsers = async (couponCode: string) => {
+    try {
+      if (selectedUserIds.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please select at least one user",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await assignCouponToUserArray(selectedUserIds, couponCode);
+
+      toast({
+        title: "Success",
+        description: `Coupon ${couponCode} assigned to ${selectedUserIds.length} selected users`,
+      });
+
+      setAssignModalOpen(false);
+      setSelectedCoupon(null);
+      setSelectedUserIds([]);
+    } catch (error) {
+      console.error("Error assigning coupon to selected users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to assign coupon to selected users",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUserSelection = (userId: string, checked: boolean) => {
+    setSelectedUserIds((prev) =>
+      checked ? [...prev, userId] : prev.filter((id) => id !== userId)
+    );
+  };
+
+  const handleSelectAllUsers = (checked: boolean) => {
+    setSelectedUserIds(checked ? topUsers.map((user) => user.userId) : []);
+  };
+
   const resetForm = () => {
     setFormData({
       code: "",
@@ -221,17 +294,61 @@ export default function AdminCoupons() {
     }));
   };
 
-  const filteredCoupons = coupons.filter(
+  // Remove duplicates and keep the latest coupon by createdAt
+  const uniqueCoupons = coupons.reduce((acc, coupon) => {
+    const existingCoupon = acc.find((c) => c.couponId === coupon.couponId);
+    if (!existingCoupon) {
+      acc.push(coupon);
+    } else {
+      // Keep the one with the latest createdAt
+      if (new Date(coupon.createdAt) > new Date(existingCoupon.createdAt)) {
+        const index = acc.findIndex((c) => c.couponId === coupon.couponId);
+        acc[index] = coupon;
+      }
+    }
+    return acc;
+  }, [] as Coupon[]);
+
+  // Filter out incomplete coupons that don't have essential data
+  const validCoupons = uniqueCoupons.filter((coupon) => {
+    return (
+      coupon.code &&
+      coupon.description &&
+      coupon.discountType !== null &&
+      coupon.discountValue !== null &&
+      coupon.expiryDate !== null &&
+      coupon.minimumOrderValue !== null
+    );
+  });
+
+  const filteredCoupons = validCoupons.filter(
     (coupon) =>
       coupon.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       coupon.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusBadge = (coupon: Coupon) => {
-    const isExpired = new Date(coupon.expiryDate) < new Date();
-    const status = isExpired ? "expired" : coupon.status;
+  // Separate active and expired coupons
+  const activeCoupons = filteredCoupons.filter((coupon) => {
+    const isExpired =
+      coupon.expiryDate && new Date(coupon.expiryDate) <= new Date();
+    return coupon.status === "active" && !isExpired;
+  });
 
-    switch (status) {
+  const expiredCoupons = filteredCoupons.filter((coupon) => {
+    const isExpired =
+      coupon.expiryDate && new Date(coupon.expiryDate) <= new Date();
+    return coupon.status !== "active" || isExpired;
+  });
+
+  const getStatusBadge = (coupon: Coupon) => {
+    const isExpired =
+      coupon.expiryDate && new Date(coupon.expiryDate) <= new Date();
+
+    if (isExpired) {
+      return <Badge variant="destructive">Expired</Badge>;
+    }
+
+    switch (coupon.status) {
       case "active":
         return (
           <Badge variant="default" className="bg-green-500">
@@ -240,8 +357,6 @@ export default function AdminCoupons() {
         );
       case "inactive":
         return <Badge variant="secondary">Inactive</Badge>;
-      case "expired":
-        return <Badge variant="destructive">Expired</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -277,7 +392,7 @@ export default function AdminCoupons() {
             <Ticket className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{coupons.length}</div>
+            <div className="text-2xl font-bold">{validCoupons.length}</div>
           </CardContent>
         </Card>
 
@@ -289,55 +404,60 @@ export default function AdminCoupons() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {
-                coupons.filter(
-                  (c) =>
-                    c.status === "active" && new Date(c.expiryDate) > new Date()
-                ).length
-              }
-            </div>
+            <div className="text-2xl font-bold">{activeCoupons.length}</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Usage</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Expired Coupons
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {coupons.reduce(
-                (sum, coupon) => sum + (coupon.usedCount || 0),
-                0
-              )}
-            </div>
+            <div className="text-2xl font-bold">{expiredCoupons.length}</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Table */}
-      <Card>
+      {/* Search Bar */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center space-x-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search coupons by code or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Active Coupons Table */}
+      <Card className="mb-6">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Coupons</CardTitle>
-              <CardDescription>Manage your promotional coupons</CardDescription>
+              <CardTitle className="text-green-600">Active Coupons</CardTitle>
+              <CardDescription>
+                Currently active promotional coupons
+              </CardDescription>
             </div>
-            <div className="flex items-center space-x-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search coupons..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
-            </div>
+            <Badge variant="default" className="bg-green-500">
+              {activeCoupons.length} Active
+            </Badge>
           </div>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="text-center py-8">Loading coupons...</div>
+          ) : activeCoupons.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No active coupons found
+            </div>
           ) : (
             <Table>
               <TableHeader>
@@ -353,7 +473,7 @@ export default function AdminCoupons() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCoupons.map((coupon) => (
+                {activeCoupons.map((coupon) => (
                   <TableRow key={coupon.couponId}>
                     <TableCell className="font-medium">{coupon.code}</TableCell>
                     <TableCell className="max-w-xs truncate">
@@ -370,14 +490,20 @@ export default function AdminCoupons() {
                             </span>
                           )}
                         </div>
-                      ) : (
+                      ) : coupon.discountType === "flat" ? (
                         `£${coupon.discountValue}`
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
                       )}
                     </TableCell>
-                    <TableCell>£{coupon.minimumOrderValue}</TableCell>
-                    <TableCell>{formatDate(coupon.expiryDate)}</TableCell>
+                    <TableCell>£{coupon.minimumOrderValue || 0}</TableCell>
                     <TableCell>
-                      {coupon.usedCount || 0} / {coupon.usageLimitGlobal}
+                      {coupon.expiryDate
+                        ? formatDate(coupon.expiryDate)
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {coupon.usedCount || 0} / {coupon.usageLimitGlobal || "∞"}
                     </TableCell>
                     <TableCell>{getStatusBadge(coupon)}</TableCell>
                     <TableCell>
@@ -387,10 +513,13 @@ export default function AdminCoupons() {
                           size="sm"
                           onClick={() => {
                             setSelectedCoupon(coupon);
+                            setSelectedUserIds([]);
+                            fetchTopUsers();
                             setAssignModalOpen(true);
                           }}
                           disabled={
-                            new Date(coupon.expiryDate) < new Date() ||
+                            (coupon.expiryDate &&
+                              new Date(coupon.expiryDate) <= new Date()) ||
                             coupon.status !== "active"
                           }
                         >
@@ -398,6 +527,81 @@ export default function AdminCoupons() {
                         </Button>
                       </div>
                     </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Expired Coupons Table */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-red-600">Expired Coupons</CardTitle>
+              <CardDescription>
+                Inactive or expired promotional coupons
+              </CardDescription>
+            </div>
+            <Badge variant="destructive">{expiredCoupons.length} Expired</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-8">Loading coupons...</div>
+          ) : expiredCoupons.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No expired coupons found
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Code</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Discount</TableHead>
+                  <TableHead>Min Order</TableHead>
+                  <TableHead>Expiry Date</TableHead>
+                  <TableHead>Usage</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {expiredCoupons.map((coupon) => (
+                  <TableRow key={coupon.couponId} className="opacity-60">
+                    <TableCell className="font-medium">{coupon.code}</TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {coupon.description}
+                    </TableCell>
+                    <TableCell>
+                      {coupon.discountType === "percentage" ? (
+                        <div className="flex items-center gap-1">
+                          <Percent className="h-3 w-3" />
+                          {coupon.discountValue}%
+                          {coupon.discountMaxLimit && (
+                            <span className="text-xs text-muted-foreground">
+                              (max £{coupon.discountMaxLimit})
+                            </span>
+                          )}
+                        </div>
+                      ) : coupon.discountType === "flat" ? (
+                        `£${coupon.discountValue}`
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell>£{coupon.minimumOrderValue || 0}</TableCell>
+                    <TableCell>
+                      {coupon.expiryDate
+                        ? formatDate(coupon.expiryDate)
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {coupon.usedCount || 0} / {coupon.usageLimitGlobal || "∞"}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(coupon)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -436,7 +640,7 @@ export default function AdminCoupons() {
                 <Label htmlFor="discountType">Discount Type *</Label>
                 <Select
                   value={formData.discountType}
-                  onValueChange={(value: "percentage" | "fixed") =>
+                  onValueChange={(value: "percentage" | "flat") =>
                     setFormData({ ...formData, discountType: value })
                   }
                 >
@@ -445,7 +649,7 @@ export default function AdminCoupons() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="percentage">Percentage</SelectItem>
-                    <SelectItem value="fixed">Fixed Amount</SelectItem>
+                    <SelectItem value="flat">Fixed Amount</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -614,34 +818,118 @@ export default function AdminCoupons() {
       </Dialog>
 
       {/* Assign Coupon Modal */}
-      <AlertDialog open={assignModalOpen} onOpenChange={setAssignModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Assign Coupon to All Users</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to assign the coupon "{selectedCoupon?.code}
-              " to all users? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setAssignModalOpen(false);
-                setSelectedCoupon(null);
-              }}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                selectedCoupon && handleAssignToAllUsers(selectedCoupon.code)
-              }
-            >
-              Assign to All Users
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={assignModalOpen} onOpenChange={setAssignModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assign Coupon to Users</DialogTitle>
+            <DialogDescription>
+              Select users to assign the coupon "{selectedCoupon?.code}" to.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {loadingUsers ? (
+              <div className="text-center py-8">Loading top users...</div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="select-all"
+                      checked={
+                        selectedUserIds.length === topUsers.length &&
+                        topUsers.length > 0
+                      }
+                      onCheckedChange={handleSelectAllUsers}
+                    />
+                    <Label htmlFor="select-all" className="text-sm font-medium">
+                      Select All ({topUsers.length} users)
+                    </Label>
+                  </div>
+                  <Badge variant="outline">
+                    {selectedUserIds.length} selected
+                  </Badge>
+                </div>
+
+                <div className="border rounded-md max-h-96 overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12">Select</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Total Orders</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topUsers.map((user) => (
+                        <TableRow key={user.userId}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedUserIds.includes(user.userId)}
+                              onCheckedChange={(checked) =>
+                                handleUserSelection(
+                                  user.userId,
+                                  checked as boolean
+                                )
+                              }
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {user.name}
+                          </TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>{user.phone || "N/A"}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {user.totalOrders}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
+          </div>
+
+          <DialogFooter className="flex justify-between">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  selectedCoupon && handleAssignToAllUsers(selectedCoupon.code)
+                }
+              >
+                Assign to All Users
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setAssignModalOpen(false);
+                  setSelectedCoupon(null);
+                  setSelectedUserIds([]);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() =>
+                  selectedCoupon &&
+                  handleAssignToSelectedUsers(selectedCoupon.code)
+                }
+                disabled={selectedUserIds.length === 0}
+              >
+                Assign to Selected ({selectedUserIds.length})
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

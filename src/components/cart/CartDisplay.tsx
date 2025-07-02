@@ -455,7 +455,16 @@ export default function CartDisplay() {
                 >
                   {showAvailableCoupons
                     ? "Hide"
-                    : `Show available (${getAvailableCoupons().length})`}
+                    : `Show available (${
+                        getAvailableCoupons().filter(
+                          (userCoupon, index, self) =>
+                            index ===
+                            self.findIndex(
+                              (c) =>
+                                c.coupon.couponId === userCoupon.coupon.couponId
+                            )
+                        ).length
+                      })`}
                 </Button>
               </div>
               <div>
@@ -466,46 +475,59 @@ export default function CartDisplay() {
                     </h4>
                     {getAvailableCoupons().length > 0 ? (
                       <div className="space-y-2">
-                        {getAvailableCoupons().map((userCoupon) => (
-                          <div
-                            key={userCoupon.coupon.couponId}
-                            className="flex items-center justify-between p-2 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 rounded-md border border-emerald-200 dark:border-emerald-700"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <code className="text-sm font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-1 rounded">
-                                  {userCoupon.coupon.code}
-                                </code>
-                                <Badge variant="secondary" className="text-xs">
-                                  {userCoupon.coupon.discountType ===
-                                  "percentage"
-                                    ? `${userCoupon.coupon.discountValue}% OFF`
-                                    : `£${userCoupon.coupon.discountValue} OFF`}
-                                </Badge>
-                              </div>
-                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                {userCoupon.coupon.description}
-                              </p>
-                              {userCoupon.coupon.minimumOrderValue && (
-                                <p className="text-xs text-orange-600 dark:text-orange-400">
-                                  Min order: £
-                                  {userCoupon.coupon.minimumOrderValue}
-                                </p>
-                              )}
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setCouponCode(userCoupon.coupon.code);
-                                setShowAvailableCoupons(false);
-                              }}
-                              className="ml-2 h-7 px-3 text-xs border-emerald-200 hover:bg-emerald-50 dark:border-emerald-700 dark:hover:bg-emerald-950/20"
+                        {getAvailableCoupons()
+                          .filter(
+                            (userCoupon, index, self) =>
+                              index ===
+                              self.findIndex(
+                                (c) =>
+                                  c.coupon.couponId ===
+                                  userCoupon.coupon.couponId
+                              )
+                          )
+                          .map((userCoupon) => (
+                            <div
+                              key={userCoupon.coupon.couponId}
+                              className="flex items-center justify-between p-2 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 rounded-md border border-emerald-200 dark:border-emerald-700"
                             >
-                              Use
-                            </Button>
-                          </div>
-                        ))}
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <code className="text-sm font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-1 rounded">
+                                    {userCoupon.coupon.code}
+                                  </code>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    {userCoupon.coupon.discountType ===
+                                    "percentage"
+                                      ? `${userCoupon.coupon.discountValue}% OFF`
+                                      : `£${userCoupon.coupon.discountValue} OFF`}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                  {userCoupon.coupon.description}
+                                </p>
+                                {userCoupon.coupon.minimumOrderValue && (
+                                  <p className="text-xs text-orange-600 dark:text-orange-400">
+                                    Min order: £
+                                    {userCoupon.coupon.minimumOrderValue}
+                                  </p>
+                                )}
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setCouponCode(userCoupon.coupon.code);
+                                  setShowAvailableCoupons(false);
+                                }}
+                                className="ml-2 h-7 px-3 text-xs border-emerald-200 hover:bg-emerald-50 dark:border-emerald-700 dark:hover:bg-emerald-950/20"
+                              >
+                                Use
+                              </Button>
+                            </div>
+                          ))}
                       </div>
                     ) : (
                       <p className="text-sm text-gray-500 dark:text-gray-400">

@@ -318,17 +318,35 @@ export const getProductById = async (productId: string): Promise<Product | null>
 }
 
 interface MostBoughtProduct {
+  id: string;
+  productCode: string;
   productName: string;
-  finalPrice: number;
   productImages: string[];
+  description: string;
   actualPrice: number;
-  category: string;
-  subCategory?: string;
-  discount?: number;
-  tags?: string[];
+  discount: number;
+  finalPrice: number;
   stock: number;
+  category: string;
+  subCategory: string;
+  tags: string[];
+  rating: number;
+  isFeatured: boolean;
+  isTrending: boolean;
+  isNew: boolean;
+  expiryDate: string | null;
+  harvestDate: string | null;
+  shelfLife: number;
+  returnable: boolean;
+  storageInstructions: string | null;
+  maxPurchaseLimit: number;
+  deliveryType: string | null;
+  createdAt: string;
+  updatedAt: string;
+  formattedPrice: string;
+  formattedActualPrice: string;
+  formattedDiscount: string;
   totalSold: number;
-  rating?: number; // Add rating field to match API response
 }
 
 interface MostBoughtResponse {
@@ -340,7 +358,7 @@ interface MostBoughtResponse {
 export const getMostBoughtProducts = async (): Promise<MostBoughtProduct[]> => {
   try {
     //const response = await axios.get(`${API_BASE_URL}/most-bought`);
-    const response = await axios.get(`http://localhost:5004/api/orders/most-bought-products`);
+    const response = await axios.get(`https://freshgiftbackend.onrender.com/api/orders/most-bought-products`);
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");
@@ -358,18 +376,35 @@ export const getMostBoughtProducts = async (): Promise<MostBoughtProduct[]> => {
     }
 
     const convertedProducts = products.map(product => ({
-      ...product,
+      id: product.id,
+      productCode: product.productCode,
       productName: product.productName || '',
-      finalPrice: product.finalPrice || 0,
       productImages: product.productImages || [],
-      actualPrice: product.actualPrice || product.finalPrice || 0,
+      description: product.description || '',
+      actualPrice: product.actualPrice || 0,
+      discount: product.discount || 0,
+      finalPrice: product.finalPrice || 0,
+      stock: product.stock || 0,
       category: product.category || 'other',
       subCategory: product.subCategory || 'other',
-      discount: product.discount || 0,
       tags: product.tags || [],
-      stock: product.stock || 0,
-      totalSold: product.totalSold || 0,
-      rating: product.rating || undefined
+      rating: product.rating || 0,
+      isFeatured: product.isFeatured || false,
+      isTrending: product.isTrending || false,
+      isNew: product.isNew || false,
+      expiryDate: product.expiryDate || null,
+      harvestDate: product.harvestDate || null,
+      shelfLife: product.shelfLife || 0,
+      returnable: product.returnable || false,
+      storageInstructions: product.storageInstructions || null,
+      maxPurchaseLimit: product.maxPurchaseLimit || 0,
+      deliveryType: product.deliveryType || null,
+      createdAt: product.createdAt || new Date().toISOString(),
+      updatedAt: product.updatedAt || new Date().toISOString(),
+      formattedPrice: product.formattedPrice || `£${product.finalPrice?.toFixed(2) || '0.00'}`,
+      formattedActualPrice: product.formattedActualPrice || `£${product.actualPrice?.toFixed(2) || '0.00'}`,
+      formattedDiscount: product.formattedDiscount || `${product.discount || 0}%`,
+      totalSold: product.totalSold || 0
     })) as MostBoughtProduct[];
 
     console.log(`✅ Converted ${convertedProducts.length} most bought products`);

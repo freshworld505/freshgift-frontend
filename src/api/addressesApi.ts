@@ -163,3 +163,22 @@ export const updateAddress = async (addressId: string, addressLine: string)=> {
 };
 
 
+// update or put phone number
+export const updatePhoneNumber = async (phoneNumber: string): Promise<void> => {
+  return withAuthentication(async () => {
+    try {
+      const user = getAuth().currentUser;
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await axios.put(`${API_BASE_URL}/users/update-phone`, { phoneNumber });
+      console.log("✅ Successfully updated phone number:", response.data);
+    } catch (error) {
+      console.error("Failed to update phone number:", error);
+      throw error;
+    }
+  });
+};
+
+

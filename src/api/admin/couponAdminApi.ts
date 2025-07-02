@@ -8,7 +8,7 @@ const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/coupons';
 export const createCoupon = async (couponData: {
   code: string;
     description: string;
-    discountType: 'percentage' | 'fixed';
+    discountType: 'percentage' | 'flat';
   discountValue: number;
   discountMaxLimit?: number;
   expiryDate: string; // format: "2025-12-31"
@@ -41,28 +41,38 @@ export const assignCouponToAllUsers = async (couponCode: string): Promise<any> =
   }
 }
 
-// Asign a coupon to a specific user or users
-// TODO: will add here after implemneting this in backend
-
 // Get available coupons
 export const getAllCoupons = async (): Promise<any[]> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.get(`${API_BASE_URL}/available`);
+    const response = await axios.get(`https://freshgiftbackend.onrender.com/api/coupons/admin/coupons/all`);
     
     // Check if response has the expected structure
-    if (!response.data || !response.data.coupons || !Array.isArray(response.data.coupons)) {
+    if (!response.data || !response.data.userCoupons || !Array.isArray(response.data.userCoupons)) {
       console.error("❌ Invalid data received from API");
       throw new Error("Invalid data received from API");
     }
     
-    // Extract the actual coupon data from the nested structure
-    const coupons = response.data.coupons.map((item: any) => item.coupon);
+    // Extract the coupon data directly from userCoupons array
+    const coupons = response.data.userCoupons;
     
     console.log("✅ Coupons fetched successfully:", coupons);
     return coupons;
   } catch (error) {
     console.error("❌ Error fetching coupons:", error);
+    throw error;
+  }
+}
+
+// assign a coupon to a user's userId array
+export const assignCouponToUserArray = async (userIds: string[], couponCode: string): Promise<any> => {
+  try {
+    await ensureAuthenticated();
+    const response = await axios.post(`https://freshgiftbackend.onrender.com/api/coupons/assign-multiple`, { userIds, couponCode });
+    console.log("✅ Coupon assigned to users successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error assigning coupon to user:", error);
     throw error;
   }
 }

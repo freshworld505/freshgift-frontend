@@ -47,10 +47,11 @@ import {
   Truck,
   CheckCircle,
   Sparkles,
+  Phone,
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { createPaymentIntent, confirmPaymentIntent } from "@/api/payment";
-import { createAddress } from "@/api/addressesApi";
+import { createAddress, updatePhoneNumber } from "@/api/addressesApi";
 import StripePaymentForm from "./StripePaymentForm";
 import SelectAddress from "./SelectAddress";
 
@@ -142,6 +143,10 @@ const convertToCountryCode = (country: string): string => {
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
+  phoneNumber: z
+    .string()
+    .min(10, "Valid phone number is required.")
+    .regex(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number"),
   streetAddress: z.string().min(5, "Street address is required."),
   city: z.string().min(2, "City is required."),
   zipCode: z.string().min(5, "Valid ZIP code is required."),
@@ -183,6 +188,7 @@ export default function CheckoutForm() {
   const { user, isAuthenticated } = useAuthStore();
   const { createOrder, isLoading: isOrderLoading } = useOrderStore();
   const { appliedCoupon, appliedDiscount } = useCouponStore();
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [showStripePayment, setShowStripePayment] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
@@ -210,6 +216,7 @@ export default function CheckoutForm() {
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       fullName: user?.name || "",
+      phoneNumber: user?.phone || "",
       streetAddress: user?.addresses?.[0]?.street || "",
       city: user?.addresses?.[0]?.city || "",
       zipCode: user?.addresses?.[0]?.zipCode || "",
@@ -316,6 +323,28 @@ export default function CheckoutForm() {
       // Get Stripe-compatible amount (in pence for GBP)
       const stripeAmount = getStripeCompatibleAmount(finalAmount);
 
+      // Update phone number if it has changed
+      if (values.phoneNumber && values.phoneNumber !== user.phone) {
+        try {
+          console.log("📞 Updating phone number:", values.phoneNumber);
+          await updatePhoneNumber(values.phoneNumber);
+          console.log("✅ Phone number updated successfully");
+          toast({
+            title: "Phone number updated",
+            description: "Your contact information has been saved.",
+          });
+        } catch (phoneError) {
+          console.error("❌ Failed to update phone number:", phoneError);
+          // Don't block the order if phone update fails, just log it
+          toast({
+            title: "Phone update failed",
+            description:
+              "Order will proceed, but phone number couldn't be updated.",
+            variant: "destructive",
+          });
+        }
+      }
+
       // Find the selected time slot
       const selectedTimeSlot = availableTimeSlots.find(
         (slot) => slot.id === values.deliveryTimeSlot
@@ -417,7 +446,7 @@ export default function CheckoutForm() {
             : `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         discountAmount: discountAmount,
         scheduledTime: getScheduledTimestamp(selectedTimeSlot),
-        userInstructions: `Delivery to: ${values.fullName}`,
+        userInstructions: `Delivery to: ${values.fullName}, Phone: ${values.phoneNumber}`,
       };
 
       console.log("📤 Sending order data to API:", orderData);
@@ -487,16 +516,19 @@ export default function CheckoutForm() {
     if (hasValidSelectedAddress) {
       // Only validate non-address fields
       const isNameValid = await form.trigger("fullName");
+      const isPhoneValid = await form.trigger("phoneNumber");
       const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
 
       console.log(
         "Validation results - Name:",
         isNameValid,
+        "Phone:",
+        isPhoneValid,
         "Time slot:",
         isTimeSlotValid
       );
 
-      if (isNameValid && isTimeSlotValid) {
+      if (isNameValid && isPhoneValid && isTimeSlotValid) {
         await onSubmit(values, "Cash");
       }
     } else {
@@ -527,11 +559,14 @@ export default function CheckoutForm() {
     if (hasValidSelectedAddress) {
       // Only validate non-address fields
       const isNameValid = await form.trigger("fullName");
+      const isPhoneValid = await form.trigger("phoneNumber");
       const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
-      isValid = isNameValid && isTimeSlotValid;
+      isValid = isNameValid && isPhoneValid && isTimeSlotValid;
       console.log(
         "Validation results - Name:",
         isNameValid,
+        "Phone:",
+        isPhoneValid,
         "Time slot:",
         isTimeSlotValid
       );
@@ -562,6 +597,31 @@ export default function CheckoutForm() {
     }
 
     try {
+      // Update phone number if it has changed
+      if (values.phoneNumber && values.phoneNumber !== user.phone) {
+        try {
+          console.log(
+            "📞 Updating phone number for card payment:",
+            values.phoneNumber
+          );
+          await updatePhoneNumber(values.phoneNumber);
+          console.log("✅ Phone number updated successfully");
+          toast({
+            title: "Phone number updated",
+            description: "Your contact information has been saved.",
+          });
+        } catch (phoneError) {
+          console.error("❌ Failed to update phone number:", phoneError);
+          // Don't block the payment if phone update fails, just log it
+          toast({
+            title: "Phone update failed",
+            description:
+              "Payment will proceed, but phone number couldn't be updated.",
+            variant: "destructive",
+          });
+        }
+      }
+
       // Find the selected time slot
       const selectedTimeSlot = availableTimeSlots.find(
         (slot) => slot.id === values.deliveryTimeSlot
@@ -596,7 +656,7 @@ export default function CheckoutForm() {
       };
 
       const scheduledTime = getScheduledTimestamp(selectedTimeSlot);
-      const userInstructions = `Delivery to: ${values.fullName}`;
+      const userInstructions = `Delivery to: ${values.fullName}, Phone: ${values.phoneNumber}`;
 
       // Handle address: either use selected address or create new one
       let addressIdentifier: string;
@@ -823,8 +883,17 @@ export default function CheckoutForm() {
                 onAddressChange={handleAddressChange}
               />
 
-              {/* Full Name Field */}
+              {/* Contact Information Section */}
               <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-emerald-100 dark:border-emerald-800">
+                  <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
+                    <Phone className="h-3 w-3 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">
+                    Contact Information
+                  </h3>
+                </div>
+
                 <FormField
                   control={form.control}
                   name="fullName"
@@ -836,6 +905,27 @@ export default function CheckoutForm() {
                       <FormControl>
                         <Input
                           placeholder="John Doe"
+                          {...field}
+                          className="h-12 rounded-xl border-emerald-200 dark:border-emerald-700 focus:border-emerald-500 focus:ring-emerald-500/20"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-foreground">
+                        Phone Number
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="+44 7911 123456"
+                          type="tel"
                           {...field}
                           className="h-12 rounded-xl border-emerald-200 dark:border-emerald-700 focus:border-emerald-500 focus:ring-emerald-500/20"
                         />
