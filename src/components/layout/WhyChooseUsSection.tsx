@@ -37,8 +37,8 @@ const whyChooseUsItems = [
     icon: <Smile className="h-12 w-12 text-orange-600" />,
     title: "Loved by Customers",
     description:
-      "Join thousands of happy customers enjoying fresh produce every day with 4.9★ rating.",
-    highlight: "50K+ customers",
+      "Join all happy customers enjoying fresh produce every day with a 4.9★ rating.",
+    highlight: "4.9★ rating",
     color: "orange",
   },
 ];
@@ -162,7 +162,7 @@ export default function WhyChooseUsSection() {
         <div className="text-center mt-16">
           <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
             <CheckCircle className="h-4 w-4 text-emerald-600" />
-            Trusted by 50,000+ customers worldwide
+            Join all happy customers today!
           </div>
         </div>
       </div>

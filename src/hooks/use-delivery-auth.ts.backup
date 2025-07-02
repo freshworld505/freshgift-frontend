@@ -1,0 +1,53 @@
+import { useState, useEffect, useCallback } from 'react';
+
+// List of delivery emails - you can add more emails here
+const DELIVERY_EMAILS = [
+  'delivery@veggieco.com',
+  'driver@freshworld.com',
+  'courier@freshworld.com',
+  'deliveryuser@freshworld.com',
+  'delivery.official01@gmail.com',
+  'delivery@freshgift.com',
+  'ajbaggar@gmail.com',
+  // Add more delivery emails as needed
+];
+
+interface DeliveryAuthState {
+  isDelivery: boolean;
+  loading: boolean;
+}
+
+export function useDeliveryAuth() {
+  const [deliveryState, setDeliveryState] = useState<DeliveryAuthState>({
+    isDelivery: false,
+    loading: true,
+  });
+
+  const checkDeliveryStatus = useCallback((email: string | null | undefined) => {
+    setDeliveryState({ loading: true, isDelivery: false });
+    
+    if (!email) {
+      setDeliveryState({ loading: false, isDelivery: false });
+      return;
+    }
+
+    const isDelivery = DELIVERY_EMAILS.includes(email.toLowerCase());
+    
+    console.log('Delivery check:', { email, isDelivery, deliveryEmails: DELIVERY_EMAILS });
+    
+    setDeliveryState({ 
+      loading: false, 
+      isDelivery 
+    });
+  }, []);
+
+  useEffect(() => {
+    // Initialize loading state
+    setDeliveryState(prev => ({ ...prev, loading: false }));
+  }, []);
+
+  return {
+    ...deliveryState,
+    checkDeliveryStatus,
+  };
+}

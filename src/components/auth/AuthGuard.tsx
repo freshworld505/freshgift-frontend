@@ -17,7 +17,21 @@ import {
 } from "@/components/ui/dialog";
 
 // Routes that don't require authentication
-const PUBLIC_ROUTES = ["/login", "/signup", "/", "/products", "/categories"];
+const PUBLIC_ROUTES = [
+  "/login",
+  "/signup",
+  "/",
+  "/products",
+  "/categories",
+  "/about",
+  "/contact",
+  "/help",
+  "/track",
+  "/deals",
+  "/privacy",
+  "/terms",
+  "/returns",
+];
 
 interface AuthGuardProps {
   children: React.ReactNode;

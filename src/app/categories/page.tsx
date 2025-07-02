@@ -19,6 +19,7 @@ import {
   ArrowRight,
   ArrowLeft,
   Percent,
+  Vegan,
 } from "lucide-react";
 
 export default function CategoriesPage() {
@@ -157,6 +158,17 @@ export default function CategoriesPage() {
       textColor: "text-violet-700",
       badge: "Fast",
       badgeColor: "bg-violet-100 text-violet-800",
+    },
+    {
+      id: "veggies",
+      title: "Fresh Vegetables",
+      description: "Crisp and nutritious vegetables",
+      icon: Vegan,
+      color: "from-green-400 to-green-600",
+      bgColor: "bg-green-50",
+      textColor: "text-green-700",
+      badge: "Veggies",
+      badgeColor: "bg-green-100 text-green-800",
     },
   ];
 

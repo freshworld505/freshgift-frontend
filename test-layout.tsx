@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+// import "./globals.css";
+// import Header from "@/components/layout/Header";
+// import Footer from "@/components/layout/Footer";
 import { Providers } from "@/components/Providers";
-import AuthGuard from "@/components/auth/AuthGuard";
+// import AuthGuard from "@/components/auth/AuthGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description: "Your online store for the freshest fruits and vegetables.",
 };
 
-export default function RootLayout({
+export default function TestLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -31,15 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
-        <Providers>
-          <AuthGuard>
-            <Header />
-            <main className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-8">
-              {children}
-            </main>
-            <Footer />
-          </AuthGuard>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

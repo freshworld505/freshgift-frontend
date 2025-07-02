@@ -42,7 +42,7 @@ export default function Header() {
   // Check if we're on the products page
   const isProductsPage = pathname === "/products";
 
-  // Check admin status when user changes
+  // Check admin and delivery status when user changes
   useEffect(() => {
     if (user?.email) {
       checkAdminStatus(user.email);

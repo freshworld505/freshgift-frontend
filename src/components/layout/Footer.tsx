@@ -3,10 +3,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
   ArrowRight,
   Truck,
   Shield,
@@ -23,15 +19,13 @@ export default function Footer() {
     { name: "Products", href: "/products" },
     { name: "Contact", href: "/contact" },
     { name: "Help Center", href: "/help" },
-    { name: "Track Order", href: "/track" },
   ];
 
   const categories = [
-    { name: "Fresh Fruits", href: "/products?category=fruits" },
+    { name: "Fresh Fruits", href: "/categories/fresh-fruits" },
     { name: "Vegetables", href: "/products?category=vegetables" },
-    { name: "Organic Produce", href: "/products?category=organic" },
-    { name: "Seasonal Items", href: "/products?category=seasonal" },
-    { name: "Herbs & Spices", href: "/products?category=herbs" },
+    { name: "Organic Produce", href: "/categories/organic" },
+    { name: "Seasonal Items", href: "/categories/seasonal" },
   ];
 
   const features = [
@@ -83,24 +77,6 @@ export default function Footer() {
                     123 Fresh Market St, Green Valley
                   </span>
                 </div>
-              </div>
-
-              {/* Social Links */}
-              <div className="flex gap-3">
-                {[
-                  { icon: Facebook, href: "#" },
-                  { icon: Twitter, href: "#" },
-                  { icon: Instagram, href: "#" },
-                  { icon: Youtube, href: "#" },
-                ].map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    className="p-2 bg-emerald-800/50 hover:bg-emerald-700 rounded-lg transition-colors group"
-                  >
-                    <social.icon className="h-5 w-5 text-emerald-200 group-hover:text-white" />
-                  </a>
-                ))}
               </div>
             </div>
 
@@ -200,12 +176,6 @@ export default function Footer() {
               </a>
               <a href="/cookies" className="hover:text-white transition-colors">
                 Cookie Policy
-              </a>
-              <a
-                href="/accessibility"
-                className="hover:text-white transition-colors"
-              >
-                Accessibility
               </a>
             </div>
           </div>

@@ -70,30 +70,6 @@ export default function HeroSection() {
               </Link>
             </Button>
           </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 border-t border-emerald-100 dark:border-emerald-800">
-            <div className="space-y-1">
-              <div className="text-3xl font-bold text-emerald-600">50K+</div>
-              <div className="text-sm text-muted-foreground">
-                Happy Customers
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-bold text-emerald-600">500+</div>
-              <div className="text-sm text-muted-foreground">
-                Fresh Products
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-bold text-emerald-600">24hr</div>
-              <div className="text-sm text-muted-foreground">Delivery</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-bold text-emerald-600">4.9★</div>
-              <div className="text-sm text-muted-foreground">Rating</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

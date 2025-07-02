@@ -5,6 +5,11 @@ import WhyChooseUsSection from "@/components/layout/WhyChooseUsSection";
 import { useCartStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import ProductList from "@/components/products/ProductList";
+import { useAllProducts } from "@/hooks/use-products";
+import { getMostBoughtProducts } from "@/api/productApi";
+import type { Product } from "@/lib/types";
 import {
   Sun,
   Sprout,
@@ -21,18 +26,93 @@ import {
   ArrowRight,
   Clock,
   Percent,
+  Flame,
+  Vegan,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function HomePage() {
   const { fetchCart } = useCartStore();
   const router = useRouter();
+  const [popularProducts, setPopularProducts] = useState<Product[]>([]);
+  const [isLoadingPopular, setIsLoadingPopular] = useState(true);
+
+  // Fallback to all products if most bought fails
+  const { data: allProducts = [], isLoading: isLoadingAllProducts } =
+    useAllProducts(1, 8);
 
   useEffect(() => {
     // Fetch cart status in background when homepage loads
     fetchCart();
   }, [fetchCart]);
+
+  // Separate effect for popular products to avoid dependency issues
+  useEffect(() => {
+    // Fetch popular/most bought products
+    const fetchPopularProducts = async () => {
+      setIsLoadingPopular(true);
+      try {
+        const mostBoughtProducts = await getMostBoughtProducts();
+
+        if (mostBoughtProducts && mostBoughtProducts.length > 0) {
+          // Convert MostBoughtProduct to Product format and take first 8
+          const convertedProducts: Product[] = mostBoughtProducts
+            .slice(0, 8)
+            .map((product, index) => ({
+              id: `mb-${index}-${Date.now()}`, // Generate unique ID
+              productCode: `MB-${index}`,
+              productName: product.productName,
+              productImages: product.productImages || [],
+              actualPrice: product.actualPrice || 0,
+              finalPrice: product.finalPrice || 0,
+              discount: product.discount || 0,
+              category: product.category || "Other",
+              subCategory: product.subCategory || undefined,
+              stock: product.stock || 0,
+              tags: product.tags || [],
+              rating: product.rating || undefined,
+              isFeatured: true,
+              isTrending: true,
+              isNew: false,
+              returnable: true,
+              deliveryType: "standard" as const,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }));
+          setPopularProducts(convertedProducts);
+        } else {
+          // Fallback to first 8 products from all products
+          if (allProducts.length > 0) {
+            setPopularProducts(allProducts.slice(0, 8));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch popular products:", error);
+        // Fallback to first 8 products from all products
+        if (allProducts.length > 0) {
+          setPopularProducts(allProducts.slice(0, 8));
+        }
+      } finally {
+        setIsLoadingPopular(false);
+      }
+    };
+
+    fetchPopularProducts();
+  }, []); // Empty dependency array - only run once on mount
+
+  // Separate effect to handle fallback when allProducts are loaded
+  useEffect(() => {
+    if (
+      !isLoadingAllProducts &&
+      allProducts.length > 0 &&
+      popularProducts.length === 0
+    ) {
+      setPopularProducts(allProducts.slice(0, 8));
+      setIsLoadingPopular(false);
+    }
+  }, [isLoadingAllProducts, allProducts.length, popularProducts.length]);
 
   // Define categories with their details
   const categories = [
@@ -92,39 +172,6 @@ export default function HomePage() {
       badgeColor: "bg-red-100 text-red-800",
     },
     {
-      id: "new-arrivals",
-      title: "Fresh Selection",
-      description: "Latest fresh arrivals",
-      icon: TrendingUp,
-      color: "from-blue-400 to-blue-600",
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-700",
-      badge: "New",
-      badgeColor: "bg-blue-100 text-blue-800",
-    },
-    {
-      id: "on-sale",
-      title: "On Sale",
-      description: "Special discounts available",
-      icon: Percent,
-      color: "from-pink-400 to-pink-600",
-      bgColor: "bg-pink-50",
-      textColor: "text-pink-700",
-      badge: "Sale",
-      badgeColor: "bg-pink-100 text-pink-800",
-    },
-    {
-      id: "beverages",
-      title: "New Arrivals",
-      description: "Latest beverages collection",
-      icon: Coffee,
-      color: "from-amber-400 to-amber-600",
-      bgColor: "bg-amber-50",
-      textColor: "text-amber-700",
-      badge: "Trending",
-      badgeColor: "bg-amber-100 text-amber-800",
-    },
-    {
       id: "bakery",
       title: "Imported Selection",
       description: "Premium imported goods",
@@ -134,39 +181,6 @@ export default function HomePage() {
       textColor: "text-purple-700",
       badge: "Premium",
       badgeColor: "bg-purple-100 text-purple-800",
-    },
-    {
-      id: "dairy",
-      title: "Fresh Juices",
-      description: "Cold-pressed fresh juices",
-      icon: Milk,
-      color: "from-cyan-400 to-cyan-600",
-      bgColor: "bg-cyan-50",
-      textColor: "text-cyan-700",
-      badge: "Fresh",
-      badgeColor: "bg-cyan-100 text-cyan-800",
-    },
-    {
-      id: "root-vegetables",
-      title: "Seasonal Picks",
-      description: "Seasonal root vegetables",
-      icon: ShoppingBasket,
-      color: "from-yellow-600 to-yellow-800",
-      bgColor: "bg-yellow-50",
-      textColor: "text-yellow-800",
-      badge: "Seasonal",
-      badgeColor: "bg-yellow-100 text-yellow-900",
-    },
-    {
-      id: "instant-delivery",
-      title: "Instant Delivery",
-      description: "Quick delivery available",
-      icon: Zap,
-      color: "from-violet-400 to-violet-600",
-      bgColor: "bg-violet-50",
-      textColor: "text-violet-700",
-      badge: "Fast",
-      badgeColor: "bg-violet-100 text-violet-800",
     },
   ];
 
@@ -245,6 +259,77 @@ export default function HomePage() {
             );
           })}
         </div>
+      </section>
+
+      {/* Most Bought Section */}
+      <section className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="p-2 bg-gradient-to-r from-orange-400 to-red-500 rounded-full">
+              <Flame className="h-6 w-6 text-white" />
+            </div>
+            <h2 className="text-4xl font-bold text-gray-900">
+              Popular Products
+            </h2>
+          </div>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Customer favorites and most-bought items this week
+          </p>
+        </div>
+
+        {isLoadingPopular || isLoadingAllProducts ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Card key={index} className="border-0 shadow-md">
+                <CardContent className="p-6">
+                  <div className="animate-pulse">
+                    <div className="aspect-square bg-gray-200 rounded-xl mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3 mb-3"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : popularProducts.length > 0 ? (
+          <div className="space-y-6">
+            <ProductList products={popularProducts} />
+            <div className="text-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white"
+              >
+                <Link href="/products">
+                  <TrendingUp className="h-5 w-5 mr-2" />
+                  View All Products
+                </Link>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Card className="border-0 shadow-md bg-gradient-to-br from-orange-50 to-red-50">
+            <CardContent className="p-12 text-center">
+              <div className="p-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full w-fit mx-auto mb-6">
+                <TrendingUp className="h-12 w-12 text-white" />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                Popular Products Coming Soon
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                We're gathering data on customer favorites. Check back soon to
+                see what's trending!
+              </p>
+              <Button
+                asChild
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
+              >
+                <Link href="/products">Browse All Products</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </section>
 
       {/* Quick Access Section */}

@@ -316,3 +316,73 @@ export const getProductById = async (productId: string): Promise<Product | null>
     return null;
   }
 }
+
+interface MostBoughtProduct {
+  productName: string;
+  finalPrice: number;
+  productImages: string[];
+  actualPrice: number;
+  category: string;
+  subCategory?: string;
+  discount?: number;
+  tags?: string[];
+  stock: number;
+  totalSold: number;
+  rating?: number; // Add rating field to match API response
+}
+
+interface MostBoughtResponse {
+  products: MostBoughtProduct[];
+  message?: string;
+}
+
+// Most Bought Products
+export const getMostBoughtProducts = async (): Promise<MostBoughtProduct[]> => {
+  try {
+    //const response = await axios.get(`${API_BASE_URL}/most-bought`);
+    const response = await axios.get(`http://localhost:5004/api/orders/most-bought-products`);
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+    console.log("✅ Most bought products fetched successfully:", response.data);
+
+    const apiData = response.data;
+    let products: any[] = [];
+
+    // Handle the new backend response structure
+    if (apiData.products) {
+      products = apiData.products;
+    } else if (Array.isArray(apiData)) {
+      products = apiData;
+    }
+
+    const convertedProducts = products.map(product => ({
+      ...product,
+      productName: product.productName || '',
+      finalPrice: product.finalPrice || 0,
+      productImages: product.productImages || [],
+      actualPrice: product.actualPrice || product.finalPrice || 0,
+      category: product.category || 'other',
+      subCategory: product.subCategory || 'other',
+      discount: product.discount || 0,
+      tags: product.tags || [],
+      stock: product.stock || 0,
+      totalSold: product.totalSold || 0,
+      rating: product.rating || undefined
+    })) as MostBoughtProduct[];
+
+    console.log(`✅ Converted ${convertedProducts.length} most bought products`);
+    return convertedProducts;
+  } catch (error: any) {
+    console.error(`❌ Error fetching most bought products:`, {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+
+    // Return empty array instead of throwing to prevent homepage crash
+    return [];
+  }
+}
