@@ -213,7 +213,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
@@ -225,44 +225,41 @@ export default function HomePage() {
                 <CardHeader
                   className={`${category.bgColor} rounded-t-lg relative overflow-hidden p-3 md:p-4`}
                 >
-                  <div className="flex flex-col sm:flex-row items-center sm:justify-between mb-2 sm:mb-3">
+                  <div className="flex flex-col items-center mb-2">
                     <div
-                      className={`p-2 md:p-3 rounded-full bg-gradient-to-r ${category.color} shadow-lg mb-2 sm:mb-0`}
+                      className={`p-2 md:p-3 rounded-full bg-gradient-to-r ${category.color} shadow-lg mb-2`}
                     >
                       <IconComponent className="h-4 w-4 md:h-6 md:w-6 text-white" />
                     </div>
                     <Badge
-                      className={`${category.badgeColor} border-0 text-xs hidden sm:block`}
+                      className={`${category.badgeColor} border-0 text-xs`}
                     >
                       {category.badge}
                     </Badge>
                   </div>
 
                   <CardTitle
-                    className={`text-sm md:text-xl font-bold ${category.textColor} group-hover:text-gray-900 transition-colors text-center sm:text-left`}
+                    className={`text-sm md:text-base lg:text-xl font-bold ${category.textColor} group-hover:text-gray-900 transition-colors text-center leading-tight`}
                   >
                     {category.title}
                   </CardTitle>
 
                   {/* Decorative gradient overlay */}
                   <div
-                    className={`absolute -top-4 -right-4 w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br ${category.color} opacity-10 rounded-full transform group-hover:scale-110 transition-transform duration-300`}
+                    className={`absolute -top-4 -right-4 w-12 h-12 md:w-16 md:h-16 lg:w-24 lg:h-24 bg-gradient-to-br ${category.color} opacity-10 rounded-full transform group-hover:scale-110 transition-transform duration-300`}
                   ></div>
                 </CardHeader>
 
-                <CardContent className="p-3 md:p-6">
-                  <p className="text-xs md:text-base text-gray-600 mb-2 md:mb-4 group-hover:text-gray-700 transition-colors text-center sm:text-left line-clamp-2">
+                <CardContent className="p-3 md:p-4 lg:p-6">
+                  <p className="text-xs md:text-sm lg:text-base text-gray-600 mb-2 md:mb-3 lg:mb-4 group-hover:text-gray-700 transition-colors text-center line-clamp-2">
                     {category.description}
                   </p>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-center sm:justify-between">
                     <span className="text-xs md:text-sm font-medium text-gray-500 group-hover:text-gray-700 transition-colors hidden sm:block">
                       Explore Collection
                     </span>
-                    <span className="text-xs font-medium text-gray-500 group-hover:text-gray-700 transition-colors block sm:hidden">
-                      View
-                    </span>
-                    <ArrowRight className="h-3 w-3 md:h-5 md:w-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
+                    <ArrowRight className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
                   </div>
                 </CardContent>
               </Card>
@@ -346,7 +343,7 @@ export default function HomePage() {
       <section className="container mx-auto px-4">
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl md:rounded-3xl p-4 md:p-8 border border-green-200">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-center">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 text-center lg:text-left">
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
                 Need something specific?
               </h3>
@@ -354,16 +351,16 @@ export default function HomePage() {
                 Browse our complete product range or search for exactly what you
                 need.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start">
                 <Card
                   className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 bg-white border border-green-200"
                   onClick={() => router.push("/products")}
                 >
-                  <CardContent className="p-3 md:p-4 flex items-center space-x-3">
+                  <CardContent className="p-3 md:p-4 flex items-center justify-center lg:justify-start space-x-3">
                     <div className="p-2 rounded-full bg-green-100">
                       <LayoutGrid className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 text-center lg:text-left">
                       <p className="font-semibold text-gray-900 text-sm md:text-base">
                         All Products
                       </p>
@@ -377,9 +374,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="text-center lg:text-right">
-              <div className="inline-flex items-center justify-center w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full shadow-2xl">
-                <ShoppingBasket className="h-12 w-12 md:h-16 md:w-16 text-white" />
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 md:w-32 md:h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full shadow-2xl">
+                <ShoppingBasket className="h-10 w-10 md:h-16 md:w-16 text-white" />
               </div>
             </div>
           </div>

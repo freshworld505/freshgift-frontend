@@ -198,11 +198,11 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-md mx-auto">
       <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="space-y-6 pb-8">
+        <CardHeader className="space-y-4 pb-6">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl mb-4 shadow-lg">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl mb-3 shadow-lg">
               <svg
-                className="w-8 h-8 text-primary-foreground"
+                className="w-6 h-6 text-primary-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -215,12 +215,7 @@ export default function LoginForm() {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Welcome Back!
-            </h1>
-            <p className="text-muted-foreground">
-              Sign in to your FreshGift account
-            </p>
+            <h2 className="text-xl font-semibold text-foreground">Sign In</h2>
           </div>
         </CardHeader>
 
