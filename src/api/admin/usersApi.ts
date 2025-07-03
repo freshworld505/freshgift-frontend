@@ -261,3 +261,59 @@ export const getTopUsersForCoupons = async (): Promise<TopUsers[]> => {
     throw error;
   }
 }
+
+interface StatusBasedUser {
+  userId: string;
+  firebaseId: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  profile: any | null;
+  profilePicture: string;
+  role: 'user' | 'admin';
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ActiveInactiveUsersResponse {
+  activeUsersCount: number;
+  inactiveUsersCount: number;
+  activeUsers: StatusBasedUser[];
+  inactiveUsers: StatusBasedUser[];
+}
+
+// active and inactive users
+export const getActiveAndInactiveUsers = async (): Promise<ActiveInactiveUsersResponse> => {
+  try {
+    await ensureAuthenticated();
+    const response = await axios.get(`${API_BASE_URL}/users/admin/customers/active-inactive`);
+    
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+
+    console.log("✅ Active and inactive users fetched successfully:", response.data);
+    
+    // Handle the response format
+    const apiData = response.data as ActiveInactiveUsersResponse;
+    
+    if (typeof apiData.activeUsersCount === 'number' && 
+        typeof apiData.inactiveUsersCount === 'number' &&
+        Array.isArray(apiData.activeUsers) &&
+        Array.isArray(apiData.inactiveUsers)) {
+      return apiData;
+    } else {
+      console.error("❌ Unexpected API response format:", response.data);
+      throw new Error("Unexpected API response format");
+    }
+  } catch (error: any) {
+    console.error("❌ Error fetching active and inactive users:", {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+    throw error;
+  }
+}

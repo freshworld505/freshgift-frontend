@@ -8,7 +8,7 @@ import {
   getTopSellingProducts,
   getTotalOrdersRevenue 
 } from '@/api/admin/analyticsApi';
-import { getAllUsers, getAllCustomersCount } from '@/api/admin/usersApi';
+import { getAllUsers, getAllCustomersCount, getActiveAndInactiveUsers } from '@/api/admin/usersApi';
 import { searchProducts, createProduct, editProduct, deleteProduct } from '@/api/admin/productApi';
 import { getAllOrdersForAdmin, getOrderById } from '@/api/admin/orderApi';
 
@@ -30,6 +30,7 @@ interface AdminState {
   users: any[];
   recentOrders: any[];
   topProducts: any[];
+  userStatusData: any | null;
   
   // Loading states
   isLoading: boolean;
@@ -37,6 +38,7 @@ interface AdminState {
   ordersLoading: boolean;
   productsLoading: boolean;
   usersLoading: boolean;
+  userStatusLoading: boolean;
 
   // Error states
   error: string | null;
@@ -46,6 +48,7 @@ interface AdminState {
   fetchOrders: () => Promise<void>;
   fetchProducts: (searchTerm?: string, page?: number, limit?: number) => Promise<void>;
   fetchUsers: () => Promise<void>;
+  fetchUserStatus: () => Promise<void>;
   fetchRecentOrders: (limit?: number) => Promise<void>;
   fetchTopProducts: () => Promise<void>;
   fetchOrderById: (orderId: string) => Promise<any>;
@@ -66,12 +69,14 @@ export const useAdminStore = create<AdminState>()(
       users: [],
       recentOrders: [],
       topProducts: [],
+      userStatusData: null,
       
       isLoading: false,
       statsLoading: false,
       ordersLoading: false,
       productsLoading: false,
       usersLoading: false,
+      userStatusLoading: false,
       
       error: null,
 
@@ -167,6 +172,17 @@ export const useAdminStore = create<AdminState>()(
             error: error.message || 'Failed to fetch users',
             usersLoading: false 
           });
+        }
+      },
+
+      fetchUserStatus: async () => {
+        set({ userStatusLoading: true });
+        try {
+          const userStatusData = await getActiveAndInactiveUsers();
+          set({ userStatusData, userStatusLoading: false });
+        } catch (error: any) {
+          console.error('Error fetching user status:', error);
+          set({ userStatusLoading: false });
         }
       },
 

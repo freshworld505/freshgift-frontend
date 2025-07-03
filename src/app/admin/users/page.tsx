@@ -23,14 +23,24 @@ import { Search, Eye, UserCheck, UserX, Users } from "lucide-react";
 import { useAdminStore } from "@/hooks/use-admin-store";
 
 export default function AdminUsers() {
-  const { users, usersLoading, error, fetchUsers } = useAdminStore();
+  const {
+    users,
+    usersLoading,
+    userStatusData,
+    userStatusLoading,
+    error,
+    fetchUsers,
+    fetchUserStatus,
+  } = useAdminStore();
 
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     // Fetch users when component mounts
     fetchUsers();
-  }, [fetchUsers]);
+    // Fetch user status data
+    fetchUserStatus();
+  }, [fetchUsers, fetchUserStatus]);
 
   const filteredUsers = users.filter(
     (user: any) =>
@@ -41,6 +51,36 @@ export default function AdminUsers() {
   );
 
   const getStatusBadge = (user: any) => {
+    // Show loading if user status data is still loading
+    if (userStatusLoading) {
+      return <Badge variant="secondary">Loading...</Badge>;
+    }
+
+    // If we have status data, check if user is in active or inactive list
+    if (userStatusData) {
+      const isActive = userStatusData.activeUsers?.some(
+        (activeUser: any) =>
+          activeUser.userId === user.userId ||
+          activeUser.firebaseId === user.firebaseId
+      );
+      const isInactive = userStatusData.inactiveUsers?.some(
+        (inactiveUser: any) =>
+          inactiveUser.userId === user.userId ||
+          inactiveUser.firebaseId === user.firebaseId
+      );
+
+      if (isActive) {
+        return (
+          <Badge variant="default" className="bg-green-100 text-green-800">
+            Active
+          </Badge>
+        );
+      } else if (isInactive) {
+        return <Badge variant="destructive">Inactive</Badge>;
+      }
+    }
+
+    // Fallback to previous logic if status data is not available
     if (user.isActive === false) {
       return <Badge variant="destructive">Inactive</Badge>;
     } else {
@@ -51,8 +91,12 @@ export default function AdminUsers() {
   const getUserStats = () => {
     const stats = {
       total: users.length,
-      active: users.filter((u: any) => u.isActive !== false).length,
-      inactive: users.filter((u: any) => u.isActive === false).length,
+      active:
+        userStatusData?.activeUsersCount ||
+        users.filter((u: any) => u.isActive !== false).length,
+      inactive:
+        userStatusData?.inactiveUsersCount ||
+        users.filter((u: any) => u.isActive === false).length,
       suspended: 0, // Not available in current data structure
       totalRevenue: 0, // Would need order data to calculate
     };
@@ -61,7 +105,7 @@ export default function AdminUsers() {
 
   const stats = getUserStats();
 
-  if (usersLoading) {
+  if (usersLoading && !users.length) {
     return (
       <div className="space-y-6">
         <div>
@@ -125,7 +169,11 @@ export default function AdminUsers() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {stats.active}
+              {userStatusLoading ? (
+                <span className="animate-pulse">...</span>
+              ) : (
+                stats.active
+              )}
             </div>
           </CardContent>
         </Card>
@@ -137,7 +185,11 @@ export default function AdminUsers() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-600">
-              {stats.inactive}
+              {userStatusLoading ? (
+                <span className="animate-pulse">...</span>
+              ) : (
+                stats.inactive
+              )}
             </div>
           </CardContent>
         </Card>

@@ -172,7 +172,7 @@ export const updatePhoneNumber = async (phoneNumber: string): Promise<void> => {
         throw new Error("User not authenticated");
       }
 
-      const response = await axios.put(`${API_BASE_URL}/users/update-phone`, { phoneNumber });
+      const response = await axios.put(`${API_BASE_URL}/users/update-phone`, { phone: phoneNumber });
       console.log("✅ Successfully updated phone number:", response.data);
     } catch (error) {
       console.error("Failed to update phone number:", error);
