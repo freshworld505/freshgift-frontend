@@ -265,13 +265,13 @@ export default function ProductDetailPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-4 max-w-6xl">
+      <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 max-w-6xl">
         {/* Main Product Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 lg:gap-6">
           {/* Image Section */}
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             {/* Main Product Image */}
-            <div className="relative aspect-square w-full max-w-md mx-auto bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden group">
+            <div className="relative aspect-square w-full max-w-sm mx-auto bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden group">
               <Image
                 src={product.productImages?.[0] || "/placeholder-product.jpg"}
                 alt={product.productName || "Product"}
@@ -334,7 +334,7 @@ export default function ProductDetailPage() {
 
             {/* Thumbnail Images */}
             {product.productImages && product.productImages.length > 1 && (
-              <div className="grid grid-cols-4 gap-1.5 max-w-md mx-auto">
+              <div className="grid grid-cols-4 gap-1 max-w-sm mx-auto">
                 {product.productImages.slice(1, 5).map((image, index) => (
                   <div
                     key={index}
@@ -354,14 +354,14 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Product Information */}
-          <div className="space-y-4">
+          <div className="space-y-2 sm:space-y-4">
             {/* Header Section */}
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+            <div className="space-y-1.5 sm:space-y-3">
+              <div className="space-y-1">
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
                   {product.productName}
                 </h1>
-                <p className="text-lg text-gray-600">
+                <p className="text-sm sm:text-lg text-gray-600">
                   {product.subCategory || product.category}
                 </p>
               </div>
@@ -372,26 +372,28 @@ export default function ProductDetailPage() {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                      className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400"
                     />
                   ))}
                 </div>
-                <span className="text-base font-medium text-gray-700">4.5</span>
+                <span className="text-sm sm:text-base font-medium text-gray-700">
+                  4.5
+                </span>
               </div>
             </div>
 
             {/* Price Section */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-3xl font-bold text-green-700">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-2.5 sm:p-4 border border-green-200">
+              <div className="flex items-baseline gap-2 mb-1 sm:mb-2">
+                <span className="text-xl sm:text-3xl font-bold text-green-700">
                   £{product.finalPrice || 0}
                 </span>
                 {product.actualPrice > product.finalPrice && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg text-gray-500 line-through">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-base sm:text-lg text-gray-500 line-through">
                       £{product.actualPrice || 0}
                     </span>
-                    <Badge className="bg-green-100 text-green-800 border-green-300 px-2 py-1 text-sm">
+                    <Badge className="bg-green-100 text-green-800 border-green-300 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm">
                       Save £
                       {(product.actualPrice - product.finalPrice || 0).toFixed(
                         2
