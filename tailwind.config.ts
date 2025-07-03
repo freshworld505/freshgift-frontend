@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
   	extend: {
+  		screens: {
+  			'xs': '375px', // Extra small devices (iPhone 6 and up)
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

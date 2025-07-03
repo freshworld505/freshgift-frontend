@@ -10,7 +10,9 @@ import {
 
 const whyChooseUsItems = [
   {
-    icon: <Leaf className="h-12 w-12 text-emerald-600" />,
+    icon: (
+      <Leaf className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 text-emerald-600" />
+    ),
     title: "Farm Fresh Quality",
     description:
       "We source the freshest produce directly from local farms, ensuring top quality and taste.",
@@ -18,7 +20,9 @@ const whyChooseUsItems = [
     color: "emerald",
   },
   {
-    icon: <Truck className="h-12 w-12 text-blue-600" />,
+    icon: (
+      <Truck className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 text-blue-600" />
+    ),
     title: "Speedy Delivery",
     description:
       "Get your groceries delivered to your doorstep quickly and reliably within 24 hours.",
@@ -26,7 +30,9 @@ const whyChooseUsItems = [
     color: "blue",
   },
   {
-    icon: <ShoppingBasket className="h-12 w-12 text-purple-600" />,
+    icon: (
+      <ShoppingBasket className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 text-purple-600" />
+    ),
     title: "Wide Selection",
     description:
       "Explore a diverse range of fruits, vegetables, and seasonal specialties all year round.",
@@ -34,7 +40,9 @@ const whyChooseUsItems = [
     color: "purple",
   },
   {
-    icon: <Smile className="h-12 w-12 text-orange-600" />,
+    icon: (
+      <Smile className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 text-orange-600" />
+    ),
     title: "Loved by Customers",
     description:
       "Join all happy customers enjoying fresh produce every day with a 4.9★ rating.",
@@ -78,7 +86,7 @@ const getColorClasses = (color: string) => {
 
 export default function WhyChooseUsSection() {
   return (
-    <section className="relative py-20 overflow-hidden">
+    <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50/50 via-white to-emerald-50/30 dark:from-slate-900/50 dark:via-background dark:to-emerald-950/30" />
 
@@ -88,13 +96,13 @@ export default function WhyChooseUsSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-4 py-2 rounded-full text-sm font-medium border border-emerald-200 dark:border-emerald-800 mb-6">
-            <Sparkles className="h-4 w-4" />
+        <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16">
+          <div className="inline-flex items-center gap-1 sm:gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm font-medium border border-emerald-200 dark:border-emerald-800 mb-3 sm:mb-4 md:mb-6">
+            <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4" />
             Why Choose FreshGift?
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold text-center mb-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-center mb-3 sm:mb-4 md:mb-6">
             <span className="bg-gradient-to-r from-emerald-600 to-lime-600 bg-clip-text text-transparent">
               The FreshGift
             </span>
@@ -102,14 +110,14 @@ export default function WhyChooseUsSection() {
             <span className="text-foreground">Difference</span>
           </h2>
 
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-muted-foreground max-w-3xl mx-auto px-2 sm:px-4">
             Experience the freshest produce with unmatched quality, speed, and
             service that keeps our customers coming back.
           </p>
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
           {whyChooseUsItems.map((item, index) => {
             const colors = getColorClasses(item.color);
 
@@ -121,30 +129,30 @@ export default function WhyChooseUsSection() {
                 {/* Animated background on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                <CardHeader className="relative items-center pb-4 pt-8">
+                <CardHeader className="relative items-center pb-2 sm:pb-3 md:pb-4 pt-4 sm:pt-6 md:pt-8">
                   {/* Icon container with animation */}
-                  <div className="relative mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <div className="absolute inset-0 bg-white dark:bg-background rounded-2xl shadow-lg" />
-                    <div className="relative p-4 bg-white dark:bg-background rounded-2xl shadow-lg">
+                  <div className="relative mb-2 sm:mb-3 md:mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <div className="absolute inset-0 bg-white dark:bg-background rounded-lg sm:rounded-xl md:rounded-2xl shadow-lg" />
+                    <div className="relative p-1.5 sm:p-2 md:p-3 lg:p-4 bg-white dark:bg-background rounded-lg sm:rounded-xl md:rounded-2xl shadow-lg">
                       {item.icon}
                     </div>
                   </div>
 
-                  <CardTitle className="text-xl font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+                  <CardTitle className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors px-1 sm:px-0">
                     {item.title}
                   </CardTitle>
 
                   {/* Highlight badge */}
                   <div
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${colors.badge} mt-2`}
+                    className={`inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-0.5 md:py-1 rounded-full text-[9px] sm:text-[10px] md:text-xs font-semibold ${colors.badge} mt-1 sm:mt-1.5 md:mt-2`}
                   >
-                    <CheckCircle className="h-3 w-3" />
+                    <CheckCircle className="h-2 w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3" />
                     {item.highlight}
                   </div>
                 </CardHeader>
 
-                <CardContent className="relative pb-8">
-                  <p className="text-muted-foreground leading-relaxed">
+                <CardContent className="relative pb-4 sm:pb-6 md:pb-8">
+                  <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-muted-foreground leading-relaxed px-2 sm:px-2 md:px-0">
                     {item.description}
                   </p>
                 </CardContent>
@@ -159,9 +167,9 @@ export default function WhyChooseUsSection() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle className="h-4 w-4 text-emerald-600" />
+        <div className="text-center mt-6 sm:mt-8 md:mt-12 lg:mt-16">
+          <div className="inline-flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-muted-foreground">
+            <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 text-emerald-600" />
             Join all happy customers today!
           </div>
         </div>

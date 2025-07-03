@@ -88,6 +88,10 @@ export default function ProductListCard({
         description: "Please log in to add items to your cart.",
         variant: "destructive",
       });
+      // redirect to login page after 1 second
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1000);
       return;
     }
 
@@ -263,7 +267,7 @@ export default function ProductListCard({
               ) : (
                 <Button
                   size="sm"
-                  className="bg-primary hover:bg-primary/90 text-white hover:scale-105 font-medium rounded-lg transition-all duration-300 text-xs sm:text-sm px-2 sm:px-3"
+                  className="bg-green-600 hover:bg-green-700 text-white hover:scale-105 font-medium rounded-lg transition-all duration-300 text-xs sm:text-sm px-2 sm:px-3"
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
@@ -394,7 +398,7 @@ export default function ProductListCard({
           </div>
         ) : (
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1 text-xs rounded-lg transition-all duration-300 shadow-sm"
+            className="w-full bg-green-600 hover:bg-green-700 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1 text-xs rounded-lg transition-all duration-300 shadow-sm"
             onClick={handleAddToCart}
           >
             <ShoppingCart className="mr-1 h-3 w-3 sm:h-3.5 sm:w-3.5" />
