@@ -130,7 +130,7 @@ export default function LoginPage() {
         </div>
 
         {/* Mobile hero content */}
-        <div className="lg:hidden text-center space-y-4 mb-8">
+        <div className="lg:hidden text-center space-y-4 mb-4">
           <h1 className="text-3xl font-bold text-foreground">
             Welcome back to <span className="text-primary">FreshGift</span>
           </h1>

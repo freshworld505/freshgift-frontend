@@ -213,7 +213,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 xs:gap-3 sm:gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 xs:gap-4 sm:gap-5 md:gap-7 lg:gap-8">
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
@@ -223,43 +223,43 @@ export default function HomePage() {
                 onClick={() => handleCategoryClick(category.id)}
               >
                 <CardHeader
-                  className={`${category.bgColor} rounded-t-lg relative overflow-hidden p-1 xs:p-1.5 sm:p-2 md:p-3 lg:p-4`}
+                  className={`${category.bgColor} rounded-t-lg relative overflow-hidden p-1.5 xs:p-2 sm:p-2.5 md:p-4 lg:p-5`}
                 >
-                  <div className="flex flex-col items-center mb-0.5 xs:mb-1 sm:mb-1.5 md:mb-2">
+                  <div className="flex flex-col items-center mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5">
                     <div
-                      className={`w-5 h-5 xs:w-6 xs:h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 xl:w-16 xl:h-16 rounded-full bg-gradient-to-r ${category.color} shadow-lg mb-0.5 xs:mb-1 sm:mb-1.5 md:mb-2 flex items-center justify-center`}
+                      className={`w-6 h-6 xs:w-7 xs:h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 lg:w-14 lg:h-14 xl:w-18 xl:h-18 rounded-full bg-gradient-to-r ${category.color} shadow-lg mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5 flex items-center justify-center`}
                     >
-                      <IconComponent className="h-2 w-2 xs:h-2.5 xs:w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6 text-white" />
+                      <IconComponent className="h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-3.5 sm:w-3.5 md:h-4.5 md:w-4.5 lg:h-6 lg:w-6 xl:h-7 xl:w-7 text-white" />
                     </div>
                     <Badge
-                      className={`${category.badgeColor} border-0 text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] px-0.5 py-0.5`}
+                      className={`${category.badgeColor} border-0 text-[8px] xs:text-[9px] sm:text-[10px] md:text-[11px] px-1 py-0.5`}
                     >
                       {category.badge}
                     </Badge>
                   </div>
 
                   <CardTitle
-                    className={`text-[8px] xs:text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base font-bold ${category.textColor} group-hover:text-gray-900 transition-colors text-center leading-tight px-0.5`}
+                    className={`text-[9px] xs:text-[10px] sm:text-[11px] md:text-sm lg:text-base xl:text-lg font-bold ${category.textColor} group-hover:text-gray-900 transition-colors text-center leading-tight px-0.5`}
                   >
                     {category.title}
                   </CardTitle>
 
                   {/* Decorative gradient overlay */}
                   <div
-                    className={`absolute -top-4 -right-4 w-6 h-6 xs:w-8 xs:h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-24 lg:h-24 bg-gradient-to-br ${category.color} opacity-10 rounded-full transform group-hover:scale-110 transition-transform duration-300`}
+                    className={`absolute -top-4 -right-4 w-7 h-7 xs:w-9 xs:h-9 sm:w-14 sm:h-14 md:w-18 md:h-18 lg:w-26 lg:h-26 bg-gradient-to-br ${category.color} opacity-10 rounded-full transform group-hover:scale-110 transition-transform duration-300`}
                   ></div>
                 </CardHeader>
 
-                <CardContent className="p-0.5 xs:p-1 sm:p-2 md:p-3 lg:p-4 xl:p-6 flex-1 flex flex-col justify-between">
-                  <p className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] xl:text-xs text-gray-600 mb-0.5 xs:mb-1 sm:mb-1.5 md:mb-2 lg:mb-3 xl:mb-4 group-hover:text-gray-700 transition-colors text-center line-clamp-2 leading-tight flex-1">
+                <CardContent className="p-1 xs:p-1.5 sm:p-2.5 md:p-4 lg:p-5 xl:p-7 flex-1 flex flex-col justify-between">
+                  <p className="text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-sm text-gray-600 mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5 lg:mb-4 xl:mb-5 group-hover:text-gray-700 transition-colors text-center line-clamp-2 leading-tight flex-1">
                     {category.description}
                   </p>
 
                   <div className="flex items-center justify-center sm:justify-between mt-auto">
-                    <span className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] font-medium text-gray-500 group-hover:text-gray-700 transition-colors hidden sm:block">
+                    <span className="text-[7px] xs:text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-medium text-gray-500 group-hover:text-gray-700 transition-colors hidden sm:block">
                       Explore Collection
                     </span>
-                    <ArrowRight className="h-1.5 w-1.5 xs:h-2 xs:w-2 sm:h-2.5 sm:w-2.5 md:h-3 md:w-3 lg:h-4 lg:w-4 xl:h-5 xl:w-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
+                    <ArrowRight className="h-2 w-2 xs:h-2.5 xs:w-2.5 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 lg:h-5 lg:w-5 xl:h-6 xl:w-6 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300" />
                   </div>
                 </CardContent>
               </Card>
@@ -285,14 +285,14 @@ export default function HomePage() {
         </div>
 
         {isLoadingPopular || isLoadingAllProducts ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 xs:gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 xs:gap-2 sm:gap-6">
             {Array.from({ length: 8 }).map((_, index) => (
               <Card key={index} className="border-0 shadow-md">
-                <CardContent className="p-2 xs:p-3 sm:p-6">
+                <CardContent className="p-1.5 xs:p-2 sm:p-6">
                   <div className="animate-pulse">
-                    <div className="aspect-square bg-gray-200 rounded-xl mb-2 xs:mb-3 sm:mb-4"></div>
-                    <div className="h-2.5 xs:h-3 sm:h-4 bg-gray-200 rounded mb-1.5 xs:mb-2"></div>
-                    <div className="h-2.5 xs:h-3 sm:h-4 bg-gray-200 rounded w-2/3 mb-2 xs:mb-2.5 sm:mb-3"></div>
+                    <div className="aspect-square bg-gray-200 rounded-xl mb-1.5 xs:mb-2 sm:mb-4"></div>
+                    <div className="h-2.5 xs:h-3 sm:h-4 bg-gray-200 rounded mb-1 xs:mb-1.5"></div>
+                    <div className="h-2.5 xs:h-3 sm:h-4 bg-gray-200 rounded w-2/3 mb-1.5 xs:mb-2 sm:mb-3"></div>
                     <div className="h-3 xs:h-4 sm:h-6 bg-gray-200 rounded w-1/2"></div>
                   </div>
                 </CardContent>
