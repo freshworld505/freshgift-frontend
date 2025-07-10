@@ -207,7 +207,7 @@ export default function ProductListCard({
                       {product.category}
                     </Badge>
                   </div>
-                  <p className="text-sm sm:text-xl font-bold text-primary ml-2 sm:ml-4">
+                  <p className="text-sm sm:text-xl font-bold text-orange-400 ml-2 sm:ml-4">
                     £{product.finalPrice || 0}
                   </p>
                 </div>
@@ -242,22 +242,22 @@ export default function ProductListCard({
                   Out of Stock
                 </Button>
               ) : isInCart ? (
-                <div className="flex items-center gap-1 bg-primary/10 rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-blue-600/10 rounded-lg p-1">
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-6 w-6 sm:h-7 sm:w-7 p-0 rounded-md hover:bg-primary/20 transition-colors"
+                    className="h-6 w-6 sm:h-7 sm:w-7 p-0 rounded-md hover:bg-blue-600/20 transition-colors"
                     onClick={handleDecreaseQuantity}
                   >
                     <Minus className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   </Button>
-                  <span className="min-w-[1.5rem] sm:min-w-[2rem] text-center text-xs sm:text-sm font-semibold text-primary">
+                  <span className="min-w-[1.5rem] sm:min-w-[2rem] text-center text-xs sm:text-sm font-semibold text-blue-600">
                     {cartQuantity}
                   </span>
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-6 w-6 sm:h-7 sm:w-7 p-0 rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-6 w-6 sm:h-7 sm:w-7 p-0 rounded-md hover:bg-blue-600/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleIncreaseQuantity}
                     disabled={!canAddMore}
                   >
@@ -267,7 +267,7 @@ export default function ProductListCard({
               ) : (
                 <Button
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white hover:scale-105 font-medium rounded-lg transition-all duration-300 text-xs sm:text-sm px-2 sm:px-3"
+                  className="bg-blue-600 hover:bg-blue-700 text-white hover:scale-105 font-medium rounded-lg transition-all duration-300 text-xs sm:text-sm px-2 sm:px-3"
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
@@ -356,7 +356,7 @@ export default function ProductListCard({
 
         {/* Price */}
         <div className="flex items-center justify-between">
-          <p className="text-sm sm:text-base font-bold text-primary">
+          <p className="text-sm sm:text-base font-bold text-orange-400">
             £{product.finalPrice || 0}
           </p>
         </div>
@@ -374,22 +374,22 @@ export default function ProductListCard({
             <span className="sm:hidden">Out</span>
           </Button>
         ) : isInCart ? (
-          <div className="flex items-center gap-1 w-full bg-primary/10 rounded-lg p-1">
+          <div className="flex items-center gap-1 w-full bg-blue-600/10 rounded-lg p-1">
             <Button
               size="sm"
               variant="ghost"
-              className="h-6 w-6 sm:h-8 sm:w-8 p-0 rounded-md hover:bg-primary/20 transition-colors"
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0 rounded-md hover:bg-blue-600/20 transition-colors"
               onClick={handleDecreaseQuantity}
             >
               <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
-            <span className="flex-1 text-center text-xs sm:text-sm font-semibold text-primary">
+            <span className="flex-1 text-center text-xs sm:text-sm font-semibold text-blue-600">
               {cartQuantity}
             </span>
             <Button
               size="sm"
               variant="ghost"
-              className="h-6 w-6 sm:h-8 sm:w-8 p-0 rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-6 w-6 sm:h-8 sm:w-8 p-0 rounded-md hover:bg-blue-600/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleIncreaseQuantity}
               disabled={!canAddMore}
             >
@@ -398,7 +398,7 @@ export default function ProductListCard({
           </div>
         ) : (
           <Button
-            className="w-full bg-green-600 hover:bg-green-700 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1 text-xs rounded-lg transition-all duration-300 shadow-sm"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.02] hover:shadow-md font-medium py-1 text-xs rounded-lg transition-all duration-300 shadow-sm"
             onClick={handleAddToCart}
           >
             <ShoppingCart className="mr-1 h-3 w-3 sm:h-3.5 sm:w-3.5" />
