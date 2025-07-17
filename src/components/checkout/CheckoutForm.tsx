@@ -54,6 +54,7 @@ import { createPaymentIntent, confirmPaymentIntent } from "@/api/payment";
 import { createAddress, updatePhoneNumber } from "@/api/addressesApi";
 import StripePaymentForm from "./StripePaymentForm";
 import SelectAddress from "./SelectAddress";
+import SaveCardPage from "./SaveCardForm";
 
 // Initialize Stripe (you'll need to add your publishable key)
 const stripePromise = loadStripe(
@@ -191,6 +192,7 @@ export default function CheckoutForm() {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
   const [showStripePayment, setShowStripePayment] = useState(false);
+  const [showCardSaving, setShowCardSaving] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentIntentData, setPaymentIntentData] = useState<{
     clientSecret: string;
@@ -813,6 +815,11 @@ export default function CheckoutForm() {
         </Card>
       </div>
     );
+  }
+
+  // Show Card save UI, if user selected recurring order
+  if (showCardSaving) {
+    return <SaveCardPage />;
   }
 
   // Show Stripe payment form if payment intent is created

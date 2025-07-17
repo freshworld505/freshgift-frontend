@@ -14,10 +14,10 @@ interface BackendResponse {
   message: string;
   products: Product[];
   pagination: {
-    total: number;
-    page: number;
-    limit: number;
+    totalItems: number;
+    currentPage: number;
     totalPages: number;
+    limit: number;
   };
 }
 
@@ -47,7 +47,8 @@ interface EditProductData {
   productImages?: string[];
 }
 
-const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/products';
+//const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/products';
+const API_BASE_URL = 'http://localhost:5004/api/products';
 
 // Create a new product
 export async function createProduct(productData: any) {
@@ -81,7 +82,7 @@ export async function createProduct(productData: any) {
       'productCode', 'productName', 'description', 'actualPrice', 'discount',
       'finalPrice', 'category', 'subCategory', 'rating', 'isFeatured',
       'isTrending', 'isNew', 'expiryDate', 'harvestDate', 'shelfLife',
-      'returnable', 'storageInstructions', 'maxPurchaseLimit', 'deliveryType', 'stock'
+      'returnable', 'storageInstructions', 'maxPurchaseLimit', 'deliveryType', 'stock', 'businessDiscount'
     ];
 
     fields.forEach(field => {
@@ -176,8 +177,8 @@ export const searchProducts = async (searchTerm: string, page: number, limit: nu
     
     return {
       products: convertedProducts,
-      total: apiData.pagination?.total || convertedProducts.length,
-      page: apiData.pagination?.page || page,
+      total: apiData.pagination?.totalItems || convertedProducts.length,
+      page: apiData.pagination?.currentPage || page,
       limit: apiData.pagination?.limit || limit
     };
   } catch (error: any) {
@@ -447,7 +448,7 @@ export const uploadProductImages = async (imageFiles: File[]): Promise<string[]>
       formData.append('productImages', file);
     });
 
-    const response = await axios.post(`${API_BASE_URL}/upload-images`, formData, {
+    const response = await axios.post(`${API_BASE_URL}/upload-image`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

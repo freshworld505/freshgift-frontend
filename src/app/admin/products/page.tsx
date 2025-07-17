@@ -29,6 +29,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Search, Plus, Edit, Trash2, Package } from "lucide-react";
 import { useAdminStore } from "@/hooks/use-admin-store";
 import EditProductModal from "@/components/admin/EditProductModal";
@@ -38,26 +47,36 @@ import { useToast } from "@/hooks/use-toast";
 export default function AdminProducts() {
   const router = useRouter();
   const { toast } = useToast();
-  const { products, productsLoading, error, fetchProducts, deleteProduct } =
-    useAdminStore();
+  const {
+    products,
+    productsLoading,
+    error,
+    fetchProducts,
+    deleteProduct,
+    productsPagination,
+  } = useAdminStore();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch products when component mounts
-    fetchProducts();
-  }, [fetchProducts]);
+    // Fetch products when component mounts or page changes
+    fetchProducts(searchTerm, currentPage, 20);
+  }, [fetchProducts, currentPage]);
 
-  const filteredProducts = (products || []).filter(
-    (product: any) =>
-      product?.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product?.productCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product?.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Handle search with debouncing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1); // Reset to first page on search
+      fetchProducts(searchTerm, 1, 20);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, fetchProducts]);
 
   const handleEditProduct = (product: any) => {
     setSelectedProduct(product);
@@ -65,7 +84,7 @@ export default function AdminProducts() {
   };
 
   const handleProductUpdated = () => {
-    fetchProducts(); // Refresh the products list
+    fetchProducts(searchTerm, currentPage, 20); // Refresh the current page
   };
 
   const handleAddProduct = () => {
@@ -84,6 +103,8 @@ export default function AdminProducts() {
       await deleteProduct(productToDelete.id);
       setDeleteDialogOpen(false);
       setProductToDelete(null);
+      // Refresh current page after deletion
+      fetchProducts(searchTerm, currentPage, 20);
       toast({
         title: "Product deleted",
         description: `"${productToDelete.productName}" has been deleted.`,
@@ -96,6 +117,11 @@ export default function AdminProducts() {
         variant: "destructive",
       });
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchProducts(searchTerm, page, 20);
   };
 
   const getStatusBadge = (product: any) => {
@@ -170,13 +196,15 @@ export default function AdminProducts() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(products || []).length}</div>
+            <div className="text-2xl font-bold">
+              {productsPagination?.total || (products || []).length}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Products
+              Active Products (Current Page)
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -191,7 +219,9 @@ export default function AdminProducts() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Out of Stock (Current Page)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -204,7 +234,9 @@ export default function AdminProducts() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Low Stock (Current Page)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -251,7 +283,7 @@ export default function AdminProducts() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredProducts.length === 0 ? (
+                {(products || []).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8">
                       <Package className="mx-auto h-12 w-12 text-gray-400" />
@@ -261,7 +293,7 @@ export default function AdminProducts() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredProducts.map((product: any) => (
+                  (products || []).map((product: any) => (
                     <TableRow key={product.id}>
                       <TableCell className="font-medium">
                         {product.productCode || product.id}
@@ -319,6 +351,95 @@ export default function AdminProducts() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination */}
+          {productsPagination && productsPagination.totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4">
+              <div className="text-sm text-gray-500">
+                Showing{" "}
+                {(productsPagination.page - 1) * productsPagination.limit + 1}{" "}
+                to{" "}
+                {Math.min(
+                  productsPagination.page * productsPagination.limit,
+                  productsPagination.total
+                )}{" "}
+                of {productsPagination.total} products
+              </div>
+
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) {
+                          handlePageChange(currentPage - 1);
+                        }
+                      }}
+                      className={
+                        currentPage <= 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+
+                  {/* Page numbers */}
+                  {Array.from(
+                    { length: Math.min(5, productsPagination.totalPages) },
+                    (_, i) => {
+                      const startPage = Math.max(1, currentPage - 2);
+                      const pageNumber = startPage + i;
+
+                      if (pageNumber <= productsPagination.totalPages) {
+                        return (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationLink
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handlePageChange(pageNumber);
+                              }}
+                              isActive={pageNumber === currentPage}
+                              className="cursor-pointer"
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+                      return null;
+                    }
+                  )}
+
+                  {productsPagination.totalPages > 5 &&
+                    currentPage < productsPagination.totalPages - 2 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < productsPagination.totalPages) {
+                          handlePageChange(currentPage + 1);
+                        }
+                      }}
+                      className={
+                        currentPage >= productsPagination.totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
 

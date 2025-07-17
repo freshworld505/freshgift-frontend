@@ -4,6 +4,7 @@ import { ensureAuthenticated, getAuthHeaders, withAuthentication, getTokenForApi
 import { getAuth } from 'firebase/auth';
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders`;
+const API_BASE_URL_FOR_RECURRING = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
 
 // Get all orders
 export const getAllMyOrders = async (): Promise<Order[]> => {
@@ -171,3 +172,102 @@ export const getPaymentStatusColor = (status: PaymentStatus): string => {
       return 'gray';
   }
 };
+
+// Recurring order api functions. -->
+
+// save card details for recurring orders --> stripe will save the card details and return a customer ID (payment method ID) that will we be give to this function
+export const saveCardDetailsForRecurringOrders = async (paymentMethodId: string): Promise<string> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.post<{ stripeCustomerId: string, paymentMethodId: string }>(`${API_BASE_URL_FOR_RECURRING}/recurring/save-card`, 
+        { paymentMethodId }, 
+        { headers }
+      );
+      return response.data.stripeCustomerId;
+    } catch (error) {
+      console.error("Failed to save card details for recurring orders:", error);
+      throw error;
+    }
+  });
+};
+
+// Create a recurring order
+interface CreateRecurringOrderRequest {
+  items: {
+    productId: string;
+    quantity: number;
+  }[];
+  frequency: string;
+  dayOfWeek: number; // 0 = Sunday, 6 = Saturday
+  addressId: string;
+  paymentMethodId: string;
+}
+export const createRecurringOrder = async (orderData: CreateRecurringOrderRequest): Promise<string> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.post<{ message: string }>(`${API_BASE_URL_FOR_RECURRING}/recurring/create`, orderData, { headers });
+      return response.data.message;
+    } catch (error) {
+      console.error("Failed to create recurring order:", error);
+      throw error;
+    }
+  });
+};
+
+// Pause a recurring order
+export const pauseRecurringOrder = async (recurringOrderId: string): Promise<Order> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.post<{ order: Order }>(`${API_BASE_URL_FOR_RECURRING}/recurring/${recurringOrderId}/pause`, { headers });
+      return response.data.order;
+    } catch (error) {
+      console.error(`Failed to pause recurring order ${recurringOrderId}:`, error);
+      throw error;
+    }
+  });
+}
+
+// Resume a paused recurring order
+export const resumeRecurringOrder = async (recurringOrderId: string): Promise<Order> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.post<{ order: Order }>(`${API_BASE_URL_FOR_RECURRING}/recurring/${recurringOrderId}/resume`, { headers });
+      return response.data.order;
+    } catch (error) {
+      console.error(`Failed to resume recurring order ${recurringOrderId}:`, error);
+      throw error;
+    }
+  });
+}
+
+// Cancel a recurring order
+export const cancelRecurringOrder = async (recurringOrderId: string): Promise<Order> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.delete<{ order: Order }>(`${API_BASE_URL_FOR_RECURRING}/recurring/${recurringOrderId}`, { headers });
+      return response.data.order;
+    } catch (error) {
+      console.error(`Failed to cancel recurring order ${recurringOrderId}:`, error);
+      throw error;
+    }
+  });
+}
+
+// Get all recurring orders for the user
+export const getAllRecurringOrders = async (): Promise<Order[]> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.get<{ recurringOrders: Order[] }>(`${API_BASE_URL_FOR_RECURRING}/recurring/my`, { headers });
+      return response.data.recurringOrders;
+    } catch (error) {
+      console.error("Failed to fetch all recurring orders:", error);
+      throw error;
+    }
+  });
+}

@@ -1,8 +1,67 @@
+"use client";
+
 import { ArrowRight, ShoppingBag, Star, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import BusinessModal from "./BusinessModal";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useState } from "react";
+import { checkBusinessUserStatus } from "@/api/BusinessUserApi";
 
 export default function HeroSection() {
+  const { user, isAuthenticated } = useAuth();
+  const [showBusinessButton, setShowBusinessButton] = useState(false);
+
+  useEffect(() => {
+    const checkBusinessStatus = async () => {
+      if (!isAuthenticated || !user?.firebaseId) {
+        setShowBusinessButton(false);
+        return;
+      }
+
+      try {
+        // Check all statuses to see if user has any existing requests
+        const [pendingResponse, rejectedResponse, approvedResponse] =
+          await Promise.all([
+            checkBusinessUserStatus("pending"),
+            checkBusinessUserStatus("rejected"),
+            checkBusinessUserStatus("approved"),
+          ]);
+
+        // Find if current user has any requests in any status
+        const allRequests = [
+          ...pendingResponse.requests,
+          ...rejectedResponse.requests,
+          ...approvedResponse.requests,
+        ];
+
+        const userRequest = allRequests.find(
+          (request) => request.user.firebaseId === user.firebaseId
+        );
+
+        if (!userRequest) {
+          // No existing request - show button
+          setShowBusinessButton(true);
+        } else if (
+          userRequest.status === "pending" ||
+          userRequest.status === "rejected"
+        ) {
+          // Has pending or rejected request - show button
+          setShowBusinessButton(true);
+        } else if (userRequest.status === "approved") {
+          // Has approved request - don't show button
+          setShowBusinessButton(false);
+        }
+      } catch (error) {
+        console.error("Failed to check business status:", error);
+        // On error, show the button to allow users to try
+        setShowBusinessButton(true);
+      }
+    };
+
+    checkBusinessStatus();
+  }, [isAuthenticated, user]);
+
   return (
     <section className="relative overflow-hidden">
       {/* Background with animated gradient */}
@@ -58,17 +117,18 @@ export default function HeroSection() {
               </Link>
             </Button>
 
-            <Button
-              variant="outline"
-              size="lg"
-              className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300 w-full sm:w-auto"
-              asChild
-            >
-              <Link href="/products">
-                <Zap className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
-                View Deals
-              </Link>
-            </Button>
+            {showBusinessButton && (
+              <BusinessModal>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300 w-full sm:w-auto"
+                >
+                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
+                  Business Deals
+                </Button>
+              </BusinessModal>
+            )}
           </div>
         </div>
       </div>

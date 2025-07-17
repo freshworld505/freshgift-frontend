@@ -9,6 +9,59 @@ type RefundStatus = 'Pending' | 'Approved' | 'Refunded';
 // Valid order status values (updated to match backend)
 type OrderStatus = 'Pending' | 'Processing' | 'Delivered' | 'Cancelled';
 
+// Recurring Order interfaces
+export interface RecurringOrderUser {
+  userId: string;
+  name: string;
+  email: string;
+  phone: string | null;
+}
+
+export interface RecurringOrderProduct {
+  id: string;
+  productName: string;
+  productImages: string[];
+  finalPrice: number;
+}
+
+export interface RecurringOrderItem {
+  id: string;
+  recurringOrderId: string;
+  productId: string;
+  quantity: number;
+  product: RecurringOrderProduct;
+}
+
+export interface RecurringOrderAddress {
+  addressId: string;
+  label: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
+export interface RecurringOrder {
+  id: string;
+  userId: string;
+  addressId: string;
+  frequency: string;
+  dayOfWeek: number;
+  nextRunAt: string;
+  paymentMethodId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user: RecurringOrderUser;
+  items: RecurringOrderItem[];
+  address: RecurringOrderAddress;
+}
+
+interface RecurringOrdersResponse {
+  recurringOrders: RecurringOrder[];
+}
+
 // Get orders by refund status
 export const getOrdersByRefundStatus = async (status: RefundStatus): Promise<any[]> => {
   try {
@@ -187,4 +240,20 @@ export const getOrderById = async (orderId: string): Promise<any> => {
     console.error("❌ Error fetching order by ID:", error);
     throw error;
   }
+}
+
+// Admin apis for recurring orders
+//const API_BASE_URL_FOR_RECURRING = 'https://freshgiftbackend.onrender.com/api/recurring-orders';
+const API_BASE_URL_FOR_RECURRING = 'http://localhost:5004/api/recurring';
+
+// Get all recurring orders
+export const getAllRecurringOrders = async (): Promise<RecurringOrder[]> => {
+  await ensureAuthenticated();
+  const response = await axios.get<RecurringOrdersResponse>(`${API_BASE_URL_FOR_RECURRING}/all`);
+  if (!response.data || !Array.isArray(response.data.recurringOrders)) {
+    console.error("❌ Invalid data received from API");
+    throw new Error("Invalid data received from API");
+  }
+  console.log("✅ All recurring orders fetched successfully:", response.data.recurringOrders);
+  return response.data.recurringOrders;  
 }

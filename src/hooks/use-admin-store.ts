@@ -32,6 +32,14 @@ interface AdminState {
   topProducts: any[];
   userStatusData: any | null;
   
+  // Pagination data
+  productsPagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  } | null;
+  
   // Loading states
   isLoading: boolean;
   statsLoading: boolean;
@@ -70,6 +78,7 @@ export const useAdminStore = create<AdminState>()(
       recentOrders: [],
       topProducts: [],
       userStatusData: null,
+      productsPagination: null,
       
       isLoading: false,
       statsLoading: false,
@@ -147,11 +156,22 @@ export const useAdminStore = create<AdminState>()(
         }
       },
 
-      fetchProducts: async (searchTerm = '', page = 1, limit = 50) => {
+      fetchProducts: async (searchTerm = '', page = 1, limit = 20) => {
         set({ productsLoading: true, error: null });
         try {
           const response = await searchProducts(searchTerm, page, limit);
-          set({ products: response.products, productsLoading: false });
+          const totalPages = Math.ceil(response.total / response.limit);
+          
+          set({ 
+            products: response.products, 
+            productsPagination: {
+              total: response.total,
+              page: response.page,
+              limit: response.limit,
+              totalPages
+            },
+            productsLoading: false 
+          });
         } catch (error: any) {
           console.error('Error fetching products:', error);
           set({ 

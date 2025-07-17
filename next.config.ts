@@ -65,6 +65,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https', // https://www.theudderfarmshop.co.uk
+        hostname: 'www.theudderfarmshop.co.uk',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

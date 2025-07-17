@@ -8,9 +8,18 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore, useAuthStore } from "@/lib/store";
 import { useWishlistStore } from "@/hooks/use-wishlist";
-import { ShoppingCart, Heart, Star, Minus, Plus } from "lucide-react";
+import {
+  ShoppingCart,
+  Heart,
+  Star,
+  Minus,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
+import { useState } from "react";
 
 interface ProductListCardProps {
   product: Product;
@@ -29,6 +38,8 @@ export default function ProductListCard({
     isInWishlist: checkIsInWishlist,
   } = useWishlistStore();
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const isInWishlist = checkIsInWishlist(product.id);
 
   const isInStock = (product.stock ?? 0) > 0;
@@ -42,24 +53,43 @@ export default function ProductListCard({
   const canAddMore = cartQuantity < (product.stock ?? 0);
 
   // Handle product images using new schema
-  const getProductImage = () => {
+  const getProductImages = () => {
     // Check if productImages array exists and has items
     if (
       product.productImages &&
       Array.isArray(product.productImages) &&
       product.productImages.length > 0
     ) {
-      const imageUrl = product.productImages[0];
-      // Ensure the image URL is not empty or just whitespace
-      return imageUrl && typeof imageUrl === "string" && imageUrl.trim()
-        ? imageUrl.trim()
-        : null;
+      return product.productImages
+        .map((imageUrl) => {
+          // Ensure the image URL is not empty or just whitespace
+          return imageUrl && typeof imageUrl === "string" && imageUrl.trim()
+            ? imageUrl.trim()
+            : null;
+        })
+        .filter(Boolean); // Remove null/empty values
     }
-    // Return null if no image is available - this will prevent empty src error
-    return null;
+    // Return empty array if no images are available
+    return [];
   };
 
-  const imageUrl = getProductImage();
+  const productImages = getProductImages();
+  const hasMultipleImages = productImages.length > 1;
+  const currentImageUrl = productImages[currentImageIndex] || null;
+
+  const nextImage = () => {
+    if (hasMultipleImages) {
+      setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+    }
+  };
+
+  const previousImage = () => {
+    if (hasMultipleImages) {
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + productImages.length) % productImages.length
+      );
+    }
+  };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -159,11 +189,10 @@ export default function ProductListCard({
         <div className="flex">
           {/* Image Section */}
           <div className="relative w-20 h-20 sm:w-32 sm:h-32 flex-shrink-0">
-            {" "}
             <Link href={`/products/${product.id}`}>
-              {imageUrl ? (
+              {currentImageUrl ? (
                 <Image
-                  src={imageUrl}
+                  src={currentImageUrl}
                   alt={product.productName || "Product"}
                   fill
                   sizes="(max-width: 640px) 80px, 128px"
@@ -177,11 +206,52 @@ export default function ProductListCard({
                 </div>
               )}
             </Link>
+
+            {/* Image Navigation for List View - Only show if multiple images */}
+            {hasMultipleImages && (
+              <>
+                {/* Previous Image Button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-0.5 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/90 border-0 rounded-full text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm transition-all duration-300 w-4 h-4 sm:w-5 sm:h-5 opacity-0 group-hover:opacity-100"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    previousImage();
+                  }}
+                >
+                  <ChevronLeft className="h-2 w-2 sm:h-3 sm:w-3" />
+                </Button>
+
+                {/* Next Image Button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0.5 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/90 border-0 rounded-full text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm transition-all duration-300 w-4 h-4 sm:w-5 sm:h-5 opacity-0 group-hover:opacity-100"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    nextImage();
+                  }}
+                >
+                  <ChevronRight className="h-2 w-2 sm:h-3 sm:w-3" />
+                </Button>
+
+                {/* Image Count Badge for List View */}
+                <Badge
+                  variant="secondary"
+                  className="absolute bottom-0.5 right-0.5 bg-black/70 text-white text-xs font-medium py-0 px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                  {currentImageIndex + 1}/{productImages.length}
+                </Badge>
+              </>
+            )}
             {/* Wishlist Button */}
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white/90 hover:bg-white border-0 rounded-lg text-red-500 hover:text-red-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 w-6 h-6 sm:w-8 sm:h-8"
+              className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-white/90 hover:bg-white border-0 rounded-lg text-red-500 hover:text-red-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 w-6 h-6 sm:w-8 sm:h-8 z-10"
               onClick={handleWishlistToggle}
             >
               <Heart
@@ -287,9 +357,9 @@ export default function ProductListCard({
       {/* Image Section */}
       <div className="relative aspect-square overflow-hidden rounded-t-xl">
         <Link href={`/products/${product.id}`}>
-          {imageUrl ? (
+          {currentImageUrl ? (
             <Image
-              src={imageUrl}
+              src={currentImageUrl}
               alt={product.productName || "Product"}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
@@ -306,11 +376,63 @@ export default function ProductListCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </Link>
 
+        {/* Image Navigation - Only show if multiple images */}
+        {hasMultipleImages && (
+          <>
+            {/* Previous Image Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute left-1 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/90 border-0 rounded-full text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm transition-all duration-300 w-6 h-6 sm:w-7 sm:h-7 opacity-0 group-hover:opacity-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                previousImage();
+              }}
+            >
+              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+
+            {/* Next Image Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/90 border-0 rounded-full text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm transition-all duration-300 w-6 h-6 sm:w-7 sm:h-7 opacity-0 group-hover:opacity-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                nextImage();
+              }}
+            >
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+
+            {/* Image Dots Indicator */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {productImages.map((_, index) => (
+                <button
+                  key={index}
+                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
+                    index === currentImageIndex
+                      ? "bg-white shadow-sm"
+                      : "bg-white/60 hover:bg-white/80"
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
         {/* Wishlist Button */}
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-white/90 hover:bg-white border-0 rounded-lg text-red-500 hover:text-red-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 w-6 h-6 sm:w-7 sm:h-7"
+          className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-white/90 hover:bg-white border-0 rounded-lg text-red-500 hover:text-red-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 w-6 h-6 sm:w-7 sm:h-7 z-10"
           onClick={handleWishlistToggle}
         >
           <Heart
@@ -323,10 +445,20 @@ export default function ProductListCard({
         {/* Category Badge */}
         <Badge
           variant="secondary"
-          className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-white/90 backdrop-blur-sm text-xs font-medium py-0.5 px-1.5 sm:px-2"
+          className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 bg-white/90 backdrop-blur-sm text-xs font-medium py-0.5 px-1.5 sm:px-2 z-10"
         >
           {product.category}
         </Badge>
+
+        {/* Image Count Badge - Only show if multiple images */}
+        {hasMultipleImages && (
+          <Badge
+            variant="secondary"
+            className="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-medium py-0.5 px-1.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            {currentImageIndex + 1}/{productImages.length}
+          </Badge>
+        )}
       </div>
 
       {/* Content Section */}

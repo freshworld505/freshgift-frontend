@@ -38,6 +38,7 @@ interface ProductFormData {
   tags: string[];
   actualPrice: number;
   discount: number;
+  businessDiscount: number;
   finalPrice: number;
   stock: number;
   productCode: string;
@@ -71,6 +72,7 @@ export default function AddProduct() {
     tags: [],
     actualPrice: 0,
     discount: 0,
+    businessDiscount: 0,
     finalPrice: 0,
     stock: 0,
     productCode: "",
@@ -518,6 +520,26 @@ export default function AddProduct() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="businessDiscount">
+                    Business Discount (%)
+                  </Label>
+                  <Input
+                    id="businessDiscount"
+                    type="number"
+                    step="0.01"
+                    value={formData.businessDiscount || ""}
+                    onChange={(e) => {
+                      const value =
+                        e.target.value === "" ? 0 : parseFloat(e.target.value);
+                      handleInputChange(
+                        "businessDiscount",
+                        isNaN(value) ? 0 : value
+                      );
+                    }}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="finalPrice">Final Price (£)</Label>
                   <Input
                     id="finalPrice"
@@ -533,8 +555,8 @@ export default function AddProduct() {
                     className="bg-muted/50"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Auto-calculated from actual price and discount, or enter
-                    manually
+                    Auto-calculated from actual price, discount, and business
+                    discount, or enter manually
                   </p>
                 </div>
                 <div className="space-y-2">

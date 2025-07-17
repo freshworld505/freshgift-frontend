@@ -48,6 +48,7 @@ export default function ProductDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const productIdParam = params.id;
   const productId = Array.isArray(productIdParam)
@@ -110,6 +111,114 @@ export default function ProductDetailPage() {
       fetchProduct(productId);
     }
   }, [productId]);
+
+  // Reset image index when product changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [product?.id]);
+
+  // Handle product images
+  const getProductImages = () => {
+    if (
+      product?.productImages &&
+      Array.isArray(product.productImages) &&
+      product.productImages.length > 0
+    ) {
+      return product.productImages
+        .map((imageUrl) => {
+          return imageUrl && typeof imageUrl === "string" && imageUrl.trim()
+            ? imageUrl.trim()
+            : null;
+        })
+        .filter(Boolean);
+    }
+    return [];
+  };
+
+  const productImages = getProductImages();
+  const hasMultipleImages = productImages.length > 1;
+  const currentImageUrl =
+    productImages[currentImageIndex] || "/placeholder-product.jpg";
+
+  const nextImage = () => {
+    if (hasMultipleImages) {
+      setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+    }
+  };
+
+  const previousImage = () => {
+    if (hasMultipleImages) {
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + productImages.length) % productImages.length
+      );
+    }
+  };
+
+  const selectImage = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
+  // Handle keyboard navigation for images
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (hasMultipleImages) {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          previousImage();
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          nextImage();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [hasMultipleImages, productImages.length]);
+
+  // Touch/swipe support for mobile
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (hasMultipleImages) {
+      if (isLeftSwipe) {
+        nextImage();
+      } else if (isRightSwipe) {
+        previousImage();
+      }
+    }
+  };
+
+  // Auto-play images (optional - can be enabled)
+  useEffect(() => {
+    if (isAutoPlay && hasMultipleImages && productImages.length > 1) {
+      const interval = setInterval(() => {
+        nextImage();
+      }, 3000); // Change image every 3 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isAutoPlay, hasMultipleImages, currentImageIndex, productImages.length]);
 
   // Show loading state
   if (isLoading) {
@@ -271,9 +380,16 @@ export default function ProductDetailPage() {
           {/* Image Section */}
           <div className="space-y-1 sm:space-y-2">
             {/* Main Product Image */}
-            <div className="relative aspect-square w-full max-w-sm mx-auto bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden group">
+            <div
+              className="relative aspect-square w-full max-w-sm mx-auto bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden group"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+              onMouseEnter={() => setIsAutoPlay(false)}
+              onMouseLeave={() => hasMultipleImages && setIsAutoPlay(true)}
+            >
               <Image
-                src={product.productImages?.[0] || "/placeholder-product.jpg"}
+                src={currentImageUrl}
                 alt={product.productName || "Product"}
                 fill
                 sizes="(max-width: 1024px) 400px, 320px"
@@ -284,8 +400,56 @@ export default function ProductDetailPage() {
                 data-ai-hint={product.dataAiHint || "product detail image"}
               />
 
+              {/* Image Navigation - Only show if multiple images */}
+              {hasMultipleImages && (
+                <>
+                  {/* Previous Image Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/90 border-0 rounded-full text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm transition-all duration-300 w-8 h-8 opacity-0 group-hover:opacity-100 z-20"
+                    onClick={previousImage}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+
+                  {/* Next Image Button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/90 border-0 rounded-full text-gray-700 hover:text-gray-900 shadow-sm backdrop-blur-sm transition-all duration-300 w-8 h-8 opacity-0 group-hover:opacity-100 z-20"
+                    onClick={nextImage}
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+
+                  {/* Image Dots Indicator */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    {productImages.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex
+                            ? "bg-white shadow-md scale-110"
+                            : "bg-white/60 hover:bg-white/80"
+                        }`}
+                        onClick={() => selectImage(index)}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Image Counter Badge */}
+                  <Badge
+                    variant="secondary"
+                    className="absolute top-4 right-14 bg-black/70 text-white text-xs font-medium py-1 px-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    {currentImageIndex + 1}/{productImages.length}
+                  </Badge>
+                </>
+              )}
+
               {/* Floating Action Badges */}
-              <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
+              <div className="absolute top-2 left-2 right-2 flex justify-between items-start z-30">
                 <div className="space-y-1">
                   <Badge className="bg-white/95 backdrop-blur-sm text-gray-700 border-0 shadow-sm font-medium px-2 py-1 text-xs">
                     {product.category}
@@ -321,7 +485,7 @@ export default function ProductDetailPage() {
 
               {/* Out of Stock Overlay */}
               {!isInStock && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-25">
                   <Badge
                     variant="destructive"
                     className="text-sm py-1.5 px-4 shadow-lg font-bold"
@@ -333,22 +497,39 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Thumbnail Images */}
-            {product.productImages && product.productImages.length > 1 && (
+            {hasMultipleImages && (
               <div className="grid grid-cols-4 gap-1 max-w-sm mx-auto">
-                {product.productImages.slice(1, 5).map((image, index) => (
+                {productImages.slice(0, 4).map((image, index) => (
                   <div
                     key={index}
-                    className="relative aspect-square rounded-md overflow-hidden bg-white border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+                    className={`relative aspect-square rounded-md overflow-hidden bg-white border-2 transition-all duration-300 cursor-pointer ${
+                      index === currentImageIndex
+                        ? "border-blue-500 shadow-lg scale-105"
+                        : "border-gray-200 hover:border-gray-300 hover:shadow-md"
+                    }`}
+                    onClick={() => selectImage(index)}
                   >
                     <Image
-                      src={image}
-                      alt={`${product.productName} view ${index + 2}`}
+                      src={image || "/placeholder-product.jpg"}
+                      alt={`${product.productName} view ${index + 1}`}
                       fill
                       sizes="80px"
                       className="object-cover hover:scale-105 transition-transform duration-300"
                     />
+                    {/* Selected Overlay */}
+                    {index === currentImageIndex && (
+                      <div className="absolute inset-0 bg-blue-500/20 border border-blue-500 rounded-md" />
+                    )}
                   </div>
                 ))}
+                {/* Show more indicator if there are more than 4 images */}
+                {productImages.length > 4 && (
+                  <div className="relative aspect-square rounded-md overflow-hidden bg-gray-100 border-2 border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
+                    <span className="text-sm font-medium text-gray-600">
+                      +{productImages.length - 4}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>

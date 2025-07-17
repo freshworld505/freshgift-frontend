@@ -25,6 +25,7 @@ import {
   Tag,
   Check,
   X,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import RecommendedProducts from "./RecommendedProducts";
@@ -419,6 +420,26 @@ export default function CartDisplay() {
               <p className="text-sm sm:text-base text-muted-foreground">
                 If you're not satisfied, we'll replace or refund your order.
               </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-0 shadow-lg rounded-xl sm:rounded-2xl">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                </div>
+                <h3 className="font-semibold text-base sm:text-lg">
+                  Wanna get delivered every week?
+                </h3>
+              </div>
+              <Button variant="outline" size="sm" className="w-full" asChild>
+                <Link href="/admin/recurring-orders">
+                  <span className="flex items-center justify-center gap-2">
+                    <RefreshCw className="h-4 w-4" />
+                    Recurring Orders
+                  </span>
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

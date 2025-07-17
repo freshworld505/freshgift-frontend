@@ -33,6 +33,12 @@ export default function AccountTabs() {
       icon: <Heart className="mr-2 h-4 w-4" />,
       description: "Saved items",
     },
+    {
+      value: "/account/recurring-orders",
+      label: "Recurring Orders",
+      icon: <Heart className="mr-2 h-4 w-4" />,
+      description: "Manage your recurring orders",
+    },
   ];
 
   const getCurrentTab = () => {
@@ -71,7 +77,7 @@ export default function AccountTabs() {
         onValueChange={(value) => router.push(value)}
         className="relative"
       >
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 bg-white/90 backdrop-blur-sm border-0 shadow-lg rounded-xl p-2 h-auto">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 bg-white/90 backdrop-blur-sm border-0 shadow-lg rounded-xl p-2 h-auto">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.value}

@@ -19,6 +19,7 @@ import {
   LogOut,
   User,
   Ticket,
+  RefreshCw,
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -42,6 +43,11 @@ const sidebarItems = [
     icon: ShoppingCart,
   },
   {
+    title: "Recurring Orders",
+    href: "/admin/recurring-orders",
+    icon: RefreshCw,
+  },
+  {
     title: "Coupons",
     href: "/admin/coupons",
     icon: Ticket,
@@ -55,6 +61,11 @@ const sidebarItems = [
     title: "Analytics",
     href: "/admin/analytics",
     icon: BarChart3,
+  },
+  {
+    title: "Business Requests",
+    href: "/admin/business-requests",
+    icon: Users,
   },
   {
     title: "Settings",

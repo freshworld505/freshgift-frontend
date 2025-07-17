@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { Product, CreateProductPayload } from '@/lib/types';
+import { ensureAuthenticated, getAuthHeaders, withAuthentication } from './ensureAuthenticated';
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`;
 
@@ -31,9 +32,10 @@ interface BackendResponse {
 }
 // Search product or get all products
 export const searchProducts = async (searchTerm: string, page: number, limit: number): Promise<ProductsResponse> => {
-  try {
-    // Ensure user is authenticated before making the request
-    //await ensureAuthenticated();
+  return withAuthentication(async () => {
+    try {
+      // Ensure user is authenticated before making the request
+      //await ensureAuthenticated();
     
     const response = await axios.get(`${API_BASE_URL}/search?searchTerm=${searchTerm}&page=${page}&limit=${limit}`);
     console.log("✅ Products fetched successfully:", response.data);
@@ -87,13 +89,14 @@ export const searchProducts = async (searchTerm: string, page: number, limit: nu
       limit: limit
     };
   }
+  });
 }
-
 
 // Get product by category
 export const getProductsByCategory = async (category: string, page: number, limit: number): Promise<Product[]> => {
-  try {
-    //await ensureAuthenticated();
+  return withAuthentication(async () => {
+    try {
+      //await ensureAuthenticated();
 
     // Build query string manually for proper URL format
     const url = `${API_BASE_URL}/filter?category=${encodeURIComponent(category)}&page=${page}&limit=${limit}`;
@@ -143,12 +146,14 @@ export const getProductsByCategory = async (category: string, page: number, limi
     // Return empty array instead of throwing to prevent homepage crash
     return [];
   }
+  });
 }
 
 // Get product by category and subcategory
 export const getProductsByCategoryAndSubcategory = async (category: string, subCategory: string, page: number, limit: number): Promise<Product[]> => {
-  try {
-    //await ensureAuthenticated();
+  return withAuthentication(async () => {
+    try {
+      //await ensureAuthenticated();
 
     // Build query string manually for proper URL format
     const url = `${API_BASE_URL}/filter?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}&page=${page}&limit=${limit}`;
@@ -198,13 +203,15 @@ export const getProductsByCategoryAndSubcategory = async (category: string, subC
     // Return empty array instead of throwing to prevent homepage crash
     return [];
   }
+  });
 }
 
 // Get product by tag
 export const getProductsByTag = async (tags: string, page: number, limit: number): Promise<Product[]> => {
-  try {
-    // Ensure user is authenticated before making the request
-    //await ensureAuthenticated();
+  return withAuthentication(async () => {
+    try {
+      // Ensure user is authenticated before making the request
+      //await ensureAuthenticated();
 
     if (!tags) {
       console.error("❌ No tags provided for filtering");
@@ -258,15 +265,19 @@ export const getProductsByTag = async (tags: string, page: number, limit: number
     // Return empty array instead of throwing to prevent homepage crash
     return [];
   }
+  });
 }
 
 // Get product by ID
 export const getProductById = async (productId: string): Promise<Product | null> => {
-  try {
-    if (!productId) {
-      console.error("❌ No product ID provided");
-      throw new Error("No product ID provided");
-    }
+  return withAuthentication(async () => {
+    try {
+      if (!productId) {
+        console.error("❌ No product ID provided");
+        throw new Error("No product ID provided");
+      }
+
+      //await ensureAuthenticated();
 
     const response = await axios.get(`${API_BASE_URL}/${productId}`);
     
@@ -315,6 +326,7 @@ export const getProductById = async (productId: string): Promise<Product | null>
     // Return null instead of throwing to prevent homepage crash
     return null;
   }
+  });
 }
 
 interface MostBoughtProduct {
@@ -356,7 +368,9 @@ interface MostBoughtResponse {
 
 // Most Bought Products
 export const getMostBoughtProducts = async (): Promise<MostBoughtProduct[]> => {
-  try {
+  return withAuthentication(async () => {
+    try {
+      //await ensureAuthenticated();
     //const response = await axios.get(`${API_BASE_URL}/most-bought`);
     const response = await axios.get(`https://freshgiftbackend.onrender.com/api/orders/most-bought-products`);
     if (!response.data) {
@@ -420,4 +434,5 @@ export const getMostBoughtProducts = async (): Promise<MostBoughtProduct[]> => {
     // Return empty array instead of throwing to prevent homepage crash
     return [];
   }
+  });
 }
