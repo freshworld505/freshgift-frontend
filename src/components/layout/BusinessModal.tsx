@@ -71,6 +71,29 @@ export default function BusinessModal({ children }: BusinessModalProps) {
     }
   };
 
+  const validatePhoneNumber = (phone: string): boolean => {
+    // Remove all spaces and special characters except +
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, "");
+
+    // UK phone number patterns
+    const ukPatterns = [
+      /^\+44[1-9]\d{8,9}$/, // +44 followed by area code and number
+      /^44[1-9]\d{8,9}$/, // 44 without +
+      /^0[1-9]\d{8,9}$/, // UK domestic format starting with 0
+    ];
+
+    // India phone number patterns
+    const indiaPatterns = [
+      /^\+91[6-9]\d{9}$/, // +91 followed by 10 digits starting with 6-9
+      /^91[6-9]\d{9}$/, // 91 without +
+      /^[6-9]\d{9}$/, // Indian domestic format (10 digits starting with 6-9)
+    ];
+
+    return [...ukPatterns, ...indiaPatterns].some((pattern) =>
+      pattern.test(cleanPhone)
+    );
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -99,6 +122,16 @@ export default function BusinessModal({ children }: BusinessModalProps) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validatePhoneNumber(formData.businessPhone)) {
+      toast({
+        title: "Invalid Phone Number",
+        description:
+          "Please enter a valid UK or India phone number. Examples: +44 20 1234 5678, +91 98765 43210",
         variant: "destructive",
       });
       return;
@@ -191,15 +224,26 @@ export default function BusinessModal({ children }: BusinessModalProps) {
               <Input
                 id="businessPhone"
                 type="tel"
-                placeholder="+919876543210"
+                placeholder="UK: +44 20 1234 5678 or India: +91 98765 43210"
                 value={formData.businessPhone}
                 onChange={(e) =>
                   handleInputChange("businessPhone", e.target.value)
                 }
-                className="pl-10"
+                className={`pl-10 ${
+                  formData.businessPhone &&
+                  !validatePhoneNumber(formData.businessPhone)
+                    ? "border-red-500 focus:border-red-500"
+                    : ""
+                }`}
                 required
               />
             </div>
+            {formData.businessPhone &&
+              !validatePhoneNumber(formData.businessPhone) && (
+                <p className="text-xs text-red-600">
+                  Please enter a valid UK (+44) or India (+91) phone number
+                </p>
+              )}
           </div>
 
           {/* Address Selection */}

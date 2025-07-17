@@ -11,6 +11,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Image from "next/image";
 import {
   MinusCircle,
@@ -26,12 +33,23 @@ import {
   Check,
   X,
   RefreshCw,
+  CreditCard,
+  MapPin,
+  Calendar,
 } from "lucide-react";
 import Link from "next/link";
 import RecommendedProducts from "./RecommendedProducts";
+import SaveCardForm from "@/components/checkout/SaveCardForm";
 import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/store";
+import {
+  saveCardDetailsForRecurringOrders,
+  createRecurringOrder,
+} from "@/api/orderApi";
+import { getUserAddresses } from "@/api/addressesApi";
+import { Address } from "@/lib/types";
+import { toast } from "@/hooks/use-toast";
 
 export default function CartDisplay() {
   const {
@@ -58,6 +76,15 @@ export default function CartDisplay() {
   const [couponError, setCouponError] = useState("");
   const [showAvailableCoupons, setShowAvailableCoupons] = useState(false);
 
+  // Recurring order states
+  const [showRecurringModal, setShowRecurringModal] = useState(false);
+  const [showCardForm, setShowCardForm] = useState(false);
+  const [frequency, setFrequency] = useState("Weekly");
+  const [dayOfWeek, setDayOfWeek] = useState(1); // Monday
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+
   // Fetch cart data when component mounts or user logs in
   useEffect(() => {
     if (isAuthenticated) {
@@ -65,6 +92,34 @@ export default function CartDisplay() {
       fetchCoupons(); // Fetch available coupons
     }
   }, [isAuthenticated, fetchCart, fetchCoupons]);
+
+  // Fetch user addresses for recurring orders
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (!isAuthenticated) return;
+
+      try {
+        setIsLoadingAddresses(true);
+        const userAddresses = await getUserAddresses();
+        setAddresses(userAddresses);
+
+        // Auto-select default address if available
+        const defaultAddress = userAddresses.find((addr) => addr.isDefault);
+        if (defaultAddress) {
+          setSelectedAddressId(defaultAddress.id);
+        } else if (userAddresses.length > 0) {
+          // If no default, select first address
+          setSelectedAddressId(userAddresses[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, [isAuthenticated]);
 
   // Debug available coupons
   useEffect(() => {
@@ -117,6 +172,99 @@ export default function CartDisplay() {
     removeCoupon();
     setCouponCode("");
     setCouponError("");
+  };
+
+  // Recurring order functions
+  const handleSetupRecurringOrder = () => {
+    if (items.length === 0) {
+      toast({
+        title: "Empty Cart",
+        description:
+          "Please add items to your cart before setting up a recurring order.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowRecurringModal(true);
+  };
+
+  const handleProceedToCardForm = () => {
+    if (!selectedAddressId) {
+      toast({
+        title: "Address Required",
+        description: "Please select a delivery address before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowRecurringModal(false);
+    setShowCardForm(true);
+  };
+
+  const handleCardSaveSuccess = async (paymentMethodId: string) => {
+    try {
+      // Show loading state
+      toast({
+        title: "Processing...",
+        description: "Setting up your recurring order...",
+      });
+
+      // Save card details for recurring orders
+      const stripeCustomerId = await saveCardDetailsForRecurringOrders(
+        paymentMethodId
+      );
+      console.log("Stripe Customer ID:", stripeCustomerId);
+
+      // Prepare recurring order data from current cart items
+      const recurringOrderData = {
+        items: items.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
+        frequency: frequency,
+        dayOfWeek: dayOfWeek,
+        addressId: selectedAddressId,
+        paymentMethodId: paymentMethodId,
+      };
+
+      // Create recurring order
+      const result = await createRecurringOrder(recurringOrderData);
+      console.log("Recurring order created:", result);
+
+      // Success feedback
+      toast({
+        title: "Recurring Order Created!",
+        description:
+          "Your recurring order has been set up successfully. You can manage it from your account.",
+      });
+
+      // Close forms
+      setShowCardForm(false);
+      setShowRecurringModal(false);
+      clearCart(); // Clear cart after successful setup
+      // navigate to orders page
+      // Uncomment if you have an orders page
+    } catch (error) {
+      console.error("Error creating recurring order:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create recurring order. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getDayName = (dayOfWeek: number) => {
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return days[dayOfWeek] || "Unknown";
   };
 
   // Show loading state
@@ -432,14 +580,10 @@ export default function CartDisplay() {
                   Wanna get delivered every week?
                 </h3>
               </div>
-              <Button variant="outline" size="sm" className="w-full" asChild>
-                <Link href="/admin/recurring-orders">
-                  <span className="flex items-center justify-center gap-2">
-                    <RefreshCw className="h-4 w-4" />
-                    Recurring Orders
-                  </span>
-                </Link>
-              </Button>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Set up a recurring order and never run out of your favorite
+                products.
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -650,6 +794,17 @@ export default function CartDisplay() {
 
           <CardFooter className="flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-6">
             <Button
+              onClick={handleSetupRecurringOrder}
+              size="lg"
+              variant="outline"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group text-sm sm:text-base py-2 sm:py-3"
+            >
+              <CreditCard className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              Add Card and Repeat Order
+              <RefreshCw className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:rotate-180 transition-transform duration-300" />
+            </Button>
+
+            <Button
               asChild
               size="lg"
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group text-sm sm:text-base py-2 sm:py-3"
@@ -677,6 +832,156 @@ export default function CartDisplay() {
 
       {/* Recommended Products */}
       <RecommendedProducts />
+
+      {/* Recurring Order Setup Modal */}
+      {showRecurringModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md mx-4 bg-white/95 dark:bg-black/95 backdrop-blur-sm border-0 shadow-2xl rounded-2xl">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-b border-purple-100 dark:border-purple-800">
+              <CardTitle className="text-xl font-bold flex items-center gap-3">
+                <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                  <RefreshCw className="h-3 w-3 text-white" />
+                </div>
+                Set Up Recurring Order
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              {/* Frequency Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Delivery Frequency
+                </label>
+                <Select value={frequency} onValueChange={setFrequency}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Weekly">Weekly</SelectItem>
+                    <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
+                    <SelectItem value="Monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Day of Week Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Delivery Day</label>
+                <Select
+                  value={dayOfWeek.toString()}
+                  onValueChange={(value) => setDayOfWeek(parseInt(value))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Monday</SelectItem>
+                    <SelectItem value="2">Tuesday</SelectItem>
+                    <SelectItem value="3">Wednesday</SelectItem>
+                    <SelectItem value="4">Thursday</SelectItem>
+                    <SelectItem value="5">Friday</SelectItem>
+                    <SelectItem value="6">Saturday</SelectItem>
+                    <SelectItem value="0">Sunday</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Address Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Delivery Address
+                </label>
+                {isLoadingAddresses ? (
+                  <div className="p-3 text-center text-sm text-gray-500">
+                    Loading addresses...
+                  </div>
+                ) : addresses.length === 0 ? (
+                  <div className="p-3 text-center text-sm text-red-600">
+                    No addresses found. Please add an address in your account
+                    settings.
+                  </div>
+                ) : (
+                  <Select
+                    value={selectedAddressId}
+                    onValueChange={setSelectedAddressId}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select delivery address" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {addresses.map((address) => (
+                        <SelectItem key={address.id} value={address.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              Address {address.id.slice(-8)}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {address.street}, {address.city}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {/* Order Summary */}
+              <div className="space-y-3 p-4 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/10 dark:to-pink-950/10 rounded-xl border border-purple-200 dark:border-purple-800">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Recurring Order Summary
+                </h4>
+                <div className="text-sm space-y-1">
+                  <p>
+                    <span className="font-medium">Frequency:</span> {frequency}
+                  </p>
+                  <p>
+                    <span className="font-medium">Day:</span>{" "}
+                    {getDayName(dayOfWeek)}
+                  </p>
+                  <p>
+                    <span className="font-medium">Items:</span> {items.length}{" "}
+                    products
+                  </p>
+                  <p>
+                    <span className="font-medium">Total:</span> £
+                    {total.toFixed(2)} per delivery
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex gap-3 p-6 pt-0">
+              <Button
+                variant="outline"
+                onClick={() => setShowRecurringModal(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleProceedToCardForm}
+                disabled={!selectedAddressId || addresses.length === 0}
+                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                Add Payment Method
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
+
+      {/* Save Card Form Modal */}
+      {showCardForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md mx-4">
+            <SaveCardForm
+              onClose={() => setShowCardForm(false)}
+              onSuccess={handleCardSaveSuccess}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
