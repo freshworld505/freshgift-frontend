@@ -199,7 +199,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="space-y-8 sm:space-y-12 md:space-y-16">
+    <div className="space-y-4 sm:space-y-6 md:space-y-10">
       <HeroSection />
 
       {/* Categories Section */}

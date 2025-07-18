@@ -243,8 +243,8 @@ export const getOrderById = async (orderId: string): Promise<any> => {
 }
 
 // Admin apis for recurring orders
-//const API_BASE_URL_FOR_RECURRING = 'https://freshgiftbackend.onrender.com/api/recurring-orders';
-const API_BASE_URL_FOR_RECURRING = 'http://localhost:5004/api/recurring';
+const API_BASE_URL_FOR_RECURRING = 'https://freshgiftbackend.onrender.com/api/recurring';
+//const API_BASE_URL_FOR_RECURRING = 'http://localhost:5004/api/recurring';
 
 // Get all recurring orders
 export const getAllRecurringOrders = async (): Promise<RecurringOrder[]> => {

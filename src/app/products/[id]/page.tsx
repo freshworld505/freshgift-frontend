@@ -603,29 +603,29 @@ export default function ProductDetailPage() {
                   Out of Stock
                 </Button>
               ) : isInCart ? (
-                <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
-                  <p className="text-center text-green-700 font-semibold mb-3">
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                  <p className="text-center text-blue-700 font-semibold mb-3">
                     Item in cart
                   </p>
                   <div className="flex items-center justify-center gap-4">
                     <Button
                       size="icon"
                       variant="outline"
-                      className="h-10 w-10 rounded-full border-2 border-green-300 hover:bg-green-100 transition-colors"
+                      className="h-10 w-10 rounded-full border-2 border-blue-300 hover:bg-blue-100 transition-colors"
                       onClick={handleDecreaseQuantity}
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-700">
+                      <div className="text-2xl font-bold text-blue-700">
                         {cartQuantity}
                       </div>
-                      <div className="text-sm text-green-600">in cart</div>
+                      <div className="text-sm text-blue-600">in cart</div>
                     </div>
                     <Button
                       size="icon"
                       variant="outline"
-                      className="h-10 w-10 rounded-full border-2 border-green-300 hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-10 w-10 rounded-full border-2 border-blue-300 hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleIncreaseQuantity}
                       disabled={!canAddMore}
                     >
@@ -633,7 +633,7 @@ export default function ProductDetailPage() {
                     </Button>
                   </div>
                   <div className="mt-3 text-center">
-                    <span className="text-green-700 font-semibold">
+                    <span className="text-blue-700 font-semibold">
                       Total: £
                       {((product.finalPrice || 0) * cartQuantity).toFixed(2)}
                     </span>
@@ -641,7 +641,7 @@ export default function ProductDetailPage() {
                 </div>
               ) : (
                 <Button
-                  className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                   onClick={handleAddToCart}
                   aria-label={`Add ${product.productName} to cart`}
                 >
@@ -870,8 +870,8 @@ export default function ProductDetailPage() {
 
                           {relatedIsInStock && (
                             <div className="flex items-center gap-1">
-                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                              <span className="text-xs text-green-600 font-medium">
+                              <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                              <span className="text-xs text-orange-600 font-medium">
                                 In Stock
                               </span>
                             </div>
@@ -897,7 +897,7 @@ export default function ProductDetailPage() {
                               <Button
                                 size="icon"
                                 variant="outline"
-                                className="h-6 w-6 rounded-full border-green-300 hover:bg-green-100 transition-colors flex-shrink-0"
+                                className="h-6 w-6 rounded-full border-blue-300 hover:bg-blue-100 transition-colors flex-shrink-0"
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   try {
@@ -923,14 +923,14 @@ export default function ProductDetailPage() {
                                 <Minus className="h-3 w-3" />
                               </Button>
                               <div className="text-center flex-1">
-                                <div className="text-sm font-bold text-green-700">
+                                <div className="text-sm font-bold text-blue-700">
                                   {relatedCartItem!.quantity}
                                 </div>
                               </div>
                               <Button
                                 size="icon"
                                 variant="outline"
-                                className="h-6 w-6 rounded-full border-green-300 hover:bg-green-100 transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-6 w-6 rounded-full border-blue-300 hover:bg-blue-100 transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   if (
@@ -967,7 +967,7 @@ export default function ProductDetailPage() {
                           </div>
                         ) : (
                           <Button
-                            className="w-full bg-green-600 hover:bg-green-700 text-white text-xs h-8"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs h-8"
                             onClick={async (e) => {
                               e.stopPropagation();
                               if (!isAuthenticated) {

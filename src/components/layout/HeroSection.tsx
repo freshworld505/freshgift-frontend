@@ -74,8 +74,8 @@ export default function HeroSection() {
         <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-green-300 rounded-full blur-2xl animate-bounce" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28">
-        <div className="text-center space-y-4 sm:space-y-6 md:space-y-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 md:py-16 lg:py-20">
+        <div className="text-center space-y-3 sm:space-y-4 md:space-y-6">
           {/* Badge */}
           <div className="inline-flex items-center gap-1 sm:gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm font-medium border border-emerald-200 dark:border-emerald-800">
             <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 fill-current" />
@@ -83,7 +83,7 @@ export default function HeroSection() {
           </div>
 
           {/* Main heading */}
-          <div className="space-y-2 sm:space-y-3 md:space-y-4">
+          <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold tracking-tight">
               <span className="bg-gradient-to-r from-emerald-600 to-lime-600 bg-clip-text text-transparent">
                 Fresh Produce
@@ -104,7 +104,7 @@ export default function HeroSection() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center items-center pt-2 sm:pt-3 md:pt-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center items-center pt-1.5 sm:pt-2 md:pt-3">
             <Button
               size="lg"
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group w-full sm:w-auto"

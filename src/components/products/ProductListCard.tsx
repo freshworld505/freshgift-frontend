@@ -278,7 +278,7 @@ export default function ProductListCard({
                     </Badge>
                   </div>
                   <p className="text-sm sm:text-xl font-bold text-orange-400 ml-2 sm:ml-4">
-                    £{product.finalPrice || 0}
+                    £{(product.finalPrice || 0).toFixed(2)}
                   </p>
                 </div>
               </Link>
@@ -489,7 +489,7 @@ export default function ProductListCard({
         {/* Price */}
         <div className="flex items-center justify-between">
           <p className="text-sm sm:text-base font-bold text-orange-400">
-            £{product.finalPrice || 0}
+            £{(product.finalPrice || 0).toFixed(2)}
           </p>
         </div>
       </CardContent>

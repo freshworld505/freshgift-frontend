@@ -3,8 +3,8 @@ import { ensureAuthenticated, getAuthHeaders, withAuthentication } from './ensur
 import { getAuth } from 'firebase/auth';
 import type { Address } from '@/lib/types';
 
-//const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
-const API_BASE_URL = `http://localhost:5004/api`;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+//const API_BASE_URL = `http://localhost:5004/api`;
 
 // Backend address response type
 type BackendAddress = {
