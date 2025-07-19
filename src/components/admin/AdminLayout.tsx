@@ -67,11 +67,6 @@ const sidebarItems = [
     href: "/admin/business-requests",
     icon: Users,
   },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-  },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

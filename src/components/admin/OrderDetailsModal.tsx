@@ -134,10 +134,6 @@ export default function OrderDetailsModal({
     }
   };
 
-  const formatCurrency = (amount: any) => {
-    return `£${parseFloat(amount || 0).toFixed(2)}`;
-  };
-
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -187,7 +183,7 @@ export default function OrderDetailsModal({
                 Total Amount
               </Label>
               <p className="font-semibold text-lg">
-                {formatCurrency(order.totalAmount)}
+                £{(order.totalAmount || 0).toFixed(2)}
               </p>
             </div>
           </div>
@@ -275,10 +271,13 @@ export default function OrderDetailsModal({
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">
-                          {formatCurrency(item.price * item.quantity)}
+                          £
+                          {(
+                            (item.unitPrice || 0) * (item.quantity || 0)
+                          ).toFixed(2)}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {formatCurrency(item.price)} each
+                          £{(item.unitPrice || 0).toFixed(2)} each
                         </p>
                       </div>
                     </div>

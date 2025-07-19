@@ -26,8 +26,13 @@ const stripePromise = loadStripe(
 interface SaveCardFormProps {
   onClose: () => void;
   onSuccess?: (paymentMethodId: string) => void;
+  isOrderPlacing?: boolean;
 }
-const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
+const SaveCardFormContent = ({
+  onClose,
+  onSuccess,
+  isOrderPlacing,
+}: SaveCardFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -68,13 +73,13 @@ const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
       console.log("Payment Method ID:", paymentMethod.id);
       console.log("Full Payment Method:", paymentMethod);
 
-      setMessage("Card saved successfully!");
-      setLoading(false);
-
-      // Call the success callback with payment method ID
       if (onSuccess) {
+        setMessage("Card saved successfully! Placing your order...");
+        // Call the success callback with payment method ID
         onSuccess(paymentMethod.id);
       } else {
+        setMessage("Card saved successfully!");
+        setLoading(false);
         // Close the form after successful save if no success callback
         setTimeout(() => {
           onClose();
@@ -182,7 +187,7 @@ const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  disabled={loading}
+                  disabled={loading || isOrderPlacing}
                   className="flex-1 h-12 rounded-xl border-2 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-all duration-200"
                 >
                   Cancel
@@ -190,14 +195,16 @@ const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
 
                 <Button
                   type="submit"
-                  disabled={!stripe || loading}
+                  disabled={!stripe || loading || isOrderPlacing}
                   className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold border-0 relative overflow-hidden group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                  {loading ? (
+                  {loading || isOrderPlacing ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white mr-3"></div>
-                      <span>Saving...</span>
+                      <span>
+                        {isOrderPlacing ? "Placing Order..." : "Saving..."}
+                      </span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center">
@@ -209,10 +216,11 @@ const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
               </div>
 
               {/* Status Message */}
-              {message && (
+              {(message || isOrderPlacing) && (
                 <div
                   className={`relative overflow-hidden rounded-2xl border-2 p-4 transition-all duration-300 animate-in slide-in-from-top-2 ${
-                    message.includes("successfully")
+                    (message && message.includes("successfully")) ||
+                    isOrderPlacing
                       ? "bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 border-emerald-200 dark:border-emerald-700"
                       : "bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 border-red-200 dark:border-red-700"
                   }`}
@@ -220,12 +228,15 @@ const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                        message.includes("successfully")
+                        (message && message.includes("successfully")) ||
+                        isOrderPlacing
                           ? "bg-emerald-100 dark:bg-emerald-900/50"
                           : "bg-red-100 dark:bg-red-900/50"
                       }`}
                     >
-                      {message.includes("successfully") ? (
+                      {isOrderPlacing ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-600/30 border-t-emerald-600"></div>
+                      ) : message && message.includes("successfully") ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                       ) : (
                         <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
@@ -234,23 +245,29 @@ const SaveCardFormContent = ({ onClose, onSuccess }: SaveCardFormProps) => {
                     <div className="flex-1">
                       <p
                         className={`text-sm font-medium ${
-                          message.includes("successfully")
+                          (message && message.includes("successfully")) ||
+                          isOrderPlacing
                             ? "text-emerald-800 dark:text-emerald-200"
                             : "text-red-800 dark:text-red-200"
                         }`}
                       >
-                        {message.includes("successfully")
+                        {isOrderPlacing
+                          ? "Processing..."
+                          : message && message.includes("successfully")
                           ? "Success!"
                           : "Error"}
                       </p>
                       <p
                         className={`text-xs mt-1 ${
-                          message.includes("successfully")
+                          (message && message.includes("successfully")) ||
+                          isOrderPlacing
                             ? "text-emerald-700 dark:text-emerald-300"
                             : "text-red-700 dark:text-red-300"
                         }`}
                       >
-                        {message}
+                        {isOrderPlacing
+                          ? "Placing your recurring order..."
+                          : message}
                       </p>
                     </div>
                   </div>

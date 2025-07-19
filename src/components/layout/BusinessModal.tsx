@@ -28,9 +28,13 @@ import type { Address } from "@/lib/types";
 
 interface BusinessModalProps {
   children: React.ReactNode;
+  businessStatus?: string | null;
 }
 
-export default function BusinessModal({ children }: BusinessModalProps) {
+export default function BusinessModal({
+  children,
+  businessStatus,
+}: BusinessModalProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -175,150 +179,194 @@ export default function BusinessModal({ children }: BusinessModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-emerald-600" />
-            Apply for Business Deals
+            {businessStatus === "pending"
+              ? "Application Status"
+              : "Apply for Business Deals"}
           </DialogTitle>
           <DialogDescription>
-            Get access to exclusive wholesale prices and bulk ordering options
-            for your business.
+            {businessStatus === "pending"
+              ? "Your business application is currently under review."
+              : "Get access to exclusive wholesale prices and bulk ordering options for your business."}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Business Name */}
-          <div className="space-y-2">
-            <Label htmlFor="businessName" className="text-sm font-medium">
-              Business Name *
-            </Label>
-            <Input
-              id="businessName"
-              placeholder="e.g., My Bakery Shop"
-              value={formData.businessName}
-              onChange={(e) =>
-                handleInputChange("businessName", e.target.value)
-              }
-              required
-            />
-          </div>
+        {businessStatus === "pending" ? (
+          /* Already Applied Content */
+          <div className="space-y-4 py-4">
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                <Zap className="h-8 w-8 text-yellow-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Application Under Review
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Thank you for your interest in our business program. Your
+                application is currently being reviewed by our team.
+              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-sm text-yellow-800">
+                  <strong>Status:</strong> Pending Review
+                </p>
+                <p className="text-sm text-yellow-700 mt-1">
+                  We'll notify you via email once your application has been
+                  processed. This typically takes 1-3 business days.
+                </p>
+              </div>
+            </div>
 
-          {/* Business ID */}
-          <div className="space-y-2">
-            <Label htmlFor="businessId" className="text-sm font-medium">
-              Business Registration ID *
-            </Label>
-            <Input
-              id="businessId"
-              placeholder="e.g., REG-982347"
-              value={formData.businessId}
-              onChange={(e) => handleInputChange("businessId", e.target.value)}
-              required
-            />
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={() => setOpen(false)}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Got it
+              </Button>
+            </div>
           </div>
-
-          {/* Business Phone */}
-          <div className="space-y-2">
-            <Label htmlFor="businessPhone" className="text-sm font-medium">
-              Business Phone Number *
-            </Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        ) : (
+          /* Application Form */
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Business Name */}
+            <div className="space-y-2">
+              <Label htmlFor="businessName" className="text-sm font-medium">
+                Business Name *
+              </Label>
               <Input
-                id="businessPhone"
-                type="tel"
-                placeholder="UK: +44 20 1234 5678 or India: +91 98765 43210"
-                value={formData.businessPhone}
+                id="businessName"
+                placeholder="e.g., My Bakery Shop"
+                value={formData.businessName}
                 onChange={(e) =>
-                  handleInputChange("businessPhone", e.target.value)
+                  handleInputChange("businessName", e.target.value)
                 }
-                className={`pl-10 ${
-                  formData.businessPhone &&
-                  !validatePhoneNumber(formData.businessPhone)
-                    ? "border-red-500 focus:border-red-500"
-                    : ""
-                }`}
                 required
               />
             </div>
-            {formData.businessPhone &&
-              !validatePhoneNumber(formData.businessPhone) && (
-                <p className="text-xs text-red-600">
-                  Please enter a valid UK (+44) or India (+91) phone number
-                </p>
-              )}
-          </div>
 
-          {/* Address Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="addressId" className="text-sm font-medium">
-              Business Address *
-            </Label>
-            {loadingAddresses ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="ml-2 text-sm text-muted-foreground">
-                  Loading addresses...
-                </span>
-              </div>
-            ) : addresses.length > 0 ? (
-              <Select
-                value={formData.addressId}
-                onValueChange={(value) => handleInputChange("addressId", value)}
-              >
-                <SelectTrigger>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
-                    <SelectValue placeholder="Select business address" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  {addresses.map((address) => (
-                    <SelectItem key={address.id} value={address.id}>
-                      <div className="flex flex-col text-left">
-                        <span className="font-medium">{address.street}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {address.city}, {address.state} {address.zipCode}
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <div className="text-sm text-muted-foreground p-3 border rounded-md">
-                No addresses found. Please add an address in your account
-                settings first.
-              </div>
-            )}
-          </div>
+            {/* Business ID */}
+            <div className="space-y-2">
+              <Label htmlFor="businessId" className="text-sm font-medium">
+                Business House Reg. Number *
+              </Label>
+              <Input
+                id="businessId"
+                placeholder="e.g., REG-982347"
+                value={formData.businessId}
+                onChange={(e) =>
+                  handleInputChange("businessId", e.target.value)
+                }
+                required
+              />
+            </div>
 
-          {/* Submit Button */}
-          <div className="flex gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading || !formData.addressId}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Submitting...
-                </>
+            {/* Business Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="businessPhone" className="text-sm font-medium">
+                Business Phone Number *
+              </Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="businessPhone"
+                  type="tel"
+                  placeholder="UK: +44 20 1234 5678 or India: +91 98765 43210"
+                  value={formData.businessPhone}
+                  onChange={(e) =>
+                    handleInputChange("businessPhone", e.target.value)
+                  }
+                  className={`pl-10 ${
+                    formData.businessPhone &&
+                    !validatePhoneNumber(formData.businessPhone)
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }`}
+                  required
+                />
+              </div>
+              {formData.businessPhone &&
+                !validatePhoneNumber(formData.businessPhone) && (
+                  <p className="text-xs text-red-600">
+                    Please enter a valid UK (+44) or India (+91) phone number
+                  </p>
+                )}
+            </div>
+
+            {/* Address Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="addressId" className="text-sm font-medium">
+                Business Address *
+              </Label>
+              {loadingAddresses ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    Loading addresses...
+                  </span>
+                </div>
+              ) : addresses.length > 0 ? (
+                <Select
+                  value={formData.addressId}
+                  onValueChange={(value) =>
+                    handleInputChange("addressId", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
+                      <SelectValue placeholder="Select business address" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {addresses.map((address) => (
+                      <SelectItem key={address.id} value={address.id}>
+                        <div className="flex flex-col text-left">
+                          <span className="font-medium">{address.street}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {address.city}, {address.state} {address.zipCode}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               ) : (
-                <>
-                  <Zap className="h-4 w-4 mr-2" />
-                  Apply Now
-                </>
+                <div className="text-sm text-muted-foreground p-3 border rounded-md">
+                  No addresses found. Please add an address in your account
+                  settings first.
+                </div>
               )}
-            </Button>
-          </div>
-        </form>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading || !formData.addressId}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="h-4 w-4 mr-2" />
+                    Apply Now
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

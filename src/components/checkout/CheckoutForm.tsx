@@ -55,6 +55,8 @@ import { createAddress, updatePhoneNumber } from "@/api/addressesApi";
 import StripePaymentForm from "./StripePaymentForm";
 import SelectAddress from "./SelectAddress";
 import SaveCardPage from "./SaveCardForm";
+import Lottie from "lottie-react";
+import successAnimation from "../../../public/Success.json";
 
 // Initialize Stripe (you'll need to add your publishable key)
 const stripePromise = loadStripe(
@@ -194,6 +196,14 @@ export default function CheckoutForm() {
   const [showStripePayment, setShowStripePayment] = useState(false);
   const [showCardSaving, setShowCardSaving] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [isPlacingRecurringOrder, setIsPlacingRecurringOrder] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [recurringOrderData, setRecurringOrderData] = useState<{
+    values: z.infer<typeof checkoutSchema>;
+    scheduledTime: string;
+    userInstructions: string;
+    selectedAddress: Address | null;
+  } | null>(null);
   const [paymentIntentData, setPaymentIntentData] = useState<{
     clientSecret: string;
     paymentIntentId: string;
@@ -467,13 +477,10 @@ export default function CheckoutForm() {
       // Clear the cart after successful order
       clearCart();
 
-      toast({
-        title: "Order placed successfully!",
-        description: "Your order has been placed and will be delivered soon.",
-      });
-
-      // Redirect to order confirmation/history page
-      router.push(`/account/orders/${newOrder.orderId}`);
+      showSuccessAnimationAndRedirect(
+        newOrder.orderId,
+        "Your order has been placed and will be delivered soon."
+      );
     } catch (error) {
       console.error("❌ Failed to place order:", error);
 
@@ -771,14 +778,22 @@ export default function CheckoutForm() {
       // Clear the cart after successful payment
       clearCart();
 
-      toast({
-        title: "Order placed successfully!",
-        description:
-          "Your payment has been processed and order has been placed.",
-      });
+      // Small delay to ensure smooth transition
+      setTimeout(() => {
+        setShowSuccessAnimation(true);
 
-      // Redirect to order confirmation page
-      router.push(`/account/orders`);
+        toast({
+          title: "Order placed successfully!",
+          description:
+            "Your payment has been processed and order has been placed.",
+        });
+
+        // Show animation for 3.5 seconds, then redirect
+        setTimeout(() => {
+          setShowSuccessAnimation(false);
+          router.push(`/account/orders`);
+        }, 3500);
+      }, 100);
     } catch (error) {
       console.error("Failed to confirm payment:", error);
       toast({
@@ -802,6 +817,176 @@ export default function CheckoutForm() {
     setCheckoutData(null);
   };
 
+  const handleRecurringOrderPayment = async () => {
+    const values = form.getValues();
+
+    // Validate form first
+    const hasValidSelectedAddress =
+      selectedAddress &&
+      typeof selectedAddress === "object" &&
+      selectedAddress.id &&
+      selectedAddress.id.trim() !== "";
+
+    let isValid = false;
+    if (hasValidSelectedAddress) {
+      const isNameValid = await form.trigger("fullName");
+      const isPhoneValid = await form.trigger("phoneNumber");
+      const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
+      isValid = isNameValid && isPhoneValid && isTimeSlotValid;
+    } else {
+      isValid = await form.trigger();
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    // Find the selected time slot
+    const selectedTimeSlot = availableTimeSlots.find(
+      (slot) => slot.id === values.deliveryTimeSlot
+    );
+
+    const getScheduledTimestamp = (timeSlot: TimeSlot | undefined): string => {
+      if (!timeSlot) {
+        return new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+      }
+
+      const now = new Date();
+      const baseDate = timeSlot.label.includes("Tomorrow")
+        ? new Date(now.getTime() + 24 * 60 * 60 * 1000)
+        : now;
+
+      const timeMatch = timeSlot.label.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/);
+      if (timeMatch) {
+        const [, hours, minutes, period] = timeMatch;
+        let hour = parseInt(hours);
+        if (period === "PM" && hour !== 12) hour += 12;
+        if (period === "AM" && hour === 12) hour = 0;
+
+        const scheduledDate = new Date(baseDate);
+        scheduledDate.setHours(hour, parseInt(minutes), 0, 0);
+        return scheduledDate.toISOString();
+      }
+
+      return new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+    };
+
+    const scheduledTime = getScheduledTimestamp(selectedTimeSlot);
+    const userInstructions = `Delivery to: ${values.fullName}, Phone: ${values.phoneNumber}`;
+
+    // Store checkout data for recurring order
+    setRecurringOrderData({
+      values,
+      scheduledTime,
+      userInstructions,
+      selectedAddress,
+    });
+
+    // Show card saving form
+    setShowCardSaving(true);
+  };
+
+  const handleCardSaveSuccess = async (paymentMethodId: string) => {
+    if (!recurringOrderData) {
+      toast({
+        title: "Error",
+        description: "Missing order data. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPlacingRecurringOrder(true);
+
+    try {
+      toast({
+        title: "Card saved successfully!",
+        description: "Now placing your recurring order...",
+      });
+
+      // Handle address: either use selected address or create new one
+      let addressId: string;
+
+      const hasValidSelectedAddress =
+        recurringOrderData.selectedAddress &&
+        typeof recurringOrderData.selectedAddress === "object" &&
+        recurringOrderData.selectedAddress.id &&
+        recurringOrderData.selectedAddress.id.trim() !== "";
+
+      if (hasValidSelectedAddress) {
+        addressId = recurringOrderData.selectedAddress!.id;
+      } else {
+        const newAddress = await createAddressFromForm(
+          recurringOrderData.values
+        );
+        addressId = newAddress.id;
+      }
+
+      // Create recurring order
+      const orderData: CreateOrderRequest = {
+        addressId: addressId,
+        deliveryType: "Recurring" as OrderDeliveryType,
+        paymentMethod: "Card" as PaymentMethod,
+        paymentStatus: "Paid" as PaymentStatus,
+        couponCode: appliedCoupon?.coupon.code || "",
+        transactionId: `recurring_${Date.now()}_${paymentMethodId}`,
+        discountAmount: appliedDiscount || 0,
+        scheduledTime: recurringOrderData.scheduledTime,
+        userInstructions: recurringOrderData.userInstructions,
+      };
+
+      console.log("🔄 Creating recurring order with saved card...");
+      const newOrder = await createOrder(orderData);
+
+      // Clear the cart after successful order
+      clearCart();
+
+      showSuccessAnimationAndRedirect(
+        newOrder.orderId,
+        "Your recurring order has been set up with the saved payment method."
+      );
+    } catch (error) {
+      console.error("❌ Failed to place recurring order:", error);
+      toast({
+        title: "Recurring order failed",
+        description: `Failed to place your recurring order. ${
+          error instanceof Error ? error.message : "Please try again."
+        }`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsPlacingRecurringOrder(false);
+      setShowCardSaving(false);
+      setRecurringOrderData(null);
+    }
+  };
+
+  const handleCardSaveCancel = () => {
+    setShowCardSaving(false);
+    setRecurringOrderData(null);
+  };
+
+  const showSuccessAnimationAndRedirect = (
+    orderId: string,
+    message: string
+  ) => {
+    // Small delay to ensure smooth transition
+    setTimeout(() => {
+      setShowSuccessAnimation(true);
+
+      toast({
+        title: "Order placed successfully!",
+        description: message,
+      });
+
+      // Show animation for 3.5 seconds, then redirect
+      setTimeout(() => {
+        setShowSuccessAnimation(false);
+        router.push(`/account/orders/${orderId}`);
+      }, 3500);
+    }, 100);
+  };
+
   if (!isClient || items.length === 0) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -819,7 +1004,32 @@ export default function CheckoutForm() {
 
   // Show Card save UI, if user selected recurring order
   if (showCardSaving) {
-    return <SaveCardPage />;
+    return (
+      <div className="space-y-8 max-w-4xl mx-auto">
+        {isPlacingRecurringOrder && (
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-700 rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">
+                    Placing Your Recurring Order
+                  </h3>
+                  <p className="text-sm text-blue-600 dark:text-blue-300">
+                    Please wait while we set up your recurring delivery...
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        <SaveCardPage
+          onClose={handleCardSaveCancel}
+          onSuccess={handleCardSaveSuccess}
+          isOrderPlacing={isPlacingRecurringOrder}
+        />
+      </div>
+    );
   }
 
   // Show Stripe payment form if payment intent is created
@@ -869,6 +1079,38 @@ export default function CheckoutForm() {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Success Animation Overlay */}
+      {showSuccessAnimation && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in-0 duration-300">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-2xl max-w-md w-full text-center animate-in slide-in-from-bottom-4 duration-500 border border-green-200 dark:border-green-700">
+            <div className="w-40 h-40 mx-auto mb-6">
+              <Lottie
+                animationData={successAnimation}
+                loop={false}
+                autoplay={true}
+                style={{ width: "100%", height: "100%" }}
+              />
+            </div>
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">
+                Order Placed Successfully!
+              </h2>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Thank you for your order! Your fresh groceries will be delivered
+                soon. You'll receive a confirmation email shortly.
+              </p>
+              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-green-50 dark:bg-green-950/20 rounded-full px-4 py-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-500 border-t-transparent"></div>
+                <span>Redirecting to your orders...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Checkout Form */}
       <Card className="bg-white/60 dark:bg-black/40 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-emerald-50 to-lime-50 dark:from-emerald-950/20 dark:to-lime-950/20 border-b border-emerald-100 dark:border-emerald-800">
@@ -1145,6 +1387,26 @@ export default function CheckoutForm() {
                   >
                     <CreditCard className="mr-2 h-5 w-5" />
                     {isOrderLoading ? "Processing..." : "Pay with Card"}
+                    <Sparkles className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  </Button>
+                </div>
+
+                {/* Recurring Order Button */}
+                <div className="text-center pt-4 border-t border-emerald-100 dark:border-emerald-700">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Want this delivered regularly?
+                  </p>
+                  <Button
+                    type="button"
+                    size="lg"
+                    disabled={isOrderLoading || isPlacingRecurringOrder}
+                    onClick={handleRecurringOrderPayment}
+                    className="w-full max-w-md bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group h-14 text-lg font-semibold"
+                  >
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    {isPlacingRecurringOrder
+                      ? "Setting up..."
+                      : "Set up Recurring Order"}
                     <Sparkles className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   </Button>
                 </div>

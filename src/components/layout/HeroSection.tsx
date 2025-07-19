@@ -6,11 +6,12 @@ import Link from "next/link";
 import BusinessModal from "./BusinessModal";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
-import { checkBusinessUserStatus } from "@/api/BusinessUserApi";
+import { getBusinessStatus } from "@/api/BusinessUserApi";
 
 export default function HeroSection() {
   const { user, isAuthenticated } = useAuth();
   const [showBusinessButton, setShowBusinessButton] = useState(false);
+  const [businessStatus, setBusinessStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const checkBusinessStatus = async () => {
@@ -20,37 +21,25 @@ export default function HeroSection() {
       }
 
       try {
-        // Check all statuses to see if user has any existing requests
-        const [pendingResponse, rejectedResponse, approvedResponse] =
-          await Promise.all([
-            checkBusinessUserStatus("pending"),
-            checkBusinessUserStatus("rejected"),
-            checkBusinessUserStatus("approved"),
-          ]);
+        // Check current user's business status
+        const businessStatusResponse = await getBusinessStatus();
 
-        // Find if current user has any requests in any status
-        const allRequests = [
-          ...pendingResponse.requests,
-          ...rejectedResponse.requests,
-          ...approvedResponse.requests,
-        ];
-
-        const userRequest = allRequests.find(
-          (request) => request.user.firebaseId === user.firebaseId
-        );
-
-        if (!userRequest) {
+        if (!businessStatusResponse) {
           // No existing request - show button
           setShowBusinessButton(true);
-        } else if (
-          userRequest.status === "pending" ||
-          userRequest.status === "rejected"
-        ) {
-          // Has pending or rejected request - show button
-          setShowBusinessButton(true);
-        } else if (userRequest.status === "approved") {
-          // Has approved request - don't show button
-          setShowBusinessButton(false);
+          setBusinessStatus(null);
+        } else {
+          // Has a request - check status
+          const status = businessStatusResponse.status;
+          setBusinessStatus(status);
+
+          if (status === "pending" || status === "rejected") {
+            // Has pending or rejected request - show button
+            setShowBusinessButton(true);
+          } else if (status === "approved") {
+            // Has approved request - don't show button
+            setShowBusinessButton(false);
+          }
         }
       } catch (error) {
         console.error("Failed to check business status:", error);
@@ -118,14 +107,16 @@ export default function HeroSection() {
             </Button>
 
             {showBusinessButton && (
-              <BusinessModal>
+              <BusinessModal businessStatus={businessStatus}>
                 <Button
                   variant="outline"
                   size="lg"
                   className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300 w-full sm:w-auto"
                 >
                   <Zap className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
-                  Business Deals
+                  {businessStatus === "pending"
+                    ? "Already Applied"
+                    : "Business Deals"}
                 </Button>
               </BusinessModal>
             )}

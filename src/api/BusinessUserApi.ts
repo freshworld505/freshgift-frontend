@@ -46,6 +46,12 @@ interface BusinessUser {
   addressId: string;
 }
 
+interface BusinessStatusResponse {
+  message: string;
+  status: 'pending' | 'approved' | 'rejected';
+  request: BusinessRequest;
+}
+
 interface BusinessRequest {
   requestId: string;
   userId: string;
@@ -264,3 +270,22 @@ export const checkBusinessUserStatus = async (status: string): Promise<{ message
     }
   });
 };
+
+// get user with particular status --> status can be pending, approved, or rejected
+export const getBusinessStatus = async (): Promise<BusinessStatusResponse | null> => {
+  return withAuthentication(async () => {
+    try {
+      const response = await axios.get<BusinessStatusResponse>(`${API_BASE_URL}/business/user/status`, {
+        headers: await getAuthHeaders(),
+      });
+      console.log("✅ Successfully fetched business user status:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch business user status:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return null; // No business user found
+      }
+      throw error;
+    }
+  });
+}

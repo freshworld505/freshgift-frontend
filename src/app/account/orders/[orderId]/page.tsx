@@ -35,7 +35,6 @@ import {
   CalendarDays,
   ListOrdered,
 } from "lucide-react";
-import { formatCurrency, convertINRtoGBP } from "@/lib/currency";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -244,12 +243,10 @@ export default function OrderDetailPage() {
                       {item.quantity}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatCurrency(convertINRtoGBP(item.unitPrice))}
+                      £{item.unitPrice}
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      {formatCurrency(
-                        convertINRtoGBP(item.unitPrice * item.quantity)
-                      )}
+                      £{(item.unitPrice * item.quantity).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -286,28 +283,25 @@ export default function OrderDetailPage() {
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Subtotal (from items above):</span>
               <span>
-                {formatCurrency(
-                  convertINRtoGBP(
-                    order.items.reduce((sum, item) => sum + item.totalPrice, 0)
-                  )
-                )}
+                £
+                {order.items
+                  .reduce((sum, item) => sum + item.totalPrice, 0)
+                  .toFixed(2)}
               </span>
             </div>
             {order.discountAmount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Discount Applied:</span>
-                <span>
-                  -{formatCurrency(convertINRtoGBP(order.discountAmount))}
-                </span>
+                <span>-£{order.discountAmount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Shipping & Handling:</span>
-              <span>{formatCurrency(0)}</span>
+              <span>£0.00</span>
             </div>
             <div className="flex justify-between text-lg font-bold text-foreground pt-1 border-t border-border mt-1">
               <span>Grand Total:</span>
-              <span>{formatCurrency(convertINRtoGBP(order.totalAmount))}</span>
+              <span>£{order.totalAmount.toFixed(2)}</span>
             </div>
           </div>
         </CardFooter>

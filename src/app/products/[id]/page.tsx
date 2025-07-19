@@ -564,17 +564,17 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Price Section */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-2.5 sm:p-4 border border-green-200">
-              <div className="flex items-baseline gap-2 mb-1 sm:mb-2">
-                <span className="text-xl sm:text-3xl font-bold text-green-700">
-                  £{product.finalPrice || 0}
+            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-xl sm:text-2xl font-bold text-orange-600">
+                  £{(product.finalPrice || 0).toFixed(2)}
                 </span>
                 {product.actualPrice > product.finalPrice && (
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="text-base sm:text-lg text-gray-500 line-through">
-                      £{product.actualPrice || 0}
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm text-gray-500 line-through">
+                      £{(product.actualPrice || 0).toFixed(2)}
                     </span>
-                    <Badge className="bg-green-100 text-green-800 border-green-300 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm">
+                    <Badge className="bg-green-100 text-green-800 px-1 py-0.5 text-xs">
                       Save £
                       {(product.actualPrice - product.finalPrice || 0).toFixed(
                         2
@@ -585,85 +585,87 @@ export default function ProductDetailPage() {
               </div>
 
               {isInStock && (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-green-700 font-medium">In Stock</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                  <span className="text-green-700 text-sm font-medium">
+                    In Stock
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Add to Cart Section */}
-            <div className="space-y-3">
-              {!isInStock ? (
-                <Button
-                  className="w-full h-12 bg-gray-100 text-gray-500 cursor-not-allowed font-semibold text-base rounded-xl"
-                  disabled
-                >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Out of Stock
-                </Button>
-              ) : isInCart ? (
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-                  <p className="text-center text-blue-700 font-semibold mb-3">
-                    Item in cart
-                  </p>
-                  <div className="flex items-center justify-center gap-4">
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="h-10 w-10 rounded-full border-2 border-blue-300 hover:bg-blue-100 transition-colors"
-                      onClick={handleDecreaseQuantity}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-700">
-                        {cartQuantity}
+            {/* Add to Cart and Info Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {/* Add to Cart Section - Takes 2/3 of space */}
+              <div className="sm:col-span-2">
+                {!isInStock ? (
+                  <Button
+                    className="w-full h-8 bg-gray-100 text-gray-500 cursor-not-allowed font-medium rounded-md text-sm"
+                    disabled
+                  >
+                    Out of Stock
+                  </Button>
+                ) : isInCart ? (
+                  <div className="bg-white border-2 border-blue-600 rounded-lg overflow-hidden">
+                    <div className="flex items-center h-10">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-full w-10 rounded-none bg-blue-600 hover:bg-blue-700 text-white border-r border-green-700"
+                        onClick={handleDecreaseQuantity}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <div className="flex-1 text-center bg-blue-50 h-full flex items-center justify-center">
+                        <span className="text-blue-700 font-bold text-sm">
+                          {cartQuantity}
+                        </span>
                       </div>
-                      <div className="text-sm text-blue-600">in cart</div>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-full w-10 rounded-none bg-blue-600 hover:bg-blue-700 text-white border-l border-blue-700 disabled:opacity-50"
+                        onClick={handleIncreaseQuantity}
+                        disabled={!canAddMore}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="h-10 w-10 rounded-full border-2 border-blue-300 hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={handleIncreaseQuantity}
-                      disabled={!canAddMore}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
                   </div>
-                  <div className="mt-3 text-center">
-                    <span className="text-blue-700 font-semibold">
-                      Total: £
-                      {((product.finalPrice || 0) * cartQuantity).toFixed(2)}
-                    </span>
+                ) : (
+                  <Button
+                    className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-sm border-2 border-blue-600 hover:border-blue-700 transition-all"
+                    onClick={handleAddToCart}
+                    aria-label={`Add ${product.productName} to cart`}
+                  >
+                    ADD
+                  </Button>
+                )}
+              </div>
+
+              {/* Quick Info Card - Takes 1/3 of space */}
+              {product.deliveryType && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-1 text-center h-10 flex items-center justify-center">
+                  <div className="flex items-center gap-1">
+                    <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                      <ShoppingCart className="h-2 w-2 text-blue-600" />
+                    </div>
+                    <p className="font-medium text-blue-900 text-xs">
+                      {product.deliveryType}
+                    </p>
                   </div>
                 </div>
-              ) : (
-                <Button
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
-                  onClick={handleAddToCart}
-                  aria-label={`Add ${product.productName} to cart`}
-                >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
-                </Button>
               )}
             </div>
 
-            {/* Quick Info Cards */}
-            <div className="grid grid-cols-2 gap-3">
-              {product.deliveryType && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <ShoppingCart className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <p className="font-semibold text-blue-900 text-sm">
-                    {product.deliveryType}
-                  </p>
-                  <p className="text-xs text-blue-700">Delivery</p>
-                </div>
-              )}
+            {/* Best Prices & Offers Section */}
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3">
+              <h3 className="font-bold text-blue-800 text-sm mb-1">
+                Best Prices & Offers
+              </h3>
+              <p className="text-blue-700 text-xs leading-relaxed">
+                Best price destination with offers directly from the farms.
+              </p>
             </div>
           </div>
         </div>
