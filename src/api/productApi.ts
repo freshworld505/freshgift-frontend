@@ -3,6 +3,8 @@ import type { Product, CreateProductPayload } from '@/lib/types';
 import { ensureAuthenticated, getAuthHeaders, withAuthentication } from './ensureAuthenticated';
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`;
+//const API_BASE_URL_USER = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users`;
+const API_BASE_URL_USER = `http://localhost:5004/api/users`;
 
 
 // API response types
@@ -30,6 +32,57 @@ interface BackendResponse {
     totalPages: number;
   };
 }
+
+// USER API: SWITCH TO BUSINESS ROLE OR USER ROLE
+
+export const getCurrentUserMode = async (): Promise<{ mode: 'user' | 'business' }> => {
+  return withAuthentication(async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL_USER}/current-mode`);
+      console.log("✅ Current user mode fetched successfully:", response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error fetching current user mode:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
+      // Default to user mode if we can't fetch
+      return { mode: 'user' };
+    }
+  });
+};
+
+export const switchUserRole = async (): Promise<void> => {
+  return withAuthentication(async () => {
+    try {
+      const response = await axios.put(`${API_BASE_URL_USER}/switch-mode`);
+      console.log("🔄 Switching user role...")
+      console.log("🔄 Switching user role to:", response.data.mode);
+      // Ensure the response contains the expected data
+      if (!response.data || !response.data.mode) {
+        console.error("❌ Invalid response format:", response.data);
+        throw new Error("Invalid response format");
+      }
+      if (response.status === 200) {
+        console.log("✅ User role switched successfully:", response.data.mode);
+      } else {
+        console.error("❌ Failed to switch user role:", response.data.message);
+      }
+    } catch (error: any) {
+      console.error('❌ Error switching user role:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
+      console.error("❌ Error switching user role:", error);
+      console.log("❌ Error switching user role:", error);
+    }
+  });
+};
+
 // Search product or get all products
 export const searchProducts = async (searchTerm: string, page: number, limit: number): Promise<ProductsResponse> => {
   return withAuthentication(async () => {

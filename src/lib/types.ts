@@ -3,6 +3,7 @@ export type Product = {
   productCode: string;
   productName: string;
   productImages: string[];
+  businessDiscount?: string; // New field for business discount
   description?: string;
   actualPrice: number;
   discount?: number;

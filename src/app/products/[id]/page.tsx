@@ -86,6 +86,23 @@ export default function ProductDetailPage() {
     }
   };
 
+  const finalDiscount = () => {
+    if (product?.businessDiscount == "0%") {
+      return `${product?.discount}%`;
+    } else {
+      return product?.businessDiscount;
+    }
+  };
+
+  // Helper function to get discount for any product (main or related)
+  const getProductDiscount = (productItem: Product) => {
+    if (productItem?.businessDiscount == "0%") {
+      return `${productItem?.discount}%`;
+    } else {
+      return productItem?.businessDiscount;
+    }
+  };
+
   // Function to fetch related products
   const fetchRelatedProducts = async (
     category: string,
@@ -459,7 +476,7 @@ export default function ProductDetailPage() {
                       variant="destructive"
                       className="shadow-sm font-bold px-2 py-1 text-xs"
                     >
-                      {product.discount}% OFF
+                      {finalDiscount()} OFF
                     </Badge>
                   )}
                 </div>
@@ -823,7 +840,7 @@ export default function ProductDetailPage() {
                             variant="destructive"
                             className="absolute top-2 right-2 shadow-sm font-bold text-xs px-2 py-1"
                           >
-                            {relatedProduct.discount}% OFF
+                            {getProductDiscount(relatedProduct)} OFF
                           </Badge>
                         )}
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import AppLogo from "@/components/layout/AppLogo";
 import CartIcon from "@/components/cart/CartIcon";
+import BusinessRoleToggle from "@/components/layout/BusinessRoleToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/lib/store";
@@ -159,6 +160,10 @@ export default function Header() {
                       <span className="font-medium">Account</span>
                     </Link>
                   </DropdownMenuItem>
+
+                  {/* Business Role Toggle - Only shown for approved business users */}
+                  <BusinessRoleToggle variant="dropdown" />
+
                   {isAdmin && (
                     <DropdownMenuItem asChild className="p-3 cursor-pointer">
                       <Link href="/admin" className="flex items-center gap-3">
@@ -288,6 +293,10 @@ export default function Header() {
                           <span className="font-medium">Account</span>
                         </Link>
                       </DropdownMenuItem>
+
+                      {/* Business Role Toggle - Only shown for approved business users */}
+                      <BusinessRoleToggle variant="dropdown" />
+
                       {isAdmin && (
                         <DropdownMenuItem
                           asChild

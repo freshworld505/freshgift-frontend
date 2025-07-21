@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import BusinessRoleToggle from "@/components/layout/BusinessRoleToggle";
 
 export default function AccountProfilePage() {
   const { user, updateUserProfile } = useAuthStore();
@@ -163,6 +164,21 @@ export default function AccountProfilePage() {
             </Button>
           </div>
         </form>
+      </div>
+
+      {/* Business Role Toggle Section */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="p-6 border-b border-gray-100">
+          <h3 className="text-xl font-semibold text-gray-800">
+            Business Account
+          </h3>
+          <p className="text-gray-600 mt-1">
+            Switch between user and business modes
+          </p>
+        </div>
+        <div className="p-6">
+          <BusinessRoleToggle variant="standalone" className="bg-gray-50" />
+        </div>
       </div>
     </div>
   );
