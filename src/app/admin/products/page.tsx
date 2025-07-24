@@ -188,7 +188,7 @@ export default function AdminProducts() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
@@ -204,7 +204,26 @@ export default function AdminProducts() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Products (Current Page)
+              Business Deals
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {
+                (products || []).filter(
+                  (p: any) =>
+                    p?.businessDiscount &&
+                    p.businessDiscount !== "0%" &&
+                    p.businessDiscount !== 0
+                ).length
+              }
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">
+              Active Products
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -219,9 +238,7 @@ export default function AdminProducts() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Out of Stock (Current Page)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -234,9 +251,7 @@ export default function AdminProducts() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Low Stock (Current Page)
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -277,6 +292,7 @@ export default function AdminProducts() {
                   <TableHead>Product Name</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Price</TableHead>
+                  <TableHead>Business Discount</TableHead>
                   <TableHead>Stock</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -285,7 +301,7 @@ export default function AdminProducts() {
               <TableBody>
                 {(products || []).length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={8} className="text-center py-8">
                       <Package className="mx-auto h-12 w-12 text-gray-400" />
                       <p className="mt-2 text-sm text-gray-500">
                         No products found
@@ -312,6 +328,30 @@ export default function AdminProducts() {
                               </span>
                             )}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        {product.businessDiscount ? (
+                          <div className="flex flex-col">
+                            <Badge
+                              variant="secondary"
+                              className="text-xs w-fit"
+                            >
+                              {typeof product.businessDiscount === "number"
+                                ? `${product.businessDiscount}%`
+                                : product.businessDiscount}
+                            </Badge>
+                            {product.businessDiscount !== "0%" &&
+                              product.businessDiscount !== 0 && (
+                                <span className="text-xs text-green-600 mt-1">
+                                  Business Deal
+                                </span>
+                              )}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-400">
+                            No discount
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <span

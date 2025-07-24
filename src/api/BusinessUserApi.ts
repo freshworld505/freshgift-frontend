@@ -275,8 +275,8 @@ export const checkBusinessUserStatus = async (status: string): Promise<{ message
 export const getBusinessStatus = async (): Promise<BusinessStatusResponse | null> => {
   return withAuthentication(async () => {
     try {
-      //const response = await axios.get<BusinessStatusResponse>(`${API_BASE_URL}/business/user/status`, {
-      const response = await axios.get<BusinessStatusResponse>(`http://localhost:5004/api/business/user/status`, {
+      const response = await axios.get<BusinessStatusResponse>(`${API_BASE_URL}/business/user/status`, {
+      //const response = await axios.get<BusinessStatusResponse>(`http://localhost:5004/api/business/user/status`, {
         headers: await getAuthHeaders(),
       });
       console.log("✅ Successfully fetched business user status:", response.data);

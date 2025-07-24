@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { sampleProducts } from "@/lib/products";
 import { Product } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,62 +18,23 @@ import {
   TrendingDown,
   Gift,
   Sparkles,
+  Loader2,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { useCartStore, useAuthStore } from "@/lib/store";
 import { useWishlistStore } from "@/hooks/use-wishlist";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
-
-// Mock deals data - in real app this would come from API
-const generateDeals = () => {
-  const dealTypes = [
-    { type: "flash", discount: 40, label: "Flash Sale", color: "bg-red-500" },
-    {
-      type: "daily",
-      discount: 25,
-      label: "Daily Deal",
-      color: "bg-emerald-500",
-    },
-    {
-      type: "weekly",
-      discount: 30,
-      label: "Weekly Special",
-      color: "bg-blue-500",
-    },
-    {
-      type: "clearance",
-      discount: 50,
-      label: "Clearance",
-      color: "bg-purple-500",
-    },
-  ];
-
-  return sampleProducts.slice(0, 12).map((product, index) => {
-    const deal = dealTypes[index % dealTypes.length];
-    const originalPrice = product.finalPrice || 0;
-    const discountedPrice = originalPrice * (1 - deal.discount / 100);
-    const endTime = new Date(
-      Date.now() + (24 - new Date().getHours()) * 60 * 60 * 1000
-    );
-
-    return {
-      ...product,
-      deal: {
-        ...deal,
-        originalPrice,
-        discountedPrice: Math.round(discountedPrice * 100) / 100,
-        endTime,
-        sold: Math.floor(Math.random() * 50) + 10,
-        total: Math.floor(Math.random() * 30) + 70,
-      },
-    };
-  });
-};
+import { searchProducts } from "@/api/productApi";
+import { getCurrentUserMode, switchUserRole } from "@/api/productApi";
 
 export default function DealsPage() {
-  const [deals, setDeals] = useState<any[]>([]);
+  const [deals, setDeals] = useState<Product[]>([]);
   const [timeLeft, setTimeLeft] = useState<{ [key: string]: string }>({});
-  const { fetchCart } = useCartStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [userMode, setUserMode] = useState<"user" | "business" | null>(null);
+  const { fetchCart, items, updateQuantity } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
   const {
     addToWishlist,
@@ -83,17 +42,99 @@ export default function DealsPage() {
     isInWishlist: checkIsInWishlist,
   } = useWishlistStore();
 
+  // Function to get business discount value
+  const getBusinessDiscountValue = (product: Product): number => {
+    if (!product.businessDiscount || product.businessDiscount === "0%") {
+      return 0;
+    }
+    const match = product.businessDiscount.match(/(\d+)%/);
+    return match ? parseInt(match[1]) : 0;
+  };
+
+  // Function to calculate discounted price
+  const getDiscountedPrice = (product: Product): number => {
+    const discountPercent = getBusinessDiscountValue(product);
+    if (discountPercent === 0) return product.finalPrice;
+    return product.finalPrice * (1 - discountPercent / 100);
+  };
+
   useEffect(() => {
-    setDeals(generateDeals());
+    const fetchDeals = async () => {
+      try {
+        setIsLoading(true);
+        // Get products with business discounts
+        const result = await searchProducts("", 1, 50);
+        const products = Array.isArray(result)
+          ? result
+          : result?.products || [];
+
+        // Filter products that have business discounts
+        const productsWithDiscounts = products.filter(
+          (product) =>
+            product.businessDiscount && product.businessDiscount !== "0%"
+        );
+
+        setDeals(productsWithDiscounts.slice(0, 12));
+      } catch (error) {
+        console.error("Error fetching deals:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load deals. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDeals();
   }, []);
+
+  // Check user mode and switch to business mode if needed
+  useEffect(() => {
+    const ensureBusinessMode = async () => {
+      if (!isAuthenticated) return;
+
+      try {
+        const currentMode = await getCurrentUserMode();
+        setUserMode(currentMode.mode);
+
+        // If user is not in business mode, switch them to business mode
+        if (currentMode.mode !== "business") {
+          console.log(
+            "User is not in business mode, switching to business mode..."
+          );
+          await switchUserRole();
+          setUserMode("business");
+
+          toast({
+            title: "Switched to Business Mode",
+            description: "You're now viewing business deals and pricing.",
+          });
+        }
+      } catch (error) {
+        console.error("Error checking/switching user mode:", error);
+        toast({
+          title: "Mode Switch Failed",
+          description:
+            "Unable to switch to business mode. Some features may not be available.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    ensureBusinessMode();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const updateTimer = () => {
       const newTimeLeft: { [key: string]: string } = {};
-      deals.forEach((deal) => {
-        const now = new Date().getTime();
-        const endTime = new Date(deal.deal.endTime).getTime();
-        const difference = endTime - now;
+      deals.forEach((product) => {
+        // Create a timer that ends at midnight
+        const now = new Date();
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+        const difference = endOfDay.getTime() - now.getTime();
 
         if (difference > 0) {
           const hours = Math.floor(difference / (1000 * 60 * 60));
@@ -101,9 +142,9 @@ export default function DealsPage() {
             (difference % (1000 * 60 * 60)) / (1000 * 60)
           );
           const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-          newTimeLeft[deal.id] = `${hours}h ${minutes}m ${seconds}s`;
+          newTimeLeft[product.id] = `${hours}h ${minutes}m ${seconds}s`;
         } else {
-          newTimeLeft[deal.id] = "Expired";
+          newTimeLeft[product.id] = "Expired";
         }
       });
       setTimeLeft(newTimeLeft);
@@ -127,7 +168,7 @@ export default function DealsPage() {
 
     try {
       // Call the API to add to cart
-      await addToCart(product.id, 1);
+      await addToCart(product.id, 10);
 
       // Refresh cart from backend to get updated data
       await fetchCart();
@@ -143,6 +184,43 @@ export default function DealsPage() {
         description: "Failed to add item to cart. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleIncreaseQuantity = async (product: Product) => {
+    const cartItem = items.find((item) => item.product.id === product.id);
+    const cartQuantity = cartItem?.quantity || 0;
+
+    // Check if we can add more items
+    if (cartQuantity >= (product.stock ?? 0)) {
+      toast({
+        title: "Stock limit reached",
+        description: `Only ${product.stock} items available in stock.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await updateQuantity(product.id, cartQuantity + 1);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  const handleDecreaseQuantity = async (product: Product) => {
+    const cartItem = items.find((item) => item.product.id === product.id);
+    const cartQuantity = cartItem?.quantity || 0;
+
+    try {
+      if (cartQuantity > 1) {
+        await updateQuantity(product.id, cartQuantity - 1);
+      } else {
+        // Remove item if quantity would become 0
+        await updateQuantity(product.id, 0);
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
     }
   };
 
@@ -163,9 +241,30 @@ export default function DealsPage() {
     }
   };
 
-  const getProgressPercentage = (sold: number, total: number) => {
-    return (sold / total) * 100;
+  const getDealColor = (discountPercent: number): string => {
+    if (discountPercent >= 40) return "bg-red-500";
+    if (discountPercent >= 30) return "bg-purple-500";
+    if (discountPercent >= 20) return "bg-blue-500";
+    return "bg-emerald-500";
   };
+
+  const getDealLabel = (discountPercent: number): string => {
+    if (discountPercent >= 40) return "Flash Business Sale";
+    if (discountPercent >= 30) return "Weekly Business Special";
+    if (discountPercent >= 20) return "Daily Business Deal";
+    return "Business Deal";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:from-emerald-950 dark:via-background dark:to-lime-950 flex items-center justify-center">
+        <div className="flex items-center space-x-4">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+          <span className="text-lg font-medium">Loading amazing deals...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 dark:from-emerald-950 dark:via-background dark:to-lime-950">
@@ -180,10 +279,21 @@ export default function DealsPage() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-6">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-full text-sm font-medium border border-red-200 dark:border-red-800 animate-pulse">
-              <Flame className="h-4 w-4 fill-current" />
-              Limited Time • Hot Deals • Save Big
+            {/* Badges Section */}
+            <div className="flex flex-col items-center space-y-3">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-2 rounded-full text-sm font-medium border border-red-200 dark:border-red-800 animate-pulse">
+                <Flame className="h-4 w-4 fill-current" />
+                Limited Time • Hot Deals • Save Big
+              </div>
+
+              {/* Business Mode Indicator */}
+              {userMode === "business" && (
+                <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium border border-blue-200 dark:border-blue-800">
+                  <Gift className="h-4 w-4 fill-current" />
+                  Business Mode Active • Exclusive Business Deals
+                </div>
+              )}
             </div>
 
             {/* Main heading */}
@@ -208,7 +318,7 @@ export default function DealsPage() {
             {/* Quick stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 max-w-2xl mx-auto">
               <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
-                <div className="text-2xl font-bold text-red-600">Up to 50%</div>
+                <div className="text-2xl font-bold text-red-600">Up to 80%</div>
                 <div className="text-sm text-muted-foreground">Off</div>
               </div>
               <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
@@ -231,135 +341,213 @@ export default function DealsPage() {
       {/* Deals Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-foreground">
-            Today's Hot Deals
-          </h2>
-          <Button variant="outline" className="rounded-full">
-            <Sparkles className="h-4 w-4 mr-2" />
-            View All Deals
-          </Button>
+          <h2 className="text-3xl font-bold text-foreground">Business Deals</h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {deals.map((product) => {
-            const isInWishlist = checkIsInWishlist(product.id);
-            const progressPercentage = getProgressPercentage(
-              product.deal.sold,
-              product.deal.total
-            );
+        {deals.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="space-y-4">
+              <div className="text-6xl">🎉</div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                No Business Deals Available
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                Business deals are currently being updated. Check back soon for
+                amazing discounts on fresh produce!
+              </p>
+              <Button asChild className="mt-6">
+                <Link href="/products">Browse All Products</Link>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {deals.map((product) => {
+              const isInWishlist = checkIsInWishlist(product.id);
+              const discountPercent = getBusinessDiscountValue(product);
+              const discountedPrice = getDiscountedPrice(product);
+              const cartItem = items.find(
+                (item) => item.product.id === product.id
+              );
+              const isInCart = !!cartItem;
 
-            return (
-              <Card
-                key={product.id}
-                className="group relative overflow-hidden border-0 bg-white/60 dark:bg-black/40 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl"
-              >
-                {/* Deal badge */}
-                <div className="absolute top-3 left-3 z-10">
-                  <Badge
-                    className={`${product.deal.color} text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg`}
-                  >
-                    <TrendingDown className="h-3 w-3 mr-1" />
-                    {product.deal.discount}% OFF
-                  </Badge>
-                </div>
-
-                {/* Wishlist button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-3 right-3 z-10 h-8 w-8 rounded-full bg-white/80 dark:bg-black/60 backdrop-blur-sm hover:bg-white dark:hover:bg-black/80 transition-all"
-                  onClick={() => handleWishlistToggle(product)}
+              return (
+                <Card
+                  key={product.id}
+                  className="group relative overflow-hidden border-0 bg-white/60 dark:bg-black/40 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 rounded-2xl"
                 >
-                  <Heart
-                    className={`h-4 w-4 transition-colors ${
-                      isInWishlist
-                        ? "fill-red-500 text-red-500"
-                        : "text-muted-foreground"
-                    }`}
-                  />
-                </Button>
+                  {/* Deal badge */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <Badge
+                      className={`${getDealColor(
+                        discountPercent
+                      )} text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg`}
+                    >
+                      <TrendingDown className="h-3 w-3 mr-1" />
+                      {discountPercent}% OFF
+                    </Badge>
+                  </div>
 
-                <CardHeader className="p-0">
-                  <Link href={`/products/${product.id}`}>
+                  {/* Wishlist button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-3 right-3 z-10 h-8 w-8 rounded-full bg-white/80 dark:bg-black/60 backdrop-blur-sm hover:bg-white dark:hover:bg-black/80 transition-all"
+                    onClick={() => handleWishlistToggle(product)}
+                  >
+                    <Heart
+                      className={`h-4 w-4 transition-colors ${
+                        isInWishlist
+                          ? "fill-red-500 text-red-500"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  </Button>
+
+                  <CardHeader className="p-0">
                     <div className="relative aspect-square overflow-hidden rounded-t-2xl">
                       <Image
-                        src={product.productImages?.[0] || "/placeholder.jpg"}
+                        src={
+                          product.productImages?.[0] ||
+                          "/placeholder-product.jpg"
+                        }
                         alt={product.productName}
                         fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                        className={`object-cover transition-transform duration-300 group-hover:scale-110 ${
+                          product.stock === 0 ? "blur-sm" : ""
+                        }`}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       />
+                      {/* Out of stock overlay */}
+                      {product.stock === 0 && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <div className="text-center space-y-2">
+                            <div className="text-white text-lg font-bold">
+                              You Missed Out!
+                            </div>
+                            <div className="text-red-400 text-sm font-medium">
+                              Out of Stock
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       {/* Overlay gradient */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                  </Link>
-                </CardHeader>
+                  </CardHeader>
 
-                <CardContent className="p-4 space-y-3">
-                  <div className="space-y-2">
-                    <CardTitle className="text-lg font-semibold line-clamp-1 group-hover:text-emerald-600 transition-colors">
-                      {product.productName}
-                    </CardTitle>
-
-                    {/* Timer */}
-                    <div className="flex items-center gap-2 text-sm text-red-600">
-                      <Timer className="h-4 w-4" />
-                      <span className="font-mono font-medium">
-                        {timeLeft[product.id] || "Loading..."}
-                      </span>
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-emerald-600">
-                        £{product.deal.discountedPrice}
-                      </span>
-                      <span className="text-lg text-muted-foreground line-through">
-                        £{product.deal.originalPrice}
-                      </span>
-                    </div>
-
-                    {/* Stock progress */}
+                  <CardContent className="p-4 space-y-3">
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Sold: {product.deal.sold}
-                        </span>
-                        <span className="text-muted-foreground">
-                          Available: {product.deal.total - product.deal.sold}
+                      <CardTitle className="text-lg font-semibold line-clamp-1 group-hover:text-emerald-600 transition-colors">
+                        {product.productName}
+                      </CardTitle>
+
+                      {/* Timer */}
+                      <div className="flex items-center gap-2 text-sm text-red-600">
+                        <Timer className="h-4 w-4" />
+                        <span className="font-mono font-medium">
+                          {timeLeft[product.id] || "Loading..."}
                         </span>
                       </div>
-                      <Progress value={progressPercentage} className="h-2" />
-                      <p className="text-xs text-orange-600 font-medium">
-                        🔥 {Math.round(progressPercentage)}% claimed
-                      </p>
-                    </div>
-                  </div>
 
-                  <Button
-                    onClick={() => handleAddToCart(product)}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 group/btn"
-                  >
-                    <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                    Add to Cart
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                      {/* Price */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-emerald-600">
+                          £{discountedPrice.toFixed(2)}
+                        </span>
+                        <span className="text-lg text-muted-foreground line-through">
+                          £{product.finalPrice.toFixed(2)}
+                        </span>
+                      </div>
+
+                      {/* Stock info */}
+                      <div className="space-y-2">
+                        {/*
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            Category: {product.category}
+                          </span>
+                          <span className="text-muted-foreground">
+                            Stock: {product.stock || 0}
+                          </span>
+                        </div>
+                        */}
+                        <p className="text-xs text-orange-600 font-medium">
+                          🔥 {getDealLabel(discountPercent)} - Limited Time!
+                        </p>
+                      </div>
+                    </div>
+
+                    {product.stock === 0 ? (
+                      <Button
+                        className="w-full bg-gray-400 hover:bg-gray-400 text-white rounded-xl font-semibold py-3 shadow-lg cursor-not-allowed"
+                        disabled
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Out of Stock
+                      </Button>
+                    ) : isInCart ? (
+                      <div className="flex items-center gap-1 w-full bg-emerald-600/10 rounded-xl p-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-600/20 transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDecreaseQuantity(product);
+                          }}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="flex-1 text-center text-sm font-semibold text-emerald-600">
+                          {cartItem?.quantity || 0}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 rounded-lg hover:bg-emerald-600/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleIncreaseQuantity(product);
+                          }}
+                          disabled={
+                            (cartItem?.quantity || 0) >= (product.stock ?? 0)
+                          }
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 group/btn"
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                        Add to Cart
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
         {/* Load more section */}
-        <div className="text-center mt-12">
-          <Button
-            size="lg"
-            variant="outline"
-            className="rounded-full px-8 py-4 bg-white/50 dark:bg-black/20 backdrop-blur-sm border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950/50"
-          >
-            <Gift className="h-5 w-5 mr-2" />
-            Load More Deals
-          </Button>
-        </div>
+        {deals.length > 0 && (
+          <div className="text-center mt-12">
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-full px-8 py-4 bg-white/50 dark:bg-black/20 backdrop-blur-sm border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950/50"
+            >
+              <Gift className="h-5 w-5 mr-2" />
+              Load More Deals
+            </Button>
+          </div>
+        )}
       </section>
 
       {/* Newsletter Section */}

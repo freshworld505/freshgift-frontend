@@ -33,12 +33,13 @@ export default function HeroSection() {
           const status = businessStatusResponse.status;
           setBusinessStatus(status);
 
-          if (status === "pending" || status === "rejected") {
-            // Has pending or rejected request - show button
+          if (
+            status === "pending" ||
+            status === "rejected" ||
+            status === "approved"
+          ) {
+            // Show button for all statuses
             setShowBusinessButton(true);
-          } else if (status === "approved") {
-            // Has approved request - don't show button
-            setShowBusinessButton(false);
           }
         }
       } catch (error) {
@@ -107,18 +108,34 @@ export default function HeroSection() {
             </Button>
 
             {showBusinessButton && (
-              <BusinessModal businessStatus={businessStatus}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300 w-full sm:w-auto"
-                >
-                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
-                  {businessStatus === "pending"
-                    ? "Already Applied"
-                    : "Business Deals"}
-                </Button>
-              </BusinessModal>
+              <>
+                {businessStatus === "approved" ? (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300 w-full sm:w-auto"
+                    asChild
+                  >
+                    <Link href="/deals">
+                      <Zap className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
+                      Business Deals
+                    </Link>
+                  </Button>
+                ) : (
+                  <BusinessModal businessStatus={businessStatus}>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg sm:rounded-xl border-2 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50 transition-all duration-300 w-full sm:w-auto"
+                    >
+                      <Zap className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 mr-1 sm:mr-2" />
+                      {businessStatus === "pending"
+                        ? "Already Applied"
+                        : "Business Deals"}
+                    </Button>
+                  </BusinessModal>
+                )}
+              </>
             )}
           </div>
         </div>

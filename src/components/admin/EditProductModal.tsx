@@ -40,6 +40,7 @@ interface Product {
   tags: string | string[]; // Can be either string or array
   actualPrice: number;
   discount?: number;
+  businessDiscount?: number | string; // Add businessDiscount field
   finalPrice: number;
   stock: number;
   productCode: string;
@@ -82,9 +83,10 @@ export default function EditProductModal({
     description: "",
     category: "",
     subCategory: "",
-    tags: [] as string[],
+    tags: [] as string[], // Change to string array to match the logic
     actualPrice: 0,
     discount: 0,
+    businessDiscount: 0, // Add businessDiscount to formData
     finalPrice: 0,
     stock: 0,
     productCode: "",
@@ -96,10 +98,10 @@ export default function EditProductModal({
     expiryDate: "",
     harvestDate: "",
     shelfLife: 0,
-    returnable: true,
+    returnable: false,
     storageInstructions: "",
     maxPurchaseLimit: 0,
-    deliveryType: "Instant",
+    deliveryType: "",
     images: [] as string[],
   });
 
@@ -120,6 +122,7 @@ export default function EditProductModal({
           : [],
         actualPrice: product.actualPrice || 0,
         discount: product.discount || 0,
+        businessDiscount: Number(product.businessDiscount) || 0,
         finalPrice: product.finalPrice || 0,
         stock: product.stock || 0,
         productCode: product.productCode || "",
@@ -211,6 +214,7 @@ export default function EditProductModal({
         description: formData.description || undefined,
         actualPrice: formData.actualPrice || undefined,
         discount: formData.discount || undefined,
+        businessDiscount: formData.businessDiscount || undefined,
         finalPrice: formData.finalPrice || undefined,
         stock: formData.stock || undefined,
         category: formData.category || undefined,
@@ -226,7 +230,7 @@ export default function EditProductModal({
         returnable: formData.returnable,
         storageInstructions: formData.storageInstructions || undefined,
         maxPurchaseLimit: formData.maxPurchaseLimit || undefined,
-        deliveryType: formData.deliveryType || "Instant",
+        deliveryType: "Instant",
         productImages: allImages.length > 0 ? allImages : undefined,
       };
 
@@ -386,6 +390,24 @@ export default function EditProductModal({
                   const value =
                     e.target.value === "" ? 0 : parseFloat(e.target.value);
                   handleInputChange("discount", isNaN(value) ? 0 : value);
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="businessDiscount">Business Discount (%)</Label>
+              <Input
+                id="businessDiscount"
+                type="number"
+                step="0.01"
+                value={formData.businessDiscount || ""}
+                onChange={(e) => {
+                  const value =
+                    e.target.value === "" ? 0 : parseFloat(e.target.value);
+                  handleInputChange(
+                    "businessDiscount",
+                    isNaN(value) ? 0 : value
+                  );
                 }}
               />
             </div>

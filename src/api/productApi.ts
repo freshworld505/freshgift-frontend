@@ -3,8 +3,8 @@ import type { Product, CreateProductPayload } from '@/lib/types';
 import { ensureAuthenticated, getAuthHeaders, withAuthentication } from './ensureAuthenticated';
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`;
-//const API_BASE_URL_USER = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users`;
-const API_BASE_URL_USER = `http://localhost:5004/api/users`;
+const API_BASE_URL_USER = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users`;
+//const API_BASE_URL_USER = `http://localhost:5004/api/users`;
 
 
 // API response types

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/toaster";
 import { useAuth } from "@/hooks/use-auth";
+import UserModeManager from "@/components/layout/UserModeManager";
 
 // Auth provider component that initializes authentication state
 function AuthProvider({ children }: { children: ReactNode }) {
@@ -33,6 +34,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <UserModeManager />
         {children}
         <Toaster />
       </AuthProvider>

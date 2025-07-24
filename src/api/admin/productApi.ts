@@ -43,6 +43,7 @@ interface EditProductData {
   returnable?: boolean;
   storageInstructions?: string;
   maxPurchaseLimit?: number;
+  businessDiscount?: number; // Business discount as number, not string
   deliveryType?: string;
   productImages?: string[];
 }
@@ -381,6 +382,12 @@ export const editProduct = async (EditProductData: EditProductData): Promise<Pro
       throw new Error("User is not authenticated. Please log in.");
     }
 
+    // Get the auth token for the request
+    const token = await getTokenForApiCalls();
+    if (!token) {
+      throw new Error("Unable to retrieve authentication token.");
+    }
+
     if (!EditProductData.productId) {
       throw new Error("Product ID is required");
     }
@@ -390,18 +397,32 @@ export const editProduct = async (EditProductData: EditProductData): Promise<Pro
       throw new Error("Invalid product data provided.");
     }
 
+    // Ensure businessDiscount is a number if provided
+    const requestData = {
+      ...EditProductData,
+      businessDiscount: EditProductData.businessDiscount ? Number(EditProductData.businessDiscount) : undefined
+    };
+
+    // Remove undefined values to avoid sending them to the backend
+    Object.keys(requestData).forEach(key => {
+      if (requestData[key as keyof EditProductData] === undefined) {
+        delete requestData[key as keyof EditProductData];
+      }
+    });
+
     // Add more detailed logging to debug the request
     console.log("📤 Sending edit product request:", {
       url: `${API_BASE_URL}/edit`,
-      data: EditProductData,
-      productId: EditProductData.productId,
-      dataKeys: Object.keys(EditProductData),
-      dataStructure: JSON.stringify(EditProductData, null, 2)
+      data: requestData,
+      productId: requestData.productId,
+      dataKeys: Object.keys(requestData),
+      dataStructure: JSON.stringify(requestData, null, 2)
     });
 
-    const response = await axios.put(`${API_BASE_URL}/edit`, EditProductData, {
+    const response = await axios.put(`${API_BASE_URL}/edit`, requestData, {
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
     });
 
@@ -410,7 +431,7 @@ export const editProduct = async (EditProductData: EditProductData): Promise<Pro
     }
 
     console.log("✅ Product updated successfully:", response.data);
-    return response.data.product;
+    return response.data.product || response.data;
   } catch (error: any) {
     // Enhanced error logging to see the full backend response
     console.error("❌ Error updating product:", {
@@ -439,6 +460,12 @@ export const uploadProductImages = async (imageFiles: File[]): Promise<string[]>
       throw new Error("User is not authenticated. Please log in.");
     }
 
+    // Get the auth token for the request
+    const token = await getTokenForApiCalls();
+    if (!token) {
+      throw new Error("Unable to retrieve authentication token.");
+    }
+
     if (!imageFiles || imageFiles.length === 0) {
       throw new Error("No image files provided");
     }
@@ -451,6 +478,7 @@ export const uploadProductImages = async (imageFiles: File[]): Promise<string[]>
     const response = await axios.post(`${API_BASE_URL}/upload-image`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
       },
     });
 
