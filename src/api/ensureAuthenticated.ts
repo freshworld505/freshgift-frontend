@@ -156,7 +156,7 @@ export const withAuthentication = async <T>(
 ): Promise<T> => {
   const isAuthenticated = await ensureAuthenticated();
   if (!isAuthenticated) {
-    throw new Error('User is not authenticated');
+    console.error("❌ User is not authenticated, cannot make API call");
   }
   
   return apiCall();
