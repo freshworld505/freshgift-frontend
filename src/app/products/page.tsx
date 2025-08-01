@@ -62,7 +62,7 @@ export default function ProductsPage() {
   }, [searchTerm]);
 
   // Use React Query hooks for data fetching
-  const allProductsQuery = useAllProducts(1, 100);
+  const allProductsQuery = useAllProducts(1, 250);
   const searchQuery = useSearchProducts(
     debouncedSearchTerm,
     debouncedSearchTerm.trim().length > 0
