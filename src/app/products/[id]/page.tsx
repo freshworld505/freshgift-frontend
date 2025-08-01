@@ -293,7 +293,15 @@ export default function ProductDetailPage() {
   }
 
   const isInWishlist = checkIsInWishlist(product.id);
-  const isInStock = (product.stock ?? 0) > 0;
+  // Convert stock to number to handle string values from backend
+  const stockValue =
+    typeof product.stock === "string"
+      ? parseInt(product.stock, 10)
+      : product.stock ?? 0;
+  const isInStock = stockValue > 0;
+  console.log(
+    `🔍 Main product ${product.productName}: stock=${product.stock}, converted=${stockValue}, isInStock=${isInStock}`
+  );
 
   // Check if product is in cart and get quantity
   const cartItem = items.find((item) => item.product.id === product.id);
@@ -301,7 +309,7 @@ export default function ProductDetailPage() {
   const cartQuantity = cartItem?.quantity || 0;
 
   // Check if we can add more items (cart quantity hasn't reached stock limit)
-  const canAddMore = cartQuantity < (product.stock ?? 0);
+  const canAddMore = cartQuantity < stockValue;
 
   const handleWishlistToggle = () => {
     if (isInWishlist) {
@@ -346,10 +354,10 @@ export default function ProductDetailPage() {
 
   const handleIncreaseQuantity = async () => {
     // Check if we can add more items
-    if (cartQuantity >= (product.stock ?? 0)) {
+    if (cartQuantity >= stockValue) {
       toast({
         title: "Stock limit reached",
-        description: `Only ${product.stock} items available in stock.`,
+        description: `Only ${stockValue} items available in stock.`,
         variant: "destructive",
       });
       return;
@@ -578,9 +586,6 @@ export default function ProductDetailPage() {
                     <span className="text-green-700 font-semibold text-sm">
                       In Stock
                     </span>
-                    <span className="text-gray-500 text-xs">
-                      ({product.stock} available)
-                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
@@ -796,7 +801,15 @@ export default function ProductDetailPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {relatedProducts.map((relatedProduct) => {
-                const relatedIsInStock = (relatedProduct.stock ?? 0) > 0;
+                // Convert stock to number to handle string values from backend
+                const stockValue =
+                  typeof relatedProduct.stock === "string"
+                    ? parseInt(relatedProduct.stock, 10)
+                    : relatedProduct.stock ?? 0;
+                const relatedIsInStock = stockValue > 0;
+                console.log(
+                  `🔍 Related product ${relatedProduct.productName}: stock=${relatedProduct.stock}, converted=${stockValue}, isInStock=${relatedIsInStock}`
+                );
                 const relatedCartItem = items.find(
                   (item) => item.product.id === relatedProduct.id
                 );
@@ -868,12 +881,12 @@ export default function ProductDetailPage() {
 
                       <div className="flex items-center space-x-2 mb-3">
                         <span className="text-xl font-bold text-blue-600">
-                          £{relatedProduct.finalPrice}
+                          £{relatedProduct.finalPrice.toFixed(2)}
                         </span>
                         {relatedProduct.actualPrice >
                           relatedProduct.finalPrice && (
                           <span className="text-sm text-gray-500 line-through">
-                            £{relatedProduct.actualPrice}
+                            £{relatedProduct.actualPrice.toFixed(2)}
                           </span>
                         )}
                       </div>
@@ -937,13 +950,10 @@ export default function ProductDetailPage() {
                               className="h-8 w-8 rounded-full border-blue-300 hover:bg-blue-100 disabled:opacity-50"
                               onClick={async (e) => {
                                 e.stopPropagation();
-                                if (
-                                  relatedCartItem!.quantity >=
-                                  (relatedProduct.stock ?? 0)
-                                ) {
+                                if (relatedCartItem!.quantity >= stockValue) {
                                   toast({
                                     title: "Stock limit reached",
-                                    description: `Only ${relatedProduct.stock} items available in stock.`,
+                                    description: `Only ${stockValue} items available in stock.`,
                                     variant: "destructive",
                                   });
                                   return;
@@ -960,10 +970,7 @@ export default function ProductDetailPage() {
                                   );
                                 }
                               }}
-                              disabled={
-                                relatedCartItem!.quantity >=
-                                (relatedProduct.stock ?? 0)
-                              }
+                              disabled={relatedCartItem!.quantity >= stockValue}
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
