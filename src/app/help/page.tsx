@@ -122,7 +122,7 @@ export default function HelpPage() {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Support",
       description: "Get help via email",
-      detail: "support@freshgift.com",
+      detail: "support@RoyalFresh.com",
       hours: "24-hour response",
       action: "Send Email",
     },
@@ -159,7 +159,7 @@ export default function HelpPage() {
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Find answers to common questions, get support, and learn how to
-              make the most of FreshGift.
+              make the most of RoyalFresh.
             </p>
 
             {/* Search Bar */}

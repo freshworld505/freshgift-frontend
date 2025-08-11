@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FreshGift - Fresh Produce Delivered",
-  description: "Your online store for the freshest fruits and vegetables.",
+  title: "RoyalFresh - Fresh Produce Delivered",
+  description: "Your online store for the best fruits and vegetables.",
 };
 
 export default function RootLayout({

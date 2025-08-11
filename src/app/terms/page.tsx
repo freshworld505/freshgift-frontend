@@ -25,7 +25,7 @@ export default function TermsOfServicePage() {
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Please read these terms carefully before using our service. By using
-            FreshGift, you agree to these terms.
+            RoyalFresh, you agree to these terms.
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             Last updated: {new Date().toLocaleDateString()}
@@ -43,7 +43,7 @@ export default function TermsOfServicePage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                By accessing and using FreshGift's website and services, you
+                By accessing and using RoyalFresh's website and services, you
                 accept and agree to be bound by the terms and provision of this
                 agreement.
               </p>
@@ -62,7 +62,7 @@ export default function TermsOfServicePage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                FreshGift is an online grocery delivery platform that provides:
+                RoyalFresh is an online grocery delivery platform that provides:
               </p>
               <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1">
                 <li>Fresh produce and grocery items</li>
@@ -239,7 +239,7 @@ export default function TermsOfServicePage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                FreshGift shall not be held liable for:
+                RoyalFresh shall not be held liable for:
               </p>
               <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1">
                 <li>Indirect, incidental, or consequential damages</li>
@@ -269,7 +269,7 @@ export default function TermsOfServicePage() {
               <p className="text-gray-600 dark:text-gray-300 mb-4">
                 All content on this website, including but not limited to text,
                 graphics, logos, images, and software, is the property of
-                FreshGift and is protected by intellectual property laws.
+                RoyalFresh and is protected by intellectual property laws.
               </p>
               <p className="text-gray-600 dark:text-gray-300">
                 You may not reproduce, distribute, or create derivative works
@@ -306,7 +306,7 @@ export default function TermsOfServicePage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                   <Mail className="h-4 w-4 text-emerald-600" />
-                  <span>legal@freshgift.com</span>
+                  <span>legal@RoyalFresh.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                   <Phone className="h-4 w-4 text-emerald-600" />

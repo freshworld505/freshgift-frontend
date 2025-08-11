@@ -84,7 +84,7 @@ export default function AdminDashboard() {
             Dashboard
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Loading your FreshGift admin dashboard...
+            Loading your RoyalFresh admin dashboard...
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -114,8 +114,8 @@ export default function AdminDashboard() {
               Admin Dashboard
             </h1>
             <p className="mt-2 text-slate-600 dark:text-slate-400">
-              Welcome to your FreshGift admin dashboard. Here's what's happening
-              with your store today.
+              Welcome to your RoyalFresh admin dashboard. Here's what's
+              happening with your store today.
             </p>
           </div>
 

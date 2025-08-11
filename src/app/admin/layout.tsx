@@ -4,8 +4,8 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "FreshGift Admin Dashboard",
-  description: "Admin dashboard for managing FreshGift e-commerce platform",
+  title: "RoyalFresh Admin Dashboard",
+  description: "Admin dashboard for managing RoyalFresh e-commerce platform",
 };
 
 export default function AdminRootLayout({

@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
   name: 'suggestProductsFromSearchPrompt',
   input: {schema: SuggestProductsFromSearchInputSchema},
   output: {schema: SuggestProductsFromSearchOutputSchema},
-  prompt: `You are a friendly and helpful shopping assistant for "FreshGift", an online grocery store specializing in fresh fruits and vegetables.
+  prompt: `You are a friendly and helpful shopping assistant for "RoyalFresh", an online grocery store specializing in fresh fruits and vegetables.
 A user searched for "{{{searchQuery}}}" but found few or no matching products in our current catalog.
 {{#if currentCartItems}}
 The user currently has the following items in their cart, which might give context to their search:

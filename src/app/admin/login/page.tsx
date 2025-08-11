@@ -79,7 +79,7 @@ export default function AdminLogin() {
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg flex items-center justify-center mb-4">
             <div className="w-8 h-8 bg-white/20 rounded-lg"></div>
           </div>
-          <CardTitle className="text-2xl font-bold">FreshGift Admin</CardTitle>
+          <CardTitle className="text-2xl font-bold">RoyalFresh Admin</CardTitle>
           <CardDescription>
             Sign in to access the admin dashboard
           </CardDescription>

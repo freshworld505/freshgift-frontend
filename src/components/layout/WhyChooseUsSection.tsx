@@ -99,12 +99,12 @@ export default function WhyChooseUsSection() {
         <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16">
           <div className="inline-flex items-center gap-1 sm:gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm font-medium border border-emerald-200 dark:border-emerald-800 mb-3 sm:mb-4 md:mb-6">
             <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4" />
-            Why Choose FreshGift?
+            Why Choose RoyalFresh?
           </div>
 
           <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-center mb-3 sm:mb-4 md:mb-6">
             <span className="bg-gradient-to-r from-emerald-600 to-lime-600 bg-clip-text text-transparent">
-              The FreshGift
+              The RoyalFresh
             </span>
             <br />
             <span className="text-foreground">Difference</span>

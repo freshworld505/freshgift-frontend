@@ -1,4 +1,4 @@
-// Currency utility for FreshGift - UK focused application
+// Currency utility for RoyalFresh - UK focused application
 // Converting from INR to GBP for UK market
 
 export const CURRENCY_CONFIG = {

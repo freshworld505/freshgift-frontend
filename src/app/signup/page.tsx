@@ -8,7 +8,7 @@ export default function SignupPage() {
         <div className="hidden lg:flex flex-col justify-start pt-8 space-y-8 pr-8">
           <div className="space-y-6">
             <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 bg-primary/10 text-sm font-medium text-primary">
-              ✨ New to FreshGift? Join us today!
+              ✨ New to RoyalFresh? Join us today!
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold text-foreground leading-tight">
               Fresh Produce,
@@ -17,7 +17,7 @@ export default function SignupPage() {
             <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
               Experience the convenience of having farm-fresh fruits and
               vegetables delivered straight to your doorstep. Join thousands of
-              satisfied customers who trust FreshGift for their daily nutrition
+              satisfied customers who trust RoyalFresh for their daily nutrition
               needs.
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function SignupPage() {
                 </div>
                 <div>
                   <p className="text-foreground font-medium mb-2">
-                    "FreshGift completely transformed our grocery shopping
+                    "RoyalFresh completely transformed our grocery shopping
                     experience!"
                   </p>
                   <p className="text-sm text-muted-foreground">
@@ -129,7 +129,7 @@ export default function SignupPage() {
         {/* Mobile hero content */}
         <div className="lg:hidden text-center space-y-4 mb-8">
           <h1 className="text-3xl font-bold text-foreground">
-            Join <span className="text-primary">FreshGift</span>
+            Join <span className="text-primary">RoyalFresh</span>
           </h1>
           <p className="text-muted-foreground">
             Get access to the freshest produce delivered to your door

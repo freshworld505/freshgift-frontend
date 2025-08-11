@@ -44,7 +44,7 @@ export default function DeliveryLogin() {
             <Truck className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            FreshGift Delivery
+            RoyalFresh Delivery
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             Sign in to your delivery portal
@@ -71,7 +71,7 @@ export default function DeliveryLogin() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="delivery@freshgift.com"
+                  placeholder="delivery@RoyalFresh.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -106,7 +106,7 @@ export default function DeliveryLogin() {
                 Demo Delivery Accounts:
               </p>
               <div className="text-xs text-blue-700 dark:text-blue-400 space-y-1">
-                <p>• delivery@freshgift.com</p>
+                <p>• delivery@RoyalFresh.com</p>
                 <p>• ajbaggar@gmail.com</p>
                 <p>• delivery@veggieco.com</p>
               </div>

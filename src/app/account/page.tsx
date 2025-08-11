@@ -93,7 +93,7 @@ export default function AccountProfilePage() {
           </div>
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold text-gray-800 mb-1">
-              {user.name || "FreshGift User"}
+              {user.name || "RoyalFresh User"}
             </h3>
             <p className="text-gray-600 text-lg">{user.email}</p>
             <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">

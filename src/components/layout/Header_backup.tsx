@@ -145,7 +145,7 @@ export default function Header() {
                   <DropdownMenuLabel className="font-normal p-4">
                     <div className="flex flex-col space-y-2">
                       <p className="text-sm font-semibold leading-none">
-                        {user.name || "FreshGift User"}
+                        {user.name || "RoyalFresh User"}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground/80">
                         {user.email}
@@ -271,7 +271,7 @@ export default function Header() {
                       <DropdownMenuLabel className="font-normal p-3">
                         <div className="flex flex-col space-y-1">
                           <p className="text-sm font-semibold leading-none">
-                            {user?.name || "FreshGift User"}
+                            {user?.name || "RoyalFresh User"}
                           </p>
                           <p className="text-xs leading-none text-muted-foreground/80">
                             {user?.email}

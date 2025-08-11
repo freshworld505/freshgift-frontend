@@ -184,7 +184,7 @@ export default function SignupForm() {
           Create Account
         </CardTitle>
         <CardDescription className="text-base text-muted-foreground">
-          Join FreshGift and start your fresh journey today
+          Join RoyalFresh and start your fresh journey today
         </CardDescription>
       </CardHeader>
 

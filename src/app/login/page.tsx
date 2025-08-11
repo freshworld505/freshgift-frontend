@@ -13,11 +13,11 @@ export default function LoginPage() {
         <div className="hidden lg:flex flex-col justify-center space-y-8 pr-8">
           <div className="space-y-6">
             <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 bg-primary/10 text-sm font-medium text-primary">
-              🔐 Welcome back to FreshGift!
+              🔐 Welcome back to RoyalFresh!
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold text-foreground leading-tight">
               Welcome Back to
-              <span className="block text-primary">FreshGift</span>
+              <span className="block text-primary">RoyalFresh</span>
             </h1>
             <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
               Continue your journey with the freshest produce delivered to your
@@ -132,7 +132,7 @@ export default function LoginPage() {
         {/* Mobile hero content */}
         <div className="lg:hidden text-center space-y-4 mb-4">
           <h1 className="text-3xl font-bold text-foreground">
-            Welcome back to <span className="text-primary">FreshGift</span>
+            Welcome back to <span className="text-primary">RoyalFresh</span>
           </h1>
           <p className="text-muted-foreground">
             Sign in to access your account and continue shopping

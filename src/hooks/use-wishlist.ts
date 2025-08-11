@@ -52,7 +52,7 @@ export const useWishlistStore = create<WishlistStore>()(
       },
     }),
     {
-      name: "freshgift-wishlist",
+      name: "RoyalFresh-wishlist",
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         state?._setHasHydrated?.(true);
