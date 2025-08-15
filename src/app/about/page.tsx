@@ -52,7 +52,7 @@ export default function AboutPage() {
               </div>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              About <span className="text-green-600">RoyalFresh</span>
+              About <span className="text-green-600">RoyaleFresh</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               We're passionate about bringing farm-fresh produce directly to
@@ -74,7 +74,7 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-gray-600">
                 <p>
-                  RoyalFresh was born from a simple idea: everyone deserves
+                  RoyaleFresh was born from a simple idea: everyone deserves
                   access to fresh, high-quality produce without the hassle of
                   visiting multiple stores or worrying about freshness.
                 </p>
@@ -166,8 +166,8 @@ export default function AboutPage() {
             Ready to Experience Fresh?
           </h2>
           <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who trust RoyalFresh for their
-            fresh produce needs.
+            Join thousands of satisfied customers who trust RoyaleFresh for
+            their fresh produce needs.
           </p>
           <Button
             asChild

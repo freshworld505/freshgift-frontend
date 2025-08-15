@@ -209,7 +209,7 @@ export default function PrivacyPolicyPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                   <Mail className="h-4 w-4 text-emerald-600" />
-                  <span>privacy@RoyalFresh.com</span>
+                  <span>privacy@RoyaleFresh.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                   <Phone className="h-4 w-4 text-emerald-600" />

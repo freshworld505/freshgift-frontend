@@ -35,7 +35,7 @@ export default function ContactPage() {
     {
       icon: <Mail className="h-6 w-6 text-green-600" />,
       title: "Email",
-      details: "hello@RoyalFresh.com",
+      details: "hello@RoyaleFresh.com",
       description: "We'll respond within 24 hours",
     },
     {

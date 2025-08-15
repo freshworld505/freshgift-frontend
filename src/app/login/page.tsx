@@ -7,30 +7,30 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-8 lg:py-12">
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-6">
+      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
         {/* Left side - Hero content */}
-        <div className="hidden lg:flex flex-col justify-center space-y-8 pr-8">
-          <div className="space-y-6">
+        <div className="hidden lg:flex flex-col justify-center space-y-6">
+          <div className="space-y-4">
             <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 bg-primary/10 text-sm font-medium text-primary">
-              🔐 Welcome back to RoyalFresh!
+              🔐 Welcome back!
             </div>
-            <h1 className="text-4xl xl:text-5xl font-bold text-foreground leading-tight">
+            <h1 className="text-3xl xl:text-4xl font-bold text-foreground leading-tight">
               Welcome Back to
-              <span className="block text-primary">RoyalFresh</span>
+              <span className="block text-primary">RoyaleFresh</span>
             </h1>
-            <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
-              Continue your journey with the freshest produce delivered to your
-              doorstep. Access your account to manage orders, track deliveries,
-              and discover new seasonal favorites.
+            <p className="text-base text-muted-foreground leading-relaxed">
+              Continue your journey with fresh produce delivered to your
+              doorstep. Access your account to manage orders and discover new
+              favorites.
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="w-4 h-4 text-primary-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -42,18 +42,18 @@ export default function LoginPage() {
                 </svg>
               </div>
               <div>
-                <span className="text-foreground font-semibold block">
+                <span className="text-foreground font-medium block">
                   Order History
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  View and reorder your favorite items
+                  View and reorder your favorites
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="w-4 h-4 text-primary-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -65,18 +65,18 @@ export default function LoginPage() {
                 </svg>
               </div>
               <div>
-                <span className="text-foreground font-semibold block">
+                <span className="text-foreground font-medium block">
                   Saved Addresses
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  Quick checkout with saved delivery locations
+                  Quick checkout with saved locations
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="w-4 h-4 text-primary-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -88,54 +88,24 @@ export default function LoginPage() {
                 </svg>
               </div>
               <div>
-                <span className="text-foreground font-semibold block">
-                  Personalized Recommendations
+                <span className="text-foreground font-medium block">
+                  Personal Recommendations
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  Discover products based on your preferences
+                  Products based on your preferences
                 </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-6 border border-primary/20 backdrop-blur-sm">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-primary-foreground"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-foreground font-medium mb-2">
-                    "Love how easy it is to reorder my weekly favorites!"
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    — Michael R., Loyal Customer ⭐⭐⭐⭐⭐
-                  </p>
-                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Mobile hero content */}
-        <div className="lg:hidden text-center space-y-4 mb-4">
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back to <span className="text-primary">RoyalFresh</span>
+        <div className="lg:hidden text-center space-y-3 mb-6">
+          <h1 className="text-2xl font-bold text-foreground">
+            Welcome back to <span className="text-primary">RoyaleFresh</span>
           </h1>
           <p className="text-muted-foreground">
-            Sign in to access your account and continue shopping
+            Sign in to access your account
           </p>
         </div>
 

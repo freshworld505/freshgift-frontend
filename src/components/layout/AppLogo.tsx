@@ -15,7 +15,7 @@ export default function AppLogo() {
       </div>
       <div className="flex flex-col">
         <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          RoyalFresh
+          RoyaleFresh
         </span>
         <span className="text-xs text-muted-foreground font-medium -mt-1 hidden sm:block">
           Fresh & Organic

@@ -27,7 +27,7 @@ export default function CookiePolicyPage() {
           </div>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             This policy explains how we use cookies and similar technologies to
-            enhance your experience on RoyalFresh.
+            enhance your experience on RoyaleFresh.
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             Last updated: {new Date().toLocaleDateString()}
@@ -334,7 +334,7 @@ export default function CookiePolicyPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                   <Mail className="h-4 w-4 text-emerald-600" />
-                  <span>cookies@RoyalFresh.com</span>
+                  <span>cookies@RoyaleFresh.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                   <Phone className="h-4 w-4 text-emerald-600" />

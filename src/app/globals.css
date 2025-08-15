@@ -77,7 +77,7 @@ body {
   }
 
   .dark {
-    /* Keeping dark mode, but RoyalFresh is primarily light themed */
+    /* Keeping dark mode, but RoyaleFresh is primarily light themed */
     --background: 0 0% 10%;
     /* Darker background */
     --foreground: 0 0% 95%;

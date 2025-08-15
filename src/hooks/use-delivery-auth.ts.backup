@@ -7,7 +7,7 @@ const DELIVERY_EMAILS = [
   'courier@freshworld.com',
   'deliveryuser@freshworld.com',
   'delivery.official01@gmail.com',
-  'delivery@RoyalFresh.com',
+  'delivery@RoyaleFresh.com',
   'ajbaggar@gmail.com',
   // Add more delivery emails as needed
 ];

@@ -196,49 +196,30 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
-        <CardHeader className="space-y-4 pb-6">
-          <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl mb-3 shadow-lg">
-              <svg
-                className="w-6 h-6 text-primary-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-foreground">Sign In</h2>
-          </div>
+    <div className="w-full max-w-sm mx-auto">
+      <Card className="shadow-lg border bg-card">
+        <CardHeader className="text-center pb-3">
+          <h2 className="text-xl font-bold">Sign In</h2>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-3">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel className="text-sm font-medium text-foreground">
-                      Email Address
-                    </FormLabel>
+                  <FormItem>
+                    <FormLabel className="text-xs">Email</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter your email address"
-                        className="h-12 border-2 border-border/60 focus:border-primary transition-colors duration-200 bg-background/50"
+                        placeholder="you@example.com"
+                        className="h-9 text-sm"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -247,46 +228,42 @@ export default function LoginForm() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
+                  <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel className="text-sm font-medium text-foreground">
-                        Password
-                      </FormLabel>
+                      <FormLabel className="text-xs">Password</FormLabel>
                       <Button
                         type="button"
                         variant="link"
-                        className="h-auto p-0 text-sm text-primary hover:text-primary/80 transition-colors duration-200 font-medium"
+                        className="h-auto p-0 text-xs text-primary"
                         onClick={() => setShowForgotPassword(true)}
                       >
-                        Forgot password?
+                        Forgot?
                       </Button>
                     </div>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter your password"
-                        className="h-12 border-2 border-border/60 focus:border-primary transition-colors duration-200 bg-background/50"
+                        placeholder="Password"
+                        className="h-9 text-sm"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
               {showForgotPassword && (
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Enter your email address and we'll send you a password reset
-                    link.
+                <div className="bg-muted/50 p-3 rounded text-center">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Enter your email and we'll send a reset link.
                   </p>
                   <Button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="w-full"
+                    className="w-full h-8 text-xs"
                     variant="outline"
                   >
-                    <Mail className="w-4 h-4 mr-2" />
                     Send Reset Email
                   </Button>
                 </div>
@@ -295,11 +272,11 @@ export default function LoginForm() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full h-9 bg-primary hover:bg-primary/90 text-sm"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                     Signing In...
                   </>
                 ) : (
@@ -309,80 +286,74 @@ export default function LoginForm() {
             </form>
           </Form>
 
-          <div className="relative">
-            <Separator className="my-6" />
+          <div className="relative my-3">
+            <Separator className="w-full" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-card px-3 text-sm text-muted-foreground">
-                or continue with
+              <span className="bg-card px-2 text-xs text-muted-foreground">
+                Or
               </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isGoogleLoading}
-              onClick={handleGoogleSignIn}
-              className="h-12 border-2 border-border/60 hover:border-primary/60 hover:bg-primary/5 transition-all duration-200"
-            >
-              {isGoogleLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Signing in with Google...
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  Continue with Google
-                </>
-              )}
-            </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isGoogleLoading}
+            onClick={handleGoogleSignIn}
+            className="w-full h-9 text-sm"
+          >
+            {isGoogleLoading ? (
+              <>
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
+                </svg>
+                Google
+              </>
+            )}
+          </Button>
+
+          <div className="text-xs text-muted-foreground text-center">
+            By signing in, you agree to our{" "}
+            <Link href="/terms" className="text-primary hover:underline">
+              Terms
+            </Link>{" "}
+            &{" "}
+            <Link href="/privacy" className="text-primary hover:underline">
+              Privacy
+            </Link>
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4 pt-6">
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/signup"
-                className="text-primary hover:text-primary/80 font-semibold transition-colors duration-200"
-              >
-                Create one now
-              </Link>
-            </p>
-          </div>
-
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              By signing in, you agree to our{" "}
-              <Link href="#" className="text-primary hover:underline">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="#" className="text-primary hover:underline">
-                Privacy Policy
-              </Link>
-            </p>
-          </div>
+        <CardFooter className="flex justify-center pt-2 pb-4">
+          <p className="text-xs text-muted-foreground">
+            Don't have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-primary hover:underline font-medium"
+            >
+              Sign up
+            </Link>
+          </p>
         </CardFooter>
       </Card>
 

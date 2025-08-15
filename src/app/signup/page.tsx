@@ -2,31 +2,29 @@ import SignupForm from "@/components/auth/SignupForm";
 
 export default function SignupPage() {
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-8 lg:py-12">
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 lg:gap-12 lg:items-start items-center">
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-6">
+      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
         {/* Left side - Hero content */}
-        <div className="hidden lg:flex flex-col justify-start pt-8 space-y-8 pr-8">
-          <div className="space-y-6">
+        <div className="hidden lg:flex flex-col justify-center space-y-6">
+          <div className="space-y-4">
             <div className="inline-flex items-center px-3 py-1 rounded-full border border-primary/20 bg-primary/10 text-sm font-medium text-primary">
-              ✨ New to RoyalFresh? Join us today!
+              ✨ Join RoyaleFresh today!
             </div>
-            <h1 className="text-4xl xl:text-5xl font-bold text-foreground leading-tight">
+            <h1 className="text-3xl xl:text-4xl font-bold text-foreground leading-tight">
               Fresh Produce,
               <span className="block text-primary">Delivered Daily</span>
             </h1>
-            <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
-              Experience the convenience of having farm-fresh fruits and
-              vegetables delivered straight to your doorstep. Join thousands of
-              satisfied customers who trust RoyalFresh for their daily nutrition
-              needs.
+            <p className="text-base text-muted-foreground leading-relaxed">
+              Farm-fresh fruits and vegetables delivered to your doorstep. Join
+              thousands of satisfied customers.
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="w-4 h-4 text-primary-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -38,7 +36,7 @@ export default function SignupPage() {
                 </svg>
               </div>
               <div>
-                <span className="text-foreground font-semibold block">
+                <span className="text-foreground font-medium block">
                   Farm-Fresh Quality
                 </span>
                 <span className="text-sm text-muted-foreground">
@@ -46,10 +44,10 @@ export default function SignupPage() {
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="w-4 h-4 text-primary-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -61,7 +59,7 @@ export default function SignupPage() {
                 </svg>
               </div>
               <div>
-                <span className="text-foreground font-semibold block">
+                <span className="text-foreground font-medium block">
                   Same-Day Delivery
                 </span>
                 <span className="text-sm text-muted-foreground">
@@ -69,10 +67,10 @@ export default function SignupPage() {
                 </span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="w-4 h-4 text-primary-foreground"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -84,55 +82,24 @@ export default function SignupPage() {
                 </svg>
               </div>
               <div>
-                <span className="text-foreground font-semibold block">
+                <span className="text-foreground font-medium block">
                   Best Price Guarantee
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  Competitive prices with exclusive member deals
+                  Competitive prices with exclusive deals
                 </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl p-6 border border-primary/20 backdrop-blur-sm">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-primary-foreground"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-foreground font-medium mb-2">
-                    "RoyalFresh completely transformed our grocery shopping
-                    experience!"
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    — Sarah K., Verified Customer ⭐⭐⭐⭐⭐
-                  </p>
-                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Mobile hero content */}
-        <div className="lg:hidden text-center space-y-4 mb-8">
-          <h1 className="text-3xl font-bold text-foreground">
-            Join <span className="text-primary">RoyalFresh</span>
+        <div className="lg:hidden text-center space-y-3 mb-6">
+          <h1 className="text-2xl font-bold text-foreground">
+            Join <span className="text-primary">RoyaleFresh</span>
           </h1>
           <p className="text-muted-foreground">
-            Get access to the freshest produce delivered to your door
+            Fresh produce delivered to your door
           </p>
         </div>
 

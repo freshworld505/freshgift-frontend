@@ -105,7 +105,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            RoyalFresh Admin
+            RoyaleFresh Admin
           </h1>
           <Button
             variant="ghost"

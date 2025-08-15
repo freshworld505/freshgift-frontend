@@ -53,7 +53,7 @@ export default function Footer() {
                 <div className="p-2 bg-emerald-600 rounded-lg">
                   <Leaf className="h-8 w-8 text-white" />
                 </div>
-                <span className="text-2xl font-bold">RoyalFresh</span>
+                <span className="text-2xl font-bold">RoyaleFresh</span>
               </div>
 
               <p className="text-emerald-100 mb-6 leading-relaxed">
@@ -69,7 +69,7 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center gap-3 text-emerald-200">
                   <Mail className="h-4 w-4" />
-                  <span className="text-sm">hello@RoyalFresh.com</span>
+                  <span className="text-sm">hello@RoyaleFresh.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-emerald-200">
                   <MapPin className="h-4 w-4" />
@@ -164,7 +164,8 @@ export default function Footer() {
           {/* Bottom section */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-emerald-200 text-sm">
-              &copy; {new Date().getFullYear()} RoyalFresh. All rights reserved.
+              &copy; {new Date().getFullYear()} RoyaleFresh. All rights
+              reserved.
             </div>
 
             <div className="flex flex-wrap gap-6 text-xs text-emerald-300">

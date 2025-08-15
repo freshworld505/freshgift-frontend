@@ -93,7 +93,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading RoyalFresh...</p>
+          <p className="text-muted-foreground">Loading RoyaleFresh...</p>
         </div>
       </div>
     );
@@ -119,8 +119,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                 Authentication Required
               </DialogTitle>
               <DialogDescription className="text-center">
-                Please sign in to access RoyalFresh and start shopping for fresh
-                produce.
+                Please sign in to access RoyaleFresh and start shopping for
+                fresh produce.
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col space-y-3 mt-6">
