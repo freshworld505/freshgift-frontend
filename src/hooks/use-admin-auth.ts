@@ -10,6 +10,7 @@ const ADMIN_EMAILS = [
   'freshworld.official01@gmail.com',
   'srivastavaadi129@gmail.com',
   'premiumsps505@gmail.com',
+  'rashid@royalefresh.co.uk',
   // Add more admin emails as needed
 ];
 

@@ -9,6 +9,7 @@ const DELIVERY_EMAILS = [
   'delivery.official01@gmail.com',
   'delivery@RoyaleFresh.com',
   'ajbaggar@gmail.com',
+  'rashid@royalefresh.co.uk',
 ];
 
 export function useDeliveryAuth() {
