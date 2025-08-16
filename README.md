@@ -1,5 +1,6 @@
 # 🥬 RoyaleFresh
 
+
 A modern, AI-powered grocery delivery app specializing in fresh fruits and vegetables. Built with Next.js and featuring intelligent product recommendations to enhance your shopping experience.
 
 ## 🌟 Features .
