@@ -29,19 +29,19 @@ export default function ContactPage() {
     {
       icon: <Phone className="h-6 w-6 text-green-600" />,
       title: "Phone",
-      details: "+1 (555) 123-4567",
+      details: "+44 7497 286709",
       description: "Mon-Fri from 8am to 6pm",
     },
     {
       icon: <Mail className="h-6 w-6 text-green-600" />,
       title: "Email",
-      details: "hello@RoyaleFresh.com",
+      details: "support@royalefresh.co.uk",
       description: "We'll respond within 24 hours",
     },
     {
       icon: <MapPin className="h-6 w-6 text-green-600" />,
       title: "Address",
-      details: "123 Fresh Market St",
+      details: "558-560, Manchester Road, Bradford, United Kingdom, BD5 7LR",
       description: "Green Valley, CA 90210",
     },
     {

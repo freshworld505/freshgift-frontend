@@ -65,16 +65,16 @@ export default function Footer() {
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3 text-emerald-200">
                   <Phone className="h-4 w-4" />
-                  <span className="text-sm">+1 (555) 123-4567</span>
+                  <span className="text-sm">+44 7497 286709</span>
                 </div>
                 <div className="flex items-center gap-3 text-emerald-200">
                   <Mail className="h-4 w-4" />
-                  <span className="text-sm">hello@RoyaleFresh.com</span>
+                  <span className="text-sm">support@royalefresh.co.uk</span>
                 </div>
                 <div className="flex items-center gap-3 text-emerald-200">
                   <MapPin className="h-4 w-4" />
                   <span className="text-sm">
-                    123 Fresh Market St, Green Valley
+                    558-560, Manchester Road, Bradford, United Kingdom, BD5 7LR
                   </span>
                 </div>
               </div>
