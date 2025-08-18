@@ -223,10 +223,12 @@ export default function Header() {
 
         {/* Mobile Header */}
         <div className="md:hidden">
-          <div className="flex items-center justify-between h-14 py-2">
-            <AppLogo />
+          <div className="flex items-center justify-between h-16 py-3">
+            <div className="flex items-center">
+              <AppLogo />
+            </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {/* Products Button */}
               <Button
                 variant="ghost"
@@ -246,7 +248,7 @@ export default function Header() {
                   <Link href="/login">Login</Link>
                 </Button>
               ) : (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-3">
                   <CartIcon />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

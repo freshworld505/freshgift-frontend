@@ -24,7 +24,15 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
+  Lock,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { addToCart } from "@/api/cartApi";
 import { getProductById, getProductsByCategory } from "@/api/productApi";
@@ -49,6 +57,7 @@ export default function ProductDetailPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const productIdParam = params.id;
   const productId = Array.isArray(productIdParam)
@@ -323,11 +332,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to add items to your cart.",
-        variant: "destructive",
-      });
+      setShowAuthDialog(true);
       return;
     }
 
@@ -982,12 +987,7 @@ export default function ProductDetailPage() {
                           onClick={async (e) => {
                             e.stopPropagation();
                             if (!isAuthenticated) {
-                              toast({
-                                title: "Login Required",
-                                description:
-                                  "Please log in to add items to your cart.",
-                                variant: "destructive",
-                              });
+                              setShowAuthDialog(true);
                               return;
                             }
                             try {
@@ -1027,6 +1027,44 @@ export default function ProductDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Authentication Dialog */}
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="h-8 w-8 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-2xl">
+              Authentication Required
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Please sign in to add items to your cart and start shopping.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col space-y-3 mt-6">
+            <Button
+              onClick={() => {
+                setShowAuthDialog(false);
+                router.push("/login");
+              }}
+              className="w-full"
+            >
+              Sign In
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAuthDialog(false);
+                router.push("/");
+              }}
+              className="w-full"
+            >
+              Go to Homepage
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
