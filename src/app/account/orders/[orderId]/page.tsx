@@ -243,10 +243,13 @@ export default function OrderDetailPage() {
                       {item.quantity}
                     </TableCell>
                     <TableCell className="text-right">
-                      £{item.unitPrice}
+                      £{Number(item.unitPrice || 0).toFixed(2)}
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      £{(item.unitPrice * item.quantity).toFixed(2)}
+                      £
+                      {(
+                        Number(item.unitPrice || 0) * Number(item.quantity || 0)
+                      ).toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -285,14 +288,14 @@ export default function OrderDetailPage() {
               <span>
                 £
                 {order.items
-                  .reduce((sum, item) => sum + item.totalPrice, 0)
+                  .reduce((sum, item) => sum + Number(item.totalPrice || 0), 0)
                   .toFixed(2)}
               </span>
             </div>
-            {order.discountAmount > 0 && (
+            {Number(order.discountAmount || 0) > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Discount Applied:</span>
-                <span>-£{order.discountAmount.toFixed(2)}</span>
+                <span>-£{Number(order.discountAmount || 0).toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between text-sm text-muted-foreground">
@@ -301,7 +304,7 @@ export default function OrderDetailPage() {
             </div>
             <div className="flex justify-between text-lg font-bold text-foreground pt-1 border-t border-border mt-1">
               <span>Grand Total:</span>
-              <span>£{order.totalAmount.toFixed(2)}</span>
+              <span>£{Number(order.totalAmount || 0).toFixed(2)}</span>
             </div>
           </div>
         </CardFooter>

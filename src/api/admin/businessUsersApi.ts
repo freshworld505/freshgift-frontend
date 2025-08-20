@@ -111,7 +111,7 @@ export const checkBusinessUserStatus = async (status: string): Promise<BusinessS
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log("✅ Successfully checked business user status:", response.data);
+  //console.log("✅ Successfully checked business user status:", response.data);
   return response.data;
 };
 

@@ -29,7 +29,7 @@ import {
 } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { getStripeCompatibleAmount } from "@/lib/currency";
 import type {
   TimeSlot,
@@ -57,6 +57,21 @@ import SelectAddress from "./SelectAddress";
 import SaveCardPage from "./SaveCardForm";
 import Lottie from "lottie-react";
 import successAnimation from "../../../public/Success.json";
+import { getShippingDetails, getTotalAfterShippingCost } from "@/api/orderApi";
+
+interface TotalCostAfterShippingCostResponse {
+  shippingCost: number;
+  cartTotal: number;
+  finalTotal: number;
+  isFreeShipping: boolean;
+  freeShippingThreshold: number;
+}
+
+interface ShippingCostResponse {
+  message: string;
+  shippingCharge: number;
+  freeShippingThreshold: number;
+}
 
 // Initialize Stripe (you'll need to add your publishable key)
 const stripePromise = loadStripe(
@@ -216,6 +231,8 @@ export default function CheckoutForm() {
     userInstructions: string;
     selectedAddress: Address | null;
   } | null>(null);
+  const [shippingDetails, setShippingDetails] =
+    useState<ShippingCostResponse | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -223,6 +240,16 @@ export default function CheckoutForm() {
       router.push("/cart");
     }
   }, [items, router]);
+
+  const fetchShippingDetails = async () => {
+    const details = await getShippingDetails();
+    console.log("🚀Shipping details fetched:", details);
+    setShippingDetails(details);
+  };
+
+  useEffect(() => {
+    fetchShippingDetails();
+  }, []);
 
   const form = useForm<z.infer<typeof checkoutSchema>>({
     resolver: zodResolver(checkoutSchema),
@@ -1351,14 +1378,38 @@ export default function CheckoutForm() {
                       )}
                       <div className="flex justify-between items-center">
                         <span className="text-muted-foreground">Delivery</span>
-                        <span className="font-medium text-green-600">FREE</span>
+                        <span className="font-medium text-green-600">
+                          {(() => {
+                            const total =
+                              getCartTotal() - (appliedDiscount || 0);
+                            if (
+                              total >=
+                              (shippingDetails?.freeShippingThreshold || 0)
+                            ) {
+                              return "Free";
+                            } else {
+                              return `£${
+                                Number(shippingDetails?.shippingCharge) || 0
+                              }`;
+                            }
+                          })()}
+                        </span>
                       </div>
                       <hr className="border-emerald-200 dark:border-emerald-700" />
                       <div className="flex justify-between items-center text-xl font-bold">
                         <span>Total</span>
                         <span className="text-emerald-600">
                           £
-                          {(getCartTotal() - (appliedDiscount || 0)).toFixed(2)}
+                          {(() => {
+                            const total =
+                              getCartTotal() - (appliedDiscount || 0);
+                            const shippingCost =
+                              total >=
+                              (shippingDetails?.freeShippingThreshold || 0)
+                                ? 0
+                                : Number(shippingDetails?.shippingCharge || 0);
+                            return (total + shippingCost).toFixed(2);
+                          })()}
                         </span>
                       </div>
                     </div>

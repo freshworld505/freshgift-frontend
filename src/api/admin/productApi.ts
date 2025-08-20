@@ -113,16 +113,16 @@ export async function createProduct(productData: any) {
     }
 
     // Debug: Log the FormData contents
-    console.log('📦 FormData contents:');
+    //console.log('📦 FormData contents:');
     for (let [key, value] of formData.entries()) {
       if (value instanceof File) {
-        console.log(`${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+        //console.log(`${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
       } else {
-        console.log(`${key}: ${value}`);
+        //console.log(`${key}: ${value}`);
       }
     }
 
-    console.log('🔐 Making API request with token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+    //console.log('🔐 Making API request with token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
 
     const response = await axios.post(`${API_BASE_URL}/create`, formData, {
       headers: {
@@ -131,7 +131,7 @@ export async function createProduct(productData: any) {
       },
     });
 
-    console.log('Product created successfully:', response.data);
+    //console.log('Product created successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating product:', error);
@@ -146,7 +146,7 @@ export const searchProducts = async (searchTerm: string, page: number, limit: nu
     await ensureAuthenticated();
     
     const response = await axios.get(`${API_BASE_URL}/search?searchTerm=${searchTerm}&page=${page}&limit=${limit}`);
-    console.log("✅ Products fetched successfully:", response.data);
+    //console.log("✅ Products fetched successfully:", response.data);
     
     // Handle new backend response format
     const apiData = response.data as BackendResponse;
@@ -208,14 +208,14 @@ export const getProductsByCategory = async (category: string, page: number, limi
     // Build query string manually for proper URL format
     const url = `${API_BASE_URL}/filter?category=${encodeURIComponent(category)}&page=${page}&limit=${limit}`;
 
-    console.log(`🔍 Fetching products by category: ${category}, URL: ${url}`);
+    //console.log(`🔍 Fetching products by category: ${category}, URL: ${url}`);
     const response = await axios.get(url);
 
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");
     }
-    console.log("✅ Products by category fetched successfully:", response.data);
+    //console.log("✅ Products by category fetched successfully:", response.data);
 
     // Handle new backend response format
     const apiData = response.data as BackendResponse;
@@ -241,7 +241,7 @@ export const getProductsByCategory = async (category: string, page: number, limi
       updatedAt: product.updatedAt || new Date()
     }) as Product);
 
-    console.log(`✅ Converted ${convertedProducts.length} products for category: ${category}`);
+    //console.log(`✅ Converted ${convertedProducts.length} products for category: ${category}`);
     return convertedProducts;
   } catch (error: any) {
     console.error(`❌ Error fetching products by category ${category}:`, {
@@ -264,14 +264,14 @@ export const getProductsByCategoryAndSubcategory = async (category: string, subC
     // Build query string manually for proper URL format
     const url = `${API_BASE_URL}/filter?category=${encodeURIComponent(category)}&subCategory=${encodeURIComponent(subCategory)}&page=${page}&limit=${limit}`;
 
-    console.log(`🔍 Fetching products by category and subcategory: ${category}/${subCategory}, URL: ${url}`);
+    //console.log(`🔍 Fetching products by category and subcategory: ${category}/${subCategory}, URL: ${url}`);
     const response = await axios.get(url);
 
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");
     }
-    console.log("✅ Products by category and subcategory fetched successfully:", response.data);
+    //console.log("✅ Products by category and subcategory fetched successfully:", response.data);
 
     // Handle new backend response format
     const apiData = response.data as BackendResponse;
@@ -297,7 +297,7 @@ export const getProductsByCategoryAndSubcategory = async (category: string, subC
       updatedAt: product.updatedAt || new Date()
     }) as Product);
 
-    console.log(`✅ Converted ${convertedProducts.length} products for category/subcategory: ${category}/${subCategory}`);
+    //console.log(`✅ Converted ${convertedProducts.length} products for category/subcategory: ${category}/${subCategory}`);
     return convertedProducts;
   } catch (error: any) {
     console.error(`❌ Error fetching products by category/subcategory ${category}/${subCategory}:`, {
@@ -326,14 +326,14 @@ export const getProductsByTag = async (tags: string, page: number, limit: number
     // Build query string manually for proper URL format
     const url = `${API_BASE_URL}/filter?tags=${encodeURIComponent(tags)}&page=${page}&limit=${limit}`;
 
-    console.log(`🔍 Fetching products with tags: ${tags}, URL: ${url}`);
+    //console.log(`🔍 Fetching products with tags: ${tags}, URL: ${url}`);
     const response = await axios.get(url);
 
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");
     }
-    console.log("✅ Products by tag fetched successfully:", response.data);
+    //console.log("✅ Products by tag fetched successfully:", response.data);
 
     const apiData = response.data;
     let products: any[] = [];
@@ -358,7 +358,7 @@ export const getProductsByTag = async (tags: string, page: number, limit: number
       updatedAt: product.updatedAt || new Date()
     }) as Product);
 
-    console.log(`✅ Converted ${convertedProducts.length} products for tags: ${tags}`);
+    //console.log(`✅ Converted ${convertedProducts.length} products for tags: ${tags}`);
     return convertedProducts;
   } catch (error: any) {
     console.error(`❌ Error fetching products by tag ${tags}:`, {

@@ -50,6 +50,22 @@ import {
 import { getUserAddresses } from "@/api/addressesApi";
 import { Address } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { registerFCMToken } from "@/api/notification";
+import { getShippingDetails, getTotalAfterShippingCost } from "@/api/orderApi";
+
+interface TotalCostAfterShippingCostResponse {
+  shippingCost: number;
+  cartTotal: number;
+  finalTotal: number;
+  isFreeShipping: boolean;
+  freeShippingThreshold: number;
+}
+
+interface ShippingCostResponse {
+  message: string;
+  shippingCharge: number;
+  freeShippingThreshold: number;
+}
 
 export default function CartDisplay() {
   const {
@@ -84,12 +100,42 @@ export default function CartDisplay() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [shippingDetails, setShippingDetails] =
+    useState<ShippingCostResponse | null>(null);
+
+  const getShippingDetailsCart = async () => {
+    try {
+      const details = await getShippingDetails();
+      console.log("Shipping details:", details);
+      setShippingDetails(details);
+    } catch (error) {
+      console.error("Error fetching shipping details:", error);
+    }
+  };
 
   // Fetch cart data when component mounts or user logs in
   useEffect(() => {
     if (isAuthenticated) {
       fetchCart();
       fetchCoupons(); // Fetch available coupons
+      getShippingDetailsCart();
+
+      // Register FCM token for push notifications
+      const registerNotifications = async () => {
+        try {
+          const success = await registerFCMToken("web");
+          if (success) {
+            console.log("✅ FCM token registered successfully for cart user");
+          } else {
+            console.log("⚠️ FCM token registration failed");
+          }
+        } catch (error) {
+          console.error("❌ Error registering FCM token:", error);
+          // Don't show error to user as notifications are not critical for cart functionality
+        }
+      };
+
+      registerNotifications();
     }
   }, [isAuthenticated, fetchCart, fetchCoupons]);
 
@@ -129,8 +175,13 @@ export default function CartDisplay() {
   }, [coupons, getAvailableCoupons]);
 
   const subtotal = getCartTotal();
-  const shipping = subtotal > 25 ? 0 : 1.99; // Free shipping over £25
-  const savings = subtotal > 25 ? 1.99 : 0;
+
+  // Calculate shipping based on API data
+  const freeShippingThreshold =
+    Number(shippingDetails?.freeShippingThreshold) || 25;
+  const shippingCharge = Number(shippingDetails?.shippingCharge) || 5;
+  const shipping = subtotal >= freeShippingThreshold ? 0 : shippingCharge;
+  const savings = subtotal >= freeShippingThreshold ? shippingCharge : 0;
 
   // Calculate discount amount if coupon is applied
   let discountAmount = 0;
@@ -538,17 +589,28 @@ export default function CartDisplay() {
                   <Truck className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
                 <h3 className="font-semibold text-base sm:text-lg">
-                  Free Shipping
+                  Free Shipping -{" "}
+                  {shippingDetails?.freeShippingThreshold
+                    ? subtotal >= shippingDetails.freeShippingThreshold
+                      ? "Qualified!"
+                      : `Add £${(
+                          shippingDetails.freeShippingThreshold - subtotal
+                        ).toFixed(2)} more`
+                    : "Unavailable"}
                 </h3>
               </div>
               <p className="text-sm sm:text-base text-muted-foreground">
-                {subtotal > 25 ? (
+                {subtotal >= (shippingDetails?.freeShippingThreshold || 25) ? (
                   <span className="text-green-600 font-medium">
                     🎉 You qualify for free shipping!
                   </span>
                 ) : (
                   <span>
-                    Add £{(25 - subtotal).toFixed(2)} more for free shipping
+                    Add £
+                    {(
+                      (shippingDetails?.freeShippingThreshold || 25) - subtotal
+                    ).toFixed(2)}{" "}
+                    more for free shipping
                   </span>
                 )}
               </p>
@@ -773,14 +835,16 @@ export default function CartDisplay() {
                   shipping === 0 ? "text-green-600" : ""
                 }`}
               >
-                {shipping === 0 ? "FREE" : `£${shipping.toFixed(2)}`}
+                {shipping === 0 ? "FREE" : `£${Number(shipping).toFixed(2)}`}
               </span>
             </div>
 
             {savings > 0 && (
               <div className="flex justify-between text-base sm:text-lg text-green-600">
                 <span>Savings:</span>
-                <span className="font-semibold">-£{savings.toFixed(2)}</span>
+                <span className="font-semibold">
+                  -£{Number(savings).toFixed(2)}
+                </span>
               </div>
             )}
 

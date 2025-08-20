@@ -9,9 +9,9 @@ const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/coupons`;
 export const getAllCoupons = async (): Promise<UserCoupon[]> => {
   return withAuthentication(async () => {
     try {
-      console.log('🔍 Fetching coupons from:', `${API_BASE_URL}/all`);
+      //console.log('🔍 Fetching coupons from:', `${API_BASE_URL}/all`);
       const response = await axios.get<{ coupons: UserCoupon[] }>(`${API_BASE_URL}/available`);
-      console.log('✅ Coupons fetched successfully:', response.data.coupons);
+      //console.log('✅ Coupons fetched successfully:', response.data.coupons);
       return response.data.coupons;
     } catch (error: any) {
       console.error("❌ Failed to fetch all coupons:", error.response?.data || error.message);

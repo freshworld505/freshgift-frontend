@@ -20,7 +20,7 @@ export const createCoupon = async (couponData: {
   try {
     await ensureAuthenticated();
     const response = await axios.post(`${API_BASE_URL}/create`, couponData);
-    console.log("✅ Coupon created successfully:", response.data);
+    //console.log("✅ Coupon created successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error creating coupon:", error);
@@ -33,7 +33,7 @@ export const assignCouponToAllUsers = async (couponCode: string): Promise<any> =
   try {
     await ensureAuthenticated();
     const response = await axios.post(`${API_BASE_URL}/assign-all`, { couponCode });
-    console.log("✅ Coupon assigned to all users successfully:", response.data);
+    //console.log("✅ Coupon assigned to all users successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error assigning coupon to all users:", error);
@@ -56,7 +56,7 @@ export const getAllCoupons = async (): Promise<any[]> => {
     // Extract the coupon data directly from userCoupons array
     const coupons = response.data.userCoupons;
     
-    console.log("✅ Coupons fetched successfully:", coupons);
+    //console.log("✅ Coupons fetched successfully:", coupons);
     return coupons;
   } catch (error) {
     console.error("❌ Error fetching coupons:", error);
@@ -69,7 +69,7 @@ export const assignCouponToUserArray = async (userIds: string[], couponCode: str
   try {
     await ensureAuthenticated();
     const response = await axios.post(`https://freshgiftbackend.onrender.com/api/coupons/assign-multiple`, { userIds, couponCode });
-    console.log("✅ Coupon assigned to users successfully:", response.data);
+    //console.log("✅ Coupon assigned to users successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error assigning coupon to user:", error);

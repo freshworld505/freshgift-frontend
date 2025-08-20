@@ -137,10 +137,10 @@ export const createAddress = async (addressData: Omit<Address, 'id'>): Promise<A
 
       const response = await axios.post<CreateAddressResponse>(`${API_BASE_URL}/address/add`, backendAddressData);
       console.log("✅ Successfully created new address");
-      console.log("🔍 Raw backend response:", response.data);
-      console.log("🔍 Backend response message:", response.data.message);
-      console.log("🔍 Backend address object:", response.data.address);
-      console.log("🆔 Backend addressId:", response.data.address?.addressId);
+      //console.log("🔍 Raw backend response:", response.data);
+      //console.log("🔍 Backend response message:", response.data.message);
+      //console.log("🔍 Backend address object:", response.data.address);
+      //console.log("🆔 Backend addressId:", response.data.address?.addressId);
       
       // Map backend response to frontend Address type
       const backendAddress = response.data.address;
@@ -160,8 +160,8 @@ export const createAddress = async (addressData: Omit<Address, 'id'>): Promise<A
         isDefault: backendAddress.isDefault,
       };
       
-      console.log("🏠 Mapped frontend address:", newAddress);
-      console.log("🆔 Frontend address ID:", newAddress.id);
+      //console.log("🏠 Mapped frontend address:", newAddress);
+      //console.log("🆔 Frontend address ID:", newAddress.id);
       
       return newAddress;
     } catch (error) {
@@ -228,7 +228,7 @@ export const updatePhoneNumber = async (phoneNumber: string): Promise<void> => {
       }
 
       const response = await axios.put(`${API_BASE_URL}/users/update-phone`, { phone: phoneNumber });
-      console.log("✅ Successfully updated phone number:", response.data);
+      //console.log("✅ Successfully updated phone number:", response.data);
     } catch (error) {
       console.error("Failed to update phone number:", error);
       throw error;
@@ -243,7 +243,7 @@ export const applyForBusinessUser = async (businessUser: BusinessUser): Promise<
       const response = await axios.post(`${API_BASE_URL}/business/apply`, businessUser, {
         headers: await getAuthHeaders(),
       });
-      console.log("✅ Successfully applied for business user:", response.data);
+      //console.log("✅ Successfully applied for business user:", response.data);
     } catch (error) {
       console.error("Failed to apply for business user:", error);
       throw error;
@@ -259,7 +259,7 @@ export const checkBusinessUserStatus = async (status: string): Promise<{ message
       const response = await axios.get(`${API_BASE_URL}/business/admin/requests/status?status=${status}`, {
         headers: await getAuthHeaders(),
       });
-      console.log("✅ Successfully checked business user status:", response.data);
+      //console.log("✅ Successfully checked business user status:", response.data);
       return {
         message: response.data.message,
         requests: response.data.requests,
@@ -279,7 +279,7 @@ export const getBusinessStatus = async (): Promise<BusinessStatusResponse | null
       //const response = await axios.get<BusinessStatusResponse>(`http://localhost:5004/api/business/user/status`, {
         headers: await getAuthHeaders(),
       });
-      console.log("✅ Successfully fetched business user status:", response.data);
+      //console.log("✅ Successfully fetched business user status:", response.data);
       return response.data;
     } catch (error) {
       console.error("Failed to fetch business user status:", error);

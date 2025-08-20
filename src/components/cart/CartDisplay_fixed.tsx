@@ -68,8 +68,8 @@ export default function CartDisplay() {
   // Debug available coupons
   useEffect(() => {
     const availableCoupons = getAvailableCoupons();
-    console.log("🎫 Available coupons:", availableCoupons);
-    console.log("🎫 All coupons:", coupons);
+    //console.log("🎫 Available coupons:", availableCoupons);
+    //console.log("🎫 All coupons:", coupons);
   }, [coupons, getAvailableCoupons]);
 
   const subtotal = getCartTotal();

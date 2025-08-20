@@ -38,14 +38,14 @@ export default function WishlistPage() {
     if (!_hasHydrated || isLoadingProducts || !allProducts.length) return;
 
     // Debug logging
-    console.log("Wishlist items from store:", wishlistItems);
-    console.log("All products available:", allProducts.length);
+    //console.log("Wishlist items from store:", wishlistItems);
+    //console.log("All products available:", allProducts.length);
 
     // Filter products based on wishlist items from localStorage
     const products = allProducts.filter((p: Product) =>
       wishlistItems.includes(p.id)
     );
-    console.log("Filtered wishlist products:", products);
+    //console.log("Filtered wishlist products:", products);
 
     setWishlistProducts(products);
     setIsLoading(false);

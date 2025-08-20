@@ -68,7 +68,7 @@ export const getTokenForApiCalls = async (): Promise<string | null> => {
     // Check if we have a valid cached token first
     if (isTokenValid()) {
       console.log("✅ Using cached JWT token");
-      console.log("Cached Token:", cachedToken);
+      //console.log("Cached Token:", cachedToken);
       return cachedToken;
     }
 

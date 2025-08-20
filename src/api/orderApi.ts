@@ -5,6 +5,7 @@ import { getAuth } from 'firebase/auth';
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders`;
 const API_BASE_URL_FOR_RECURRING = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+const API_BASE_URL_FOR_SHIPPING = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
 
 // Get all orders
 export const getAllMyOrders = async (): Promise<Order[]> => {
@@ -39,17 +40,17 @@ export const getOrderById = async (orderId: string): Promise<Order> => {
 export const createOrder = async (orderData: CreateOrderRequest): Promise<Order> => {
   return withAuthentication(async () => {
     try {
-      console.log("🚀 OrderAPI: Creating order with data:", orderData);
+      //console.log("🚀 OrderAPI: Creating order with data:", orderData);
       const headers = await getAuthHeaders();
-      console.log("🔑 OrderAPI: Using headers:", headers);
+      //console.log("🔑 OrderAPI: Using headers:", headers);
       
       const response = await axios.post<{ message: string; orderId: string; total: number }>(`${API_BASE_URL}/place`, orderData, { headers });
-      console.log("✅ OrderAPI: Order creation response:", response.data);
+      //console.log("✅ OrderAPI: Order creation response:", response.data);
       
       // Since the backend doesn't return the full order object, we need to fetch it
-      console.log("📋 OrderAPI: Fetching created order details...");
+      //console.log("📋 OrderAPI: Fetching created order details...");
       const createdOrder = await getOrderById(response.data.orderId);
-      console.log("✅ OrderAPI: Full order details:", createdOrder);
+      //console.log("✅ OrderAPI: Full order details:", createdOrder);
       
       return createdOrder;
     } catch (error) {
@@ -63,6 +64,47 @@ export const createOrder = async (orderData: CreateOrderRequest): Promise<Order>
         console.error("❌ OrderAPI: Error status text:", axiosError.response?.statusText);
       }
       
+      throw error;
+    }
+  });
+};
+
+// get shipping cost
+interface TotalCostAfterShippingCostResponse {
+  shippingCost: number;
+  cartTotal: number;
+  finalTotal: number;
+  isFreeShipping: boolean;
+  freeShippingThreshold: number;
+}
+
+export const getTotalAfterShippingCost = async (cartTotal: number) => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.post<TotalCostAfterShippingCostResponse>(`${API_BASE_URL}/shipping/calculate`, { headers });
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch shipping cost for cart total ${cartTotal}:`, error);
+      throw error;
+    }
+  });
+};
+
+interface ShippingCostResponse {
+  message: string;
+  shippingCharge: number;
+  freeShippingThreshold: number;
+}
+
+export const getShippingDetails = async () : Promise<ShippingCostResponse> => {
+  return withAuthentication(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await axios.get<ShippingCostResponse>(`${API_BASE_URL_FOR_SHIPPING}/shipping/settings`, { headers });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch shipping details:", error);
       throw error;
     }
   });

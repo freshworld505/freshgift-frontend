@@ -308,9 +308,9 @@ export default function ProductDetailPage() {
       ? parseInt(product.stock, 10)
       : product.stock ?? 0;
   const isInStock = stockValue > 0;
-  console.log(
-    `🔍 Main product ${product.productName}: stock=${product.stock}, converted=${stockValue}, isInStock=${isInStock}`
-  );
+  //console.log(
+  //  `🔍 Main product ${product.productName}: stock=${product.stock}, converted=${stockValue}, isInStock=${isInStock}`
+  //);
 
   // Check if product is in cart and get quantity
   const cartItem = items.find((item) => item.product.id === product.id);

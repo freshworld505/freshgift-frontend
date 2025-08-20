@@ -43,7 +43,7 @@ export const getUserAddresses = async (): Promise<Address[]> => {
   return withAuthentication(async () => {
     try {
       const response = await axios.get<GetAddressesResponse>(`${API_BASE_URL}/address/my`);
-      console.log("✅ Successfully fetched user addresses");
+      //console.log("✅ Successfully fetched user addresses");
       
       // Map backend response to frontend Address type
       const addresses: Address[] = response.data.addresses.map((backendAddress: BackendAddress) => ({
@@ -82,12 +82,12 @@ export const createAddress = async (addressData: Omit<Address, 'id'>): Promise<A
       };
 
       const response = await axios.post<CreateAddressResponse>(`${API_BASE_URL}/address/add`, backendAddressData);
-      console.log("✅ Successfully created new address");
-      console.log("🔍 Raw backend response:", response.data);
-      console.log("🔍 Backend response message:", response.data.message);
-      console.log("🔍 Backend address object:", response.data.address);
-      console.log("🆔 Backend addressId:", response.data.address?.addressId);
-      
+      //console.log("✅ Successfully created new address");
+      //console.log("🔍 Raw backend response:", response.data);
+      //console.log("🔍 Backend response message:", response.data.message);
+      //console.log("🔍 Backend address object:", response.data.address);
+      //console.log("🆔 Backend addressId:", response.data.address?.addressId);
+
       // Map backend response to frontend Address type
       const backendAddress = response.data.address;
       
@@ -106,8 +106,8 @@ export const createAddress = async (addressData: Omit<Address, 'id'>): Promise<A
         isDefault: backendAddress.isDefault,
       };
       
-      console.log("🏠 Mapped frontend address:", newAddress);
-      console.log("🆔 Frontend address ID:", newAddress.id);
+      //console.log("🏠 Mapped frontend address:", newAddress);
+      //console.log("🆔 Frontend address ID:", newAddress.id);
       
       return newAddress;
     } catch (error) {
@@ -122,7 +122,7 @@ export const deleteAddress = async (addressId: string): Promise<void> => {
   return withAuthentication(async () => {
     try {
       await axios.delete(`${API_BASE_URL}/address/${addressId}`);
-      console.log("✅ Successfully deleted address");
+      //console.log("✅ Successfully deleted address");
     } catch (error) {
       console.error("Failed to delete address:", error);
       throw error;
@@ -173,7 +173,7 @@ export const updatePhoneNumber = async (phoneNumber: string): Promise<void> => {
       }
 
       const response = await axios.put(`${API_BASE_URL}/users/update-phone`, { phone: phoneNumber });
-      console.log("✅ Successfully updated phone number:", response.data);
+      //console.log("✅ Successfully updated phone number:", response.data);
     } catch (error) {
       console.error("Failed to update phone number:", error);
       throw error;

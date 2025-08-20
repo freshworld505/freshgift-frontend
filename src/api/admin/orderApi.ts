@@ -81,7 +81,7 @@ export const getOrdersByRefundStatus = async (status: RefundStatus): Promise<any
       throw new Error("Invalid data received from API");
     }
     
-    console.log(`✅ Orders with refund status "${status}" fetched successfully:`, response.data.orders);
+    //console.log(`✅ Orders with refund status "${status}" fetched successfully:`, response.data.orders);
     return response.data.orders;
   } catch (error) {
     console.error("❌ Error fetching orders by refund status:", error);
@@ -101,7 +101,8 @@ export const approveRefund = async (orderId: string): Promise<void> => {
     const response = await axios.post(`${API_BASE_URL}/admin/approve-refund/${orderId}`);
     
     if (response.status === 200) {
-      console.log(`✅ Refund for order ${orderId} approved successfully:`, response.data);
+      //console.log(`✅ Refund for order ${orderId} approved successfully:`, response.data);
+      console.log(`✅ Refund for order ${orderId} approved successfully`);
     } else {
       console.error("❌ Failed to approve refund:", response.data);
       throw new Error(response.data?.message || "Failed to approve refund");
@@ -160,7 +161,8 @@ export const updateOrderStatus = async (
     const response = await axios.patch(`${API_BASE_URL}/admin/update-status/${orderId}`, updateData);
     
     if (response.status === 200) {
-      console.log(`✅ Order ${orderId} updated successfully:`, response.data);
+      //console.log(`✅ Order ${orderId} updated successfully:`, response.data);
+      console.log(`✅ Order ${orderId} updated successfully`);
     } else {
       console.error("❌ Failed to update order:", response.data);
       throw new Error(response.data?.message || "Failed to update order");
@@ -207,7 +209,7 @@ export const getAllOrdersForAdmin = async (): Promise<any[]> => {
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ All orders for admin fetched successfully:", response.data);
+    //console.log("✅ All orders for admin fetched successfully:", response.data);
     return response.data.orders;
   } catch (error) {
     console.error("❌ Error fetching all orders for admin:", error);
@@ -230,7 +232,7 @@ export const getOrderById = async (orderId: string): Promise<any> => {
       throw new Error("No data received from API");
     }
     
-    console.log(`✅ Order ${orderId} fetched successfully:`, response.data);
+    //console.log(`✅ Order ${orderId} fetched successfully:`, response.data);
     return response.data.order || response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
@@ -254,6 +256,6 @@ export const getAllRecurringOrders = async (): Promise<RecurringOrder[]> => {
     console.error("❌ Invalid data received from API");
     throw new Error("Invalid data received from API");
   }
-  console.log("✅ All recurring orders fetched successfully:", response.data.recurringOrders);
+  //console.log("✅ All recurring orders fetched successfully:", response.data.recurringOrders);
   return response.data.recurringOrders;  
 }

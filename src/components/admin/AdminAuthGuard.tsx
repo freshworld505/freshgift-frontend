@@ -16,13 +16,13 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log("AdminAuthGuard effect:", {
-      pathname,
-      loading,
-      userEmail: user?.email,
-      isAuthenticated,
-      isAdmin,
-    });
+    //console.log("AdminAuthGuard effect:", {
+    //  pathname,
+    //  loading,
+    //  userEmail: user?.email,
+    //  isAuthenticated,
+    //  isAdmin,
+    //});
 
     // Wait for auth state to load
     if (loading) {
