@@ -54,21 +54,36 @@ export const useAdminStats = () => {
         if (ordersData.status === 'fulfilled') {
           const orders = ordersData.value;
           totalOrders = orders.length;
-          totalRevenue = orders
-            .filter((order: any) => order.orderStatus === 'Delivered')
-            .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+          
+          // Calculate revenue from delivered orders
+          const deliveredOrders = orders.filter((order: any) => order.orderStatus === 'Delivered');
+          console.log('📊 Delivered orders:', deliveredOrders);
+          
+          totalRevenue = deliveredOrders.reduce((sum: number, order: any) => {
+            const orderAmount = Number(order.totalAmount) || 0;
+            console.log(`Order ${order.id}: totalAmount = ${order.totalAmount}, parsed = ${orderAmount}`);
+            return sum + orderAmount;
+          }, 0);
+          
+          console.log('💰 Calculated total revenue:', totalRevenue);
+        } else {
+          console.error('❌ Failed to fetch orders:', ordersData.reason);
         }
 
         if (customersData.status === 'fulfilled') {
           totalUsers = customersData.value.totalCustomers;
+        } else {
+          console.error('❌ Failed to fetch customers:', customersData.reason);
         }
 
         if (productsData.status === 'fulfilled') {
           totalProducts = productsData.value.total;
+        } else {
+          console.error('❌ Failed to fetch products:', productsData.reason);
         }
 
-        return {
-          totalRevenue,
+        const stats = {
+          totalRevenue: Number(totalRevenue) || 0,
           totalOrders,
           totalProducts,
           totalUsers,
@@ -76,6 +91,9 @@ export const useAdminStats = () => {
           ordersChange: 8.3,   // Mock data - replace with actual calculation
           usersChange: 15.2,   // Mock data - replace with actual calculation
         };
+
+        console.log('📈 Final calculated stats:', stats);
+        return stats;
       } catch (error) {
         console.error('Error fetching admin stats:', error);
         throw error;

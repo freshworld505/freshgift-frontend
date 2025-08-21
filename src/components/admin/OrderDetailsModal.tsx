@@ -183,7 +183,7 @@ export default function OrderDetailsModal({
                 Total Amount
               </Label>
               <p className="font-semibold text-lg">
-                £{(order.totalAmount || 0).toFixed(2)}
+                £{(Number(order.totalAmount || 0) || 0).toFixed(2)}
               </p>
             </div>
           </div>
@@ -261,7 +261,7 @@ export default function OrderDetailsModal({
                           {item.productName || item.name}
                         </p>
                         <p className="text-sm text-gray-600">
-                          Quantity: {item.quantity}
+                          Quantity: {Number(item.quantity || 0) || 0}
                         </p>
                         {item.productCode && (
                           <p className="text-sm text-gray-500">
@@ -273,11 +273,12 @@ export default function OrderDetailsModal({
                         <p className="font-semibold">
                           £
                           {(
-                            (item.unitPrice || 0) * (item.quantity || 0)
+                            (Number(item.unitPrice || 0) || 0) *
+                            (Number(item.quantity || 0) || 0)
                           ).toFixed(2)}
                         </p>
                         <p className="text-sm text-gray-600">
-                          £{(item.unitPrice || 0).toFixed(2)} each
+                          £{(Number(item.unitPrice || 0) || 0).toFixed(2)} each
                         </p>
                       </div>
                     </div>

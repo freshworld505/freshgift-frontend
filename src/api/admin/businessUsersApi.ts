@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { ensureAuthenticated, getTokenForApiCalls } from './authTokenHelper';
 
-const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/business';
-//const API_BASE_URL = 'http://localhost:5004/api/business';
+//const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/business';
+const API_BASE_URL = 'http://localhost:5003/api/business';
 
 // Type definitions for business requests
 interface User {

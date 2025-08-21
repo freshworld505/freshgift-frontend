@@ -32,7 +32,7 @@ const isTokenValid = (): boolean => {
 // Generate jwt token for API authorization
 export const generateJwtToken = async (userId: string): Promise<string> => {
   try {
-    const response = await axios.post(`https://freshgiftbackend.onrender.com/api/auth/generatetoken`, { firebaseId: userId });
+    const response = await axios.post(`http://localhost:5003/api/auth/generatetoken`, { firebaseId: userId });
     if (response.data && response.data.jwt) {
       setAuthToken(response.data.jwt);
       console.log("✅ JWT token generated and set for API authorization");
@@ -96,6 +96,7 @@ export const ensureAuthenticated = async (): Promise<boolean> => {
       // Only generate new token if cached one is invalid/expired
       const token = await generateJwtToken(user.uid);
       setAuthToken(token);
+      console.log("✅ New JWT token generated for authentication", token);
       console.log("✅ New JWT token generated for authentication");
       return true;
     }

@@ -105,15 +105,30 @@ export default function AdminOrders() {
             o.orderStatus?.toLowerCase() === "delivered" ||
             o.status?.toLowerCase() === "completed"
         )
-        .reduce(
-          (sum: number, o: any) => sum + (o.totalAmount || o.total || 0),
-          0
-        ),
+        .reduce((sum: number, o: any) => {
+          const orderAmount = Number(o.totalAmount || o.total || 0);
+          return (
+            sum +
+            (!isNaN(orderAmount) && isFinite(orderAmount) ? orderAmount : 0)
+          );
+        }, 0),
     };
     return stats;
   };
 
   const stats = getOrderStats();
+
+  // Ensure all stats are valid numbers
+  const safeStats = {
+    total: Number(stats.total) || 0,
+    completed: Number(stats.completed) || 0,
+    processing: Number(stats.processing) || 0,
+    pending: Number(stats.pending) || 0,
+    totalRevenue: Number(stats.totalRevenue) || 0,
+  };
+
+  console.log("📊 Orders page stats:", stats);
+  console.log("🛡️ Safe orders stats:", safeStats);
 
   if (ordersLoading) {
     return (
@@ -170,7 +185,7 @@ export default function AdminOrders() {
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-bold">{safeStats.total}</div>
           </CardContent>
         </Card>
         <Card>
@@ -179,7 +194,7 @@ export default function AdminOrders() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {stats.completed}
+              {safeStats.completed}
             </div>
           </CardContent>
         </Card>
@@ -189,7 +204,7 @@ export default function AdminOrders() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {stats.processing}
+              {safeStats.processing}
             </div>
           </CardContent>
         </Card>
@@ -199,7 +214,7 @@ export default function AdminOrders() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {stats.pending}
+              {safeStats.pending}
             </div>
           </CardContent>
         </Card>
@@ -209,7 +224,7 @@ export default function AdminOrders() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              £{stats.totalRevenue.toFixed(2)}
+              £{safeStats.totalRevenue.toFixed(2)}
             </div>
           </CardContent>
         </Card>
@@ -281,7 +296,10 @@ export default function AdminOrders() {
                         items
                       </TableCell>
                       <TableCell className="font-medium">
-                        £{(order.total || order.totalAmount || 0).toFixed(2)}
+                        £
+                        {(
+                          Number(order.total || order.totalAmount || 0) || 0
+                        ).toFixed(2)}
                       </TableCell>
                       <TableCell>
                         {getStatusBadge(order.status || order.orderStatus)}

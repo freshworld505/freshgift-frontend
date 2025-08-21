@@ -85,6 +85,7 @@ export function SalesChart() {
 
       // Get orders data and process it by month
       const orders = await getAllOrders();
+      console.log("📊 SalesChart: Fetched orders:", orders?.length || 0);
 
       // Process orders data to get monthly sales and orders
       const monthlyData = orders.reduce((acc: any, order: any) => {
@@ -97,7 +98,11 @@ export function SalesChart() {
           acc[key] = { month: key, sales: 0, orders: 0 };
         }
 
-        acc[key].sales += order.totalAmount || order.total || 0;
+        // Ensure totalAmount is a valid number
+        const orderAmount = Number(order.totalAmount || order.total || 0);
+        if (!isNaN(orderAmount) && isFinite(orderAmount)) {
+          acc[key].sales += orderAmount;
+        }
         acc[key].orders += 1;
 
         return acc;
@@ -109,8 +114,13 @@ export function SalesChart() {
           (a: any, b: any) =>
             new Date(a.month).getTime() - new Date(b.month).getTime()
         )
-        .slice(-6);
+        .slice(-6)
+        .map((item: any) => ({
+          ...item,
+          sales: Number(item.sales.toFixed(2)), // Round sales to 2 decimal places
+        }));
 
+      console.log("📊 SalesChart: Processed data:", sortedData);
       setChartData(sortedData);
     } catch (error) {
       console.error("Error fetching sales data:", error);
@@ -157,6 +167,10 @@ export function SalesChart() {
               boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
               backdropFilter: "blur(10px)",
             }}
+            formatter={(value: any, name: string) => [
+              name === "Sales (£)" ? `£${Number(value).toFixed(2)}` : value,
+              name,
+            ]}
           />
           <Legend />
           <Line
@@ -203,6 +217,7 @@ export function RevenueChart() {
 
       // Get recent orders for the last week
       const orders = await getAllOrders();
+      console.log("📊 RevenueChart: Fetched orders:", orders?.length || 0);
 
       // Process orders data to get daily revenue for the last 7 days
       const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -223,11 +238,22 @@ export function RevenueChart() {
         );
 
         if (dayIndex !== -1) {
-          last7Days[dayIndex].revenue += order.totalAmount || order.total || 0;
+          // Ensure totalAmount is a valid number
+          const orderAmount = Number(order.totalAmount || order.total || 0);
+          if (!isNaN(orderAmount) && isFinite(orderAmount)) {
+            last7Days[dayIndex].revenue += orderAmount;
+          }
         }
       });
 
-      setChartData(last7Days);
+      // Round revenue values to 2 decimal places
+      const roundedData = last7Days.map((day) => ({
+        ...day,
+        revenue: Number(day.revenue.toFixed(2)),
+      }));
+
+      console.log("📊 RevenueChart: Processed data:", roundedData);
+      setChartData(roundedData);
     } catch (error) {
       console.error("Error fetching revenue data:", error);
       // Fallback to mock data
@@ -274,6 +300,10 @@ export function RevenueChart() {
               boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
               backdropFilter: "blur(10px)",
             }}
+            formatter={(value: any, name: string) => [
+              name === "revenue" ? `£${Number(value).toFixed(2)}` : value,
+              name === "revenue" ? "Revenue" : name,
+            ]}
           />
           <Area
             type="monotone"
@@ -306,10 +336,17 @@ export function CategoryChart() {
       const categoryPromises = PRODUCT_CATEGORIES.map(async (category) => {
         try {
           const response = await getTotalRevenueAndOrdersByCategory(category);
+          // Ensure revenue is a valid number
+          const revenue = Number(response.totalRevenue || 0);
+          const orders = Number(response.totalOrders || 0);
+
           return {
             name: category,
-            value: response.totalRevenue || 0,
-            orders: response.totalOrders || 0,
+            value:
+              !isNaN(revenue) && isFinite(revenue)
+                ? Number(revenue.toFixed(2))
+                : 0,
+            orders: !isNaN(orders) && isFinite(orders) ? orders : 0,
             color: getCategoryColor(category),
           };
         } catch (error) {
@@ -324,6 +361,7 @@ export function CategoryChart() {
       });
 
       const categoryData = await Promise.all(categoryPromises);
+      console.log("📊 CategoryChart: Fetched category data:", categoryData);
 
       // Filter out categories with no revenue and sort by value
       const filteredData = categoryData
@@ -331,6 +369,7 @@ export function CategoryChart() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 6); // Show top 6 categories
 
+      console.log("📊 CategoryChart: Processed data:", filteredData);
       setChartData(filteredData);
     } catch (error) {
       console.error("Error fetching category data:", error);
@@ -405,6 +444,10 @@ export function CategoryChart() {
               boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
               backdropFilter: "blur(10px)",
             }}
+            formatter={(value: any, name: string) => [
+              `£${Number(value).toFixed(2)}`,
+              "Revenue",
+            ]}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -422,6 +465,7 @@ export function OrdersChart() {
 
       // Get orders data and process it by month
       const orders = await getAllOrders();
+      console.log("📊 OrdersChart: Fetched orders:", orders?.length || 0);
 
       // Process orders data to get monthly order counts
       const monthlyData = orders.reduce((acc: any, order: any) => {
@@ -472,6 +516,7 @@ export function OrdersChart() {
         orders: monthlyData[month]?.orders || 0,
       }));
 
+      console.log("📊 OrdersChart: Processed data:", chartData);
       setChartData(chartData);
     } catch (error) {
       console.error("Error fetching orders data:", error);

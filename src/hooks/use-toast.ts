@@ -10,7 +10,7 @@ import type {
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 10000
-const TOAST_DISPLAY_DURATION = 1000 // 1000 second display time
+const TOAST_DISPLAY_DURATION = 2000 // 2000 second display time
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode

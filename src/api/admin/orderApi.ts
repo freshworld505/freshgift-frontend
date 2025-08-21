@@ -1,7 +1,10 @@
 import { ensureAuthenticated } from './authTokenHelper';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/orders';
+const API_BASE_URL = 'http://localhost:5003/api/orders';
+const API_BASE_URL_FOR_SHIPPING = 'http://localhost:5003/api';
+const API_BASE_URL_FOR_RECURRING = 'http://localhost:5003/api/recurring';
+const API_BASE_URL_FOR_BALANCE = 'http://localhost:5003/api/orders/admin';
 
 // Valid refund status values
 type RefundStatus = 'Pending' | 'Approved' | 'Refunded';
@@ -245,8 +248,7 @@ export const getOrderById = async (orderId: string): Promise<any> => {
 }
 
 // Admin apis for recurring orders
-const API_BASE_URL_FOR_RECURRING = 'https://freshgiftbackend.onrender.com/api/recurring';
-//const API_BASE_URL_FOR_RECURRING = 'http://localhost:5004/api/recurring';
+//const API_BASE_URL_FOR_RECURRING = 'https://freshgiftbackend.onrender.com/api/recurring';
 
 // Get all recurring orders
 export const getAllRecurringOrders = async (): Promise<RecurringOrder[]> => {
@@ -258,4 +260,123 @@ export const getAllRecurringOrders = async (): Promise<RecurringOrder[]> => {
   }
   //console.log("✅ All recurring orders fetched successfully:", response.data.recurringOrders);
   return response.data.recurringOrders;  
+}
+
+interface ShippingCostResponse {
+  message: string;
+  shippingCharge: number;
+  freeShippingThreshold: number;
+}
+
+export const getShippingDetails = async (): Promise<ShippingCostResponse> => {
+  try {
+    await ensureAuthenticated();
+    const response = await axios.get<ShippingCostResponse>(`${API_BASE_URL_FOR_SHIPPING}/shipping/settings`);
+
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error fetching shipping details:", error);
+    throw error;
+  }
+}
+
+interface UpdateShippingResponse {
+  message: string;
+  shippingCharge: number;
+  freeShippingThreshold: number;
+}
+
+export const updateShippingDetails = async (data: {
+  shippingCharge: number;
+  freeShippingThreshold: number;
+}): Promise<UpdateShippingResponse> => {
+  try {
+    await ensureAuthenticated();
+    const response = await axios.put(`${API_BASE_URL_FOR_SHIPPING}/shipping/admin/update`, data);
+
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+
+    console.log("✅ Shipping details updated successfully:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error updating shipping details:", error);
+    throw error;
+  }
+}
+ 
+interface StripeBalanceAmount {
+  amount: number;
+  currency: string;
+}
+
+interface StripeTransaction {
+  id: string;
+  amount: number;
+  currency: string;
+  type: string;
+  status: string;
+  description: string | null;
+  createdAt: string;
+  fee: number;
+  net: number;
+}
+
+interface StripeBalanceData {
+  available: StripeBalanceAmount[];
+  pending: StripeBalanceAmount[];
+  recentTransactions: StripeTransaction[];
+}
+
+interface StripeBalanceResponse {
+  balance: StripeBalanceData;
+}
+
+// Get Stripe balance for admin dashboard
+export const getStripeBalance = async (): Promise<StripeBalanceResponse> => {
+  try {
+    await ensureAuthenticated();
+    const response = await axios.get<StripeBalanceResponse>(`${API_BASE_URL_FOR_BALANCE}/stripe/balance`);
+
+    if (!response.data) {
+      console.error("❌ No data received from API");
+      throw new Error("No data received from API");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error fetching Stripe balance:", error);
+    throw error;
+  }
+}
+
+// stripe payout button (amount must be > 1 gbp)
+
+export const createStripePayout = async (amount: number, currency: string): Promise<void> => {
+  try {
+    if (amount <= 1) {
+      throw new Error("Amount must be greater than 1 GBP");
+    }
+
+    await ensureAuthenticated();
+    const response = await axios.post(`${API_BASE_URL_FOR_BALANCE}/stripe/manual-payout`, { amount, currency });
+
+    if (response.status === 200) {
+      console.log(`✅ Stripe payout of ${amount} ${currency} created successfully`);
+    } else {
+      console.error("❌ Failed to create Stripe payout:", response.data);
+      throw new Error(response.data?.message || "Failed to create Stripe payout");
+    }
+  } catch (error) {
+    console.error("❌ Error creating Stripe payout:", error);
+    throw error;
+  }
 }

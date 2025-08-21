@@ -67,6 +67,11 @@ const sidebarItems = [
     href: "/admin/business-requests",
     icon: Users,
   },
+  {
+    title: "Shippings and Payouts",
+    href: "/admin/shippings-and-payouts",
+    icon: Settings,
+  },
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {

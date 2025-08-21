@@ -2,7 +2,7 @@ import { ensureAuthenticated } from './authTokenHelper';
 import axios from 'axios';
 
 
-const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/coupons';
+const API_BASE_URL = 'http://localhost:5003/api/coupons';
 
 // Create a new coupon
 export const createCoupon = async (couponData: {
@@ -45,8 +45,8 @@ export const assignCouponToAllUsers = async (couponCode: string): Promise<any> =
 export const getAllCoupons = async (): Promise<any[]> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.get(`https://freshgiftbackend.onrender.com/api/coupons/admin/coupons/all`);
-    
+    const response = await axios.get(`http://localhost:5003/api/coupons/admin/coupons/all`);
+
     // Check if response has the expected structure
     if (!response.data || !response.data.userCoupons || !Array.isArray(response.data.userCoupons)) {
       console.error("❌ Invalid data received from API");
@@ -68,7 +68,7 @@ export const getAllCoupons = async (): Promise<any[]> => {
 export const assignCouponToUserArray = async (userIds: string[], couponCode: string): Promise<any> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.post(`https://freshgiftbackend.onrender.com/api/coupons/assign-multiple`, { userIds, couponCode });
+    const response = await axios.post(`http://localhost:5003/api/coupons/assign-multiple`, { userIds, couponCode });
     //console.log("✅ Coupon assigned to users successfully:", response.data);
     return response.data;
   } catch (error) {

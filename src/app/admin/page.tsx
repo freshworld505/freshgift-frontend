@@ -58,6 +58,20 @@ export default function AdminDashboard() {
   // Use actual stats or defaults
   const currentStats = stats || defaultStats;
 
+  // Ensure all numeric values are valid numbers
+  const safeStats = {
+    totalRevenue: Number(currentStats.totalRevenue) || 0,
+    totalOrders: Number(currentStats.totalOrders) || 0,
+    totalProducts: Number(currentStats.totalProducts) || 0,
+    totalUsers: Number(currentStats.totalUsers) || 0,
+    revenueChange: Number(currentStats.revenueChange) || 0,
+    ordersChange: Number(currentStats.ordersChange) || 0,
+    usersChange: Number(currentStats.usersChange) || 0,
+  };
+
+  console.log("🎯 Current stats in dashboard:", currentStats);
+  console.log("🛡️ Safe stats in dashboard:", safeStats);
+
   // Handle refresh with toast notification
   const handleRefresh = async () => {
     try {
@@ -177,22 +191,22 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              £{currentStats.totalRevenue.toLocaleString()}
+              £{safeStats.totalRevenue.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-muted-foreground">
-              {currentStats.revenueChange > 0 ? (
+              {safeStats.revenueChange > 0 ? (
                 <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
               ) : (
                 <TrendingDown className="h-3 w-3 mr-1 text-red-500" />
               )}
               <span
                 className={
-                  currentStats.revenueChange > 0
+                  safeStats.revenueChange > 0
                     ? "text-green-500"
                     : "text-red-500"
                 }
               >
-                {Math.abs(currentStats.revenueChange)}%
+                {Math.abs(safeStats.revenueChange)}%
               </span>
               <span className="ml-1">from last month</span>
             </div>
@@ -206,13 +220,11 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentStats.totalOrders.toLocaleString()}
+              {safeStats.totalOrders.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              <span className="text-green-500">
-                {currentStats.ordersChange}%
-              </span>
+              <span className="text-green-500">{safeStats.ordersChange}%</span>
               <span className="ml-1">from last month</span>
             </div>
           </CardContent>
@@ -227,7 +239,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentStats.totalProducts.toLocaleString()}
+              {safeStats.totalProducts.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-muted-foreground">
               <TrendingDown className="h-3 w-3 mr-1 text-red-500" />
@@ -244,13 +256,11 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentStats.totalUsers.toLocaleString()}
+              {safeStats.totalUsers.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-              <span className="text-green-500">
-                {currentStats.usersChange}%
-              </span>
+              <span className="text-green-500">{safeStats.usersChange}%</span>
               <span className="ml-1">from last month</span>
             </div>
           </CardContent>

@@ -30,7 +30,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { use, useEffect, useState } from "react";
-import { getStripeCompatibleAmount } from "@/lib/currency";
+import { getStripeCompatibleAmount, convertToPence } from "@/lib/currency";
 import type {
   TimeSlot,
   CreateOrderRequest,
@@ -755,9 +755,20 @@ export default function CheckoutForm() {
         addressIdentifier, // Use addressId for payment intent
         appliedCoupon?.coupon.code // couponCode
       );
+      console.log("🚀✅🚀❤️Payment Intent Response:", paymentIntentResponse);
 
       // Store the payment intent data and checkout data
-      setPaymentIntentData(paymentIntentResponse);
+      // Convert amount to pence for StripePaymentForm (it expects pence)
+      const amountInPence = convertToPence(paymentIntentResponse.amount);
+      console.log("💰 Converting amount for Stripe:", {
+        originalAmount: paymentIntentResponse.amount,
+        amountInPence: amountInPence,
+      });
+
+      setPaymentIntentData({
+        ...paymentIntentResponse,
+        amount: amountInPence,
+      });
       setCheckoutData({
         values,
         scheduledTime,

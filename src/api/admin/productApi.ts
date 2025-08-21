@@ -48,8 +48,8 @@ interface EditProductData {
   productImages?: string[];
 }
 
-const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/products';
-//const API_BASE_URL = 'http://localhost:5004/api/products';
+//const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/products';
+const API_BASE_URL = 'http://localhost:5003/api/products';
 
 // Create a new product
 export async function createProduct(productData: any) {

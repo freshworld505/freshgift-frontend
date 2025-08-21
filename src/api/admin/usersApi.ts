@@ -1,7 +1,7 @@
 import { ensureAuthenticated } from './authTokenHelper';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api';
+const API_BASE_URL = 'http://localhost:5003/api';
 
 // User interface based on the API response format
 export interface AdminUser {
@@ -233,8 +233,8 @@ interface TopUsersResponse {
 export const getTopUsersForCoupons = async (): Promise<TopUsers[]> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.get(`https://freshgiftbackend.onrender.com/api/users/admin/top-users`);
-    
+    const response = await axios.get(`http://localhost:5003/api/users/admin/top-users`);
+
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");
