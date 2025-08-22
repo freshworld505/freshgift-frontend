@@ -97,6 +97,7 @@ export default function CartDisplay() {
   const [showCardForm, setShowCardForm] = useState(false);
   const [frequency, setFrequency] = useState("Weekly");
   const [dayOfWeek, setDayOfWeek] = useState(1); // Monday
+  const [executionTime, setExecutionTime] = useState("09:00"); // Default to 9:00 AM
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
@@ -276,6 +277,7 @@ export default function CartDisplay() {
         dayOfWeek: dayOfWeek,
         addressId: selectedAddressId,
         paymentMethodId: paymentMethodId,
+        executionTime: executionTime,
       };
 
       // Create recurring order
@@ -920,8 +922,8 @@ export default function CartDisplay() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="Daily">Daily</SelectItem>
                     <SelectItem value="Weekly">Weekly</SelectItem>
-                    <SelectItem value="Bi-weekly">Bi-weekly</SelectItem>
                     <SelectItem value="Monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
@@ -933,9 +935,14 @@ export default function CartDisplay() {
                 <Select
                   value={dayOfWeek.toString()}
                   onValueChange={(value) => setDayOfWeek(parseInt(value))}
+                  disabled={frequency === "Daily"}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue
+                      placeholder={
+                        frequency === "Daily" ? "Every day" : "Select day"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="1">Monday</SelectItem>
@@ -947,6 +954,31 @@ export default function CartDisplay() {
                     <SelectItem value="0">Sunday</SelectItem>
                   </SelectContent>
                 </Select>
+                {frequency === "Daily" && (
+                  <p className="text-xs text-gray-500">
+                    Daily orders will be delivered every day at the selected
+                    time
+                  </p>
+                )}
+              </div>
+
+              {/* Execution Time Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Payment Time
+                </label>
+                <Input
+                  type="time"
+                  value={executionTime}
+                  onChange={(e) => setExecutionTime(e.target.value)}
+                  className="w-full"
+                  min="06:00"
+                  max="22:00"
+                />
+                <p className="text-xs text-gray-500">
+                  Choose your preferred payment time (00:05 AM - 11:55 PM)
+                </p>
               </div>
 
               {/* Address Selection */}
@@ -1000,9 +1032,14 @@ export default function CartDisplay() {
                   <p>
                     <span className="font-medium">Frequency:</span> {frequency}
                   </p>
+                  {frequency !== "Daily" && (
+                    <p>
+                      <span className="font-medium">Day:</span>{" "}
+                      {getDayName(dayOfWeek)}
+                    </p>
+                  )}
                   <p>
-                    <span className="font-medium">Day:</span>{" "}
-                    {getDayName(dayOfWeek)}
+                    <span className="font-medium">Time:</span> {executionTime}
                   </p>
                   <p>
                     <span className="font-medium">Items:</span> {items.length}{" "}

@@ -243,11 +243,10 @@ export default function AdminUsers() {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
-                  <TableHead>Orders</TableHead>
-                  <TableHead>Total Spent</TableHead>
+
                   <TableHead>Status</TableHead>
                   <TableHead>Join Date</TableHead>
-                  <TableHead>Last Login</TableHead>
+
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -273,8 +272,7 @@ export default function AdminUsers() {
                       <TableCell className="text-gray-600">
                         {user.phone || user.phoneNumber || "N/A"}
                       </TableCell>
-                      <TableCell>N/A</TableCell>
-                      <TableCell className="font-medium">£0.00</TableCell>
+
                       <TableCell>{getStatusBadge(user)}</TableCell>
                       <TableCell>
                         {user.joinDate ||
@@ -282,12 +280,7 @@ export default function AdminUsers() {
                             ? new Date(user.createdAt).toLocaleDateString()
                             : "N/A")}
                       </TableCell>
-                      <TableCell>
-                        {user.lastLogin ||
-                          (user.lastLoginAt
-                            ? new Date(user.lastLoginAt).toLocaleDateString()
-                            : "N/A")}
-                      </TableCell>
+
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
                           <Button variant="outline" size="sm">

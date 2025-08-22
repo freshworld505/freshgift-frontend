@@ -241,9 +241,10 @@ interface CreateRecurringOrderRequest {
     quantity: number;
   }[];
   frequency: string;
-  dayOfWeek: number; // 0 = Sunday, 6 = Saturday
+  dayOfWeek?: number; // 0 = Sunday, 6 = Saturday
   addressId: string;
   paymentMethodId: string;
+  executionTime?: string; //HH:MM" format (24-hour) - Required for Daily
 }
 export const createRecurringOrder = async (orderData: CreateRecurringOrderRequest): Promise<string> => {
   return withAuthentication(async () => {
