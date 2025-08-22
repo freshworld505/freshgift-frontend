@@ -127,8 +127,8 @@ export default function AdminOrders() {
     totalRevenue: Number(stats.totalRevenue) || 0,
   };
 
-  console.log("📊 Orders page stats:", stats);
-  console.log("🛡️ Safe orders stats:", safeStats);
+  //console.log("📊 Orders page stats:", stats);
+  //console.log("🛡️ Safe orders stats:", safeStats);
 
   if (ordersLoading) {
     return (

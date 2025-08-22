@@ -1,7 +1,7 @@
 import { ensureAuthenticated } from './authTokenHelper';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5003/api';
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
 
 // User interface based on the API response format
 export interface AdminUser {
@@ -47,7 +47,7 @@ export const getAllUsers = async (): Promise<AdminUser[]> => {
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Users fetched successfully:", response.data);
+    //console.log("✅ Users fetched successfully:", response.data);
     
     // Handle the response format
     const apiData = response.data as UsersResponse;
@@ -83,7 +83,7 @@ export const getAllCustomersCount = async (): Promise<CustomerCountResponse> => 
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Customer count fetched successfully:", response.data);
+    //console.log("✅ Customer count fetched successfully:", response.data);
     
     // Handle the response format
     const apiData = response.data as CustomerCountResponse;
@@ -118,7 +118,7 @@ export const getNewUsersBetweenDates = async (startDate: string, endDate: string
       throw new Error("No data received from API");
     }
 
-    console.log("✅ New users fetched successfully:", response.data);
+    //console.log("✅ New users fetched successfully:", response.data);
     
     // Handle the response format
     const apiData = response.data as NewUsersResponse;
@@ -151,7 +151,7 @@ export const promoteUserToAdmin = async (userId: string): Promise<AdminUser> => 
       throw new Error("No data received from API");
     }
 
-    console.log("✅ User promoted to admin successfully:", response.data);
+    //console.log("✅ User promoted to admin successfully:", response.data);
     
     // Handle the response format
     const apiData = response.data as AdminUser;
@@ -179,7 +179,7 @@ export const toggleUserStatus = async (userId: string, action: 'block' | 'unbloc
       throw new Error("No data received from API");
     }
 
-    console.log(`✅ User ${action}ed successfully:`, response.data);
+    //console.log(`✅ User ${action}ed successfully:`, response.data);
     return response.data.user || response.data;
   } catch (error: any) {
     console.error(`❌ Error ${action}ing user:`, {
@@ -203,7 +203,7 @@ export const getUserById = async (userId: string): Promise<AdminUser> => {
       throw new Error("No data received from API");
     }
 
-    console.log("✅ User details fetched successfully:", response.data);
+    //console.log("✅ User details fetched successfully:", response.data);
     return response.data.user || response.data;
   } catch (error: any) {
     console.error("❌ Error fetching user details:", {
@@ -233,14 +233,14 @@ interface TopUsersResponse {
 export const getTopUsersForCoupons = async (): Promise<TopUsers[]> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.get(`http://localhost:5003/api/users/admin/top-users`);
+    const response = await axios.get(`${API_BASE_URL}/users/admin/top-users`);
 
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Top users for coupons fetched successfully:", response.data);
+    //console.log("✅ Top users for coupons fetched successfully:", response.data);
     
     // Handle the response format
     const apiData = response.data as TopUsersResponse;
@@ -293,7 +293,7 @@ export const getActiveAndInactiveUsers = async (): Promise<ActiveInactiveUsersRe
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Active and inactive users fetched successfully:", response.data);
+    //console.log("✅ Active and inactive users fetched successfully:", response.data);
     
     // Handle the response format
     const apiData = response.data as ActiveInactiveUsersResponse;

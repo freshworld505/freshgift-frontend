@@ -97,7 +97,7 @@ const Page = () => {
       setFormData(safeSettings);
       setHasChanges(false);
 
-      console.log("📦 Shipping settings loaded:", safeSettings);
+      //console.log("📦 Shipping settings loaded:", safeSettings);
     } catch (error) {
       console.error("❌ Error fetching shipping settings:", error);
       toast({
@@ -135,7 +135,7 @@ const Page = () => {
       };
 
       setStripeBalance(safeBalance);
-      console.log("💳 Stripe balance loaded:", safeBalance);
+      //console.log("💳 Stripe balance loaded:", safeBalance);
     } catch (error) {
       console.error("❌ Error fetching Stripe balance:", error);
       toast({
@@ -188,7 +188,7 @@ const Page = () => {
         variant: "default",
       });
 
-      console.log("✅ Shipping settings updated:", validatedData);
+      //console.log("✅ Shipping settings updated:", validatedData);
     } catch (error) {
       console.error("❌ Error updating shipping settings:", error);
       toast({
@@ -260,7 +260,7 @@ const Page = () => {
       setPayoutAmount("");
       fetchStripeBalance();
 
-      console.log(`✅ Payout created: £${amount.toFixed(2)}`);
+      //console.log(`✅ Payout created: £${amount.toFixed(2)}`);
     } catch (error: any) {
       console.error("❌ Error creating payout:", error);
       toast({

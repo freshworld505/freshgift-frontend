@@ -33,8 +33,7 @@ export const PRODUCT_TAGS = [
 ];
 
 // Base URL for the API
-//const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/orders/admin';
-const API_BASE_URL = 'http://localhost:5003/api/orders/admin';
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/admin`;
 
 // Total orders revenue
 export const getTotalOrdersRevenue = async (): Promise<number> => {
@@ -47,7 +46,7 @@ export const getTotalOrdersRevenue = async (): Promise<number> => {
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ Total orders revenue fetched successfully:", response.data);
+    //console.log("✅ Total orders revenue fetched successfully:", response.data);
     return response.data.totalRevenue;
   } catch (error) {
     console.error("❌ Error fetching total orders revenue:", error);
@@ -66,7 +65,7 @@ export const getTotalRevenueAndOrdersByCategory = async (category: string): Prom
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ Total revenue and orders by category fetched successfully:", response.data);
+    //console.log("✅ Total revenue and orders by category fetched successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error fetching total revenue and orders by category:", error);
@@ -85,7 +84,7 @@ export const getTotalOrdersAndRevenueBySubcategory = async (subCategory: string)
       throw new Error("Invalid data received from API");
     }
 
-    console.log("✅ Total orders and revenue by subcategory fetched successfully:", response.data);
+    //console.log("✅ Total orders and revenue by subcategory fetched successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error fetching total orders and revenue by subcategory:", error);
@@ -104,7 +103,7 @@ export const getTotalOrdersAndRevenueByTag = async (tag: string): Promise<any> =
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ Total orders and revenue by tag fetched successfully:", response.data);
+    //console.log("✅ Total orders and revenue by tag fetched successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error fetching total orders and revenue by tag:", error);
@@ -138,7 +137,7 @@ export const getTotalOrdersAndRevenueByDateRange = async (
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ Total orders and revenue by date range fetched successfully:", response.data);
+    //console.log("✅ Total orders and revenue by date range fetched successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error fetching total orders and revenue by date range:", error);
@@ -157,7 +156,7 @@ export const getAllOrders = async (): Promise<any[]> => {
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ All orders fetched successfully:", response.data);
+    //console.log("✅ All orders fetched successfully:", response.data);
     return response.data.orders;
   } catch (error) {
     console.error("❌ Error fetching all orders:", error);
@@ -178,7 +177,7 @@ export const getRecentOrders = async (limit: number = 10): Promise<any[]> => {
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ Recent orders fetched successfully:", response.data);
+    //console.log("✅ Recent orders fetched successfully:", response.data);
     return response.data.recentOrders;
   } catch (error) {
     console.error("❌ Error fetching recent orders:", error);
@@ -197,7 +196,7 @@ export const getTopSellingProducts = async (): Promise<any[]> => {
       throw new Error("Invalid data received from API");
     }
     
-    console.log("✅ Top selling products fetched successfully:", response.data);
+    //console.log("✅ Top selling products fetched successfully:", response.data);
     return response.data.topSellingProducts;
   } catch (error) {
     console.error("❌ Error fetching top selling products:", error);

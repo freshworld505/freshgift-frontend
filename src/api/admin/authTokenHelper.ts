@@ -11,7 +11,7 @@ export const setAuthToken = (token: string | null) => {
     // Apply token to every request if available
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     cachedToken = token;
-    console.log("✅ Auth token set for API requests");
+    //console.log("✅ Auth token set for API requests");
     // Set token expiration to 50 minutes from now (assuming 1 hour token validity)
     tokenExpiration = Date.now() + (50 * 60 * 1000);
   } else {
@@ -19,23 +19,23 @@ export const setAuthToken = (token: string | null) => {
     delete axios.defaults.headers.common['Authorization'];
     cachedToken = null;
     tokenExpiration = null;
-    console.log("⚠️ Auth token removed from API requests");
+    //console.log("⚠️ Auth token removed from API requests");
   }
 }
 
 // Check if current token is still valid
 const isTokenValid = (): boolean => {
-  console.log("Checking if token is valid...");
+  //console.log("Checking if token is valid...");
   return cachedToken !== null && tokenExpiration !== null && Date.now() < tokenExpiration;
 }
 
 // Generate jwt token for API authorization
 export const generateJwtToken = async (userId: string): Promise<string> => {
   try {
-    const response = await axios.post(`http://localhost:5003/api/auth/generatetoken`, { firebaseId: userId });
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/generatetoken`, { firebaseId: userId });
     if (response.data && response.data.jwt) {
       setAuthToken(response.data.jwt);
-      console.log("✅ JWT token generated and set for API authorization");
+      //console.log("✅ JWT token generated and set for API authorization");
       return response.data.jwt;
     } else {
       console.error("❌ Failed to generate JWT token:", response.data);
@@ -52,7 +52,7 @@ export const getTokenForApiCalls = async (): Promise<string | null> => {
   try {
     // Check if we have a valid cached token first
     if (isTokenValid()) {
-      console.log("✅ Using cached JWT token");
+      //console.log("✅ Using cached JWT token");
       return cachedToken;
     }
 
@@ -66,10 +66,10 @@ export const getTokenForApiCalls = async (): Promise<string | null> => {
       }
       // Set the JWT token for API calls
       setAuthToken(token);
-      console.log("✅ New JWT Token retrieved and set for API calls");
+      //console.log("✅ New JWT Token retrieved and set for API calls");
       return token;
     } else {
-      console.log("⚠️ No user is signed in, cannot retrieve token");
+      //console.log("⚠️ No user is signed in, cannot retrieve token");
       setAuthToken(null);
       return null;
     }
@@ -85,7 +85,7 @@ export const ensureAuthenticated = async (): Promise<boolean> => {
   try {
     // Check if we have a valid cached token first
     if (isTokenValid()) {
-      console.log("✅ Using cached token for authentication");
+      //console.log("✅ Using cached token for authentication");
       return true;
     }
 
@@ -96,8 +96,8 @@ export const ensureAuthenticated = async (): Promise<boolean> => {
       // Only generate new token if cached one is invalid/expired
       const token = await generateJwtToken(user.uid);
       setAuthToken(token);
-      console.log("✅ New JWT token generated for authentication", token);
-      console.log("✅ New JWT token generated for authentication");
+      //console.log("✅ New JWT token generated for authentication", token);
+      //console.log("✅ New JWT token generated for authentication");
       return true;
     }
     return false;

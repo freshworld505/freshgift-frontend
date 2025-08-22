@@ -208,9 +208,9 @@ export const useAdminStore = create<AdminState>()(
 
       fetchRecentOrders: async (limit = 5) => {
         try {
-          console.log(`🔄 Fetching ${limit} recent orders...`);
+          //console.log(`🔄 Fetching ${limit} recent orders...`);
           const recentOrders = await getRecentOrders(limit);
-          console.log("✅ Recent orders fetched from API:", recentOrders?.length || 0);
+          //console.log("✅ Recent orders fetched from API:", recentOrders?.length || 0);
           set({ recentOrders });
         } catch (error: any) {
           console.warn('⚠️ Recent orders API failed, trying fallback with regular orders');
@@ -223,10 +223,10 @@ export const useAdminStore = create<AdminState>()(
               const fallbackRecentOrders = orders
                 .sort((a: any, b: any) => new Date(b.createdAt || b.orderDate || 0).getTime() - new Date(a.createdAt || a.orderDate || 0).getTime())
                 .slice(0, limit);
-              console.log("✅ Using fallback recent orders:", fallbackRecentOrders?.length || 0);
+              //console.log("✅ Using fallback recent orders:", fallbackRecentOrders?.length || 0);
               set({ recentOrders: fallbackRecentOrders });
             } else {
-              console.log("📋 No orders available for fallback");
+              //console.log("📋 No orders available for fallback");
               set({ recentOrders: [] });
             }
           } catch (fallbackError) {
@@ -238,9 +238,9 @@ export const useAdminStore = create<AdminState>()(
 
       fetchTopProducts: async () => {
         try {
-          console.log("🔄 Fetching top products...");
+          //console.log("🔄 Fetching top products...");
           const topProducts = await getTopSellingProducts();
-          console.log("✅ Top products fetched from API:", topProducts?.length || 0);
+          //console.log("✅ Top products fetched from API:", topProducts?.length || 0);
           set({ topProducts });
         } catch (error: any) {
           console.warn('⚠️ Top products API failed, trying fallback with regular products');
@@ -260,10 +260,10 @@ export const useAdminStore = create<AdminState>()(
                   revenue: product.finalPrice,
                   sales: product.stock || 0, // Mock sales data
                 }));
-              console.log("✅ Using fallback top products:", fallbackTopProducts?.length || 0);
+              //console.log("✅ Using fallback top products:", fallbackTopProducts?.length || 0);
               set({ topProducts: fallbackTopProducts });
             } else {
-              console.log("📋 No products available for fallback");
+              //console.log("📋 No products available for fallback");
               set({ topProducts: [] });
             }
           } catch (fallbackError) {

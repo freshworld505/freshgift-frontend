@@ -4,7 +4,7 @@ import { ensureAuthenticated, getAuthHeaders, withAuthentication } from './ensur
 
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`;
 const API_BASE_URL_USER = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users`;
-//const API_BASE_URL_USER = `http://localhost:5004/api/users`;
+const API_BASE_URL_BASE = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
 
 
 // API response types
@@ -58,7 +58,7 @@ export const switchUserRole = async (): Promise<void> => {
   return withAuthentication(async () => {
     try {
       const response = await axios.put(`${API_BASE_URL_USER}/switch-mode`);
-      console.log("🔄 Switching user role...")
+      //console.log("🔄 Switching user role...")
       //console.log("🔄 Switching user role to:", response.data.mode);
       // Ensure the response contains the expected data
       if (!response.data || !response.data.mode) {
@@ -425,7 +425,7 @@ export const getMostBoughtProducts = async (): Promise<MostBoughtProduct[]> => {
     try {
       //await ensureAuthenticated();
     //const response = await axios.get(`${API_BASE_URL}/most-bought`);
-    const response = await axios.get(`https://freshgiftbackend.onrender.com/api/orders/most-bought-products`);
+    const response = await axios.get(`${API_BASE_URL_BASE}/api/orders/most-bought-products`);
     if (!response.data) {
       console.error("❌ No data received from API");
       throw new Error("No data received from API");

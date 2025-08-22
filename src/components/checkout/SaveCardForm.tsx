@@ -70,8 +70,8 @@ const SaveCardFormContent = ({
       }
 
       // ✅ Console log the payment method ID as requested
-      console.log("Payment Method ID:", paymentMethod.id);
-      console.log("Full Payment Method:", paymentMethod);
+      //console.log("Payment Method ID:", paymentMethod.id);
+      //console.log("Full Payment Method:", paymentMethod);
 
       if (onSuccess) {
         setMessage("Card saved successfully! Placing your order...");

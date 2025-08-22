@@ -107,7 +107,7 @@ export default function CartDisplay() {
   const getShippingDetailsCart = async () => {
     try {
       const details = await getShippingDetails();
-      console.log("Shipping details:", details);
+      //console.log("Shipping details:", details);
       setShippingDetails(details);
     } catch (error) {
       console.error("Error fetching shipping details:", error);
@@ -126,7 +126,7 @@ export default function CartDisplay() {
         try {
           const success = await registerFCMToken("web");
           if (success) {
-            console.log("✅ FCM token registered successfully for cart user");
+            console.log("");
           } else {
             console.log("⚠️ FCM token registration failed");
           }
@@ -171,8 +171,8 @@ export default function CartDisplay() {
   // Debug available coupons
   useEffect(() => {
     const availableCoupons = getAvailableCoupons();
-    console.log("🎫 Available coupons:", availableCoupons);
-    console.log("🎫 All coupons:", coupons);
+    //console.log("🎫 Available coupons:", availableCoupons);
+    //console.log("🎫 All coupons:", coupons);
   }, [coupons, getAvailableCoupons]);
 
   const subtotal = getCartTotal();
@@ -265,7 +265,7 @@ export default function CartDisplay() {
       const stripeCustomerId = await saveCardDetailsForRecurringOrders(
         paymentMethodId
       );
-      console.log("Stripe Customer ID:", stripeCustomerId);
+      //console.log("Stripe Customer ID:", stripeCustomerId);
 
       // Prepare recurring order data from current cart items
       const recurringOrderData = {
@@ -282,7 +282,7 @@ export default function CartDisplay() {
 
       // Create recurring order
       const result = await createRecurringOrder(recurringOrderData);
-      console.log("Recurring order created:", result);
+      //console.log("Recurring order created:", result);
 
       // Success feedback
       toast({

@@ -33,7 +33,7 @@ export const useUserMode = () => {
         
         // If user is in business mode, switch them to user mode
         if (currentMode.mode === 'business') {
-          console.log('User is in business mode, switching to user mode for page:', pathname);
+          //console.log('User is in business mode, switching to user mode for page:', pathname);
           await switchUserRole();
           
           // Optional: Show a toast notification

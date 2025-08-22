@@ -132,7 +132,7 @@ const PaymentForm = ({
           break;
         case "processing":
           // Keep processing state true and poll for status
-          console.log("Payment is processing...");
+          //console.log("Payment is processing...");
 
           let pollCount = 0;
           const maxPollAttempts = 30; // 30 attempts * 2 seconds = 1 minute max

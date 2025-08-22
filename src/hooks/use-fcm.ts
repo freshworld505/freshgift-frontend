@@ -91,7 +91,7 @@ export const useFCM = (): UseFCMReturn => {
    * Handle foreground messages
    */
   const handleForegroundMessage = (payload: any) => {
-    console.log('Foreground message received:', payload);
+    //console.log('Foreground message received:', payload);
     
     // Show a custom notification or update UI
     if (Notification.permission === 'granted') {
@@ -118,7 +118,7 @@ export const useFCM = (): UseFCMReturn => {
       // Request notification permission
       if ('Notification' in window && Notification.permission === 'default') {
         const permission = await Notification.requestPermission();
-        console.log('Notification permission:', permission);
+        //console.log('Notification permission:', permission);
       }
 
       // Get new token

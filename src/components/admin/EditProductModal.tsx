@@ -239,13 +239,13 @@ export default function EditProductModal({
         Object.entries(updateData).filter(([_, value]) => value !== undefined)
       );
 
-      console.log("🔍 EditProductModal - About to send update data:", {
-        originalProduct: product,
-        formData: formData,
-        updateData: updateData,
-        cleanedData: cleanedData,
-        dataStructure: JSON.stringify(cleanedData, null, 2),
-      });
+      //console.log("🔍 EditProductModal - About to send update data:", {
+      //  originalProduct: product,
+      //  formData: formData,
+      //  updateData: updateData,
+      //  cleanedData: cleanedData,
+      //  dataStructure: JSON.stringify(cleanedData, null, 2),
+      //});
 
       await updateProduct(product.id, cleanedData);
 

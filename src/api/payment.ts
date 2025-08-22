@@ -17,7 +17,7 @@ export const createPaymentIntent = async (addressId: string, couponCode?: string
       const response = await axios.post(`${API_BASE_URL}/orders/create-payment-intent`, body);
 
       if (response && response.data && response.data.clientSecret) {
-        console.log("✅ Payment intent created successfully");
+        //console.log("✅ Payment intent created successfully");
         return response.data;
       } else {
         console.error("❌ Failed to create payment intent:", response);
@@ -43,7 +43,7 @@ export const confirmPaymentIntent = async (paymentIntentId: string, addressId: s
       const response = await axios.post(`${API_BASE_URL}/orders/confirm`, body);
 
       if (response && response) {
-        console.log("✅ Payment intent confirmed successfully");
+        //console.log("✅ Payment intent confirmed successfully");
         return response;
       } else {
         console.error("❌ Failed to confirm payment intent:", response);

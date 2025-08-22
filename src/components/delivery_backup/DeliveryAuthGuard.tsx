@@ -18,13 +18,13 @@ export default function DeliveryAuthGuard({
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log("DeliveryAuthGuard effect:", {
-      pathname,
-      loading,
-      userEmail: user?.email,
-      isAuthenticated,
-      isDelivery,
-    });
+    //console.log("DeliveryAuthGuard effect:", {
+    //  pathname,
+    //  loading,
+    //  userEmail: user?.email,
+    //  isAuthenticated,
+    //  isDelivery,
+    //});
 
     // Wait for auth state to load
     if (loading) {
@@ -43,7 +43,7 @@ export default function DeliveryAuthGuard({
       isAuthenticated &&
       isDelivery
     ) {
-      console.log("Redirecting authenticated delivery person to dashboard");
+      //console.log("Redirecting authenticated delivery person to dashboard");
       router.push("/delivery");
       return;
     }
@@ -53,7 +53,7 @@ export default function DeliveryAuthGuard({
       pathname !== "/delivery/login" &&
       (!user || !isAuthenticated || !isDelivery)
     ) {
-      console.log("Redirecting non-delivery user to delivery login");
+      //console.log("Redirecting non-delivery user to delivery login");
       router.push("/delivery/login");
       return;
     }

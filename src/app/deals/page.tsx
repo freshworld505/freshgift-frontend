@@ -101,9 +101,9 @@ export default function DealsPage() {
 
         // If user is not in business mode, switch them to business mode
         if (currentMode.mode !== "business") {
-          console.log(
-            "User is not in business mode, switching to business mode..."
-          );
+          //console.log(
+          //  "User is not in business mode, switching to business mode..."
+          //);
           await switchUserRole();
           setUserMode("business");
 

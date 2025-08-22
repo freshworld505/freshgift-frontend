@@ -77,7 +77,7 @@ export default function SignupForm() {
         afterLoginUser
           .getIdToken(/* forceRefresh */ true)
           .then((idToken) => {
-            fetch("https://freshgiftbackend.onrender.com/api/auth/verify", {
+            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -127,7 +127,7 @@ export default function SignupForm() {
         afterLoginUser
           .getIdToken(/* forceRefresh */ true)
           .then((idToken) => {
-            fetch("https://freshgiftbackend.onrender.com/api/auth/verify", {
+            fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

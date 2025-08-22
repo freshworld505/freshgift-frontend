@@ -12,13 +12,13 @@ export const getFCMToken = async (): Promise<string | null> => {
   try {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') {
-      console.log('Not in browser environment, skipping FCM token generation');
+      //console.log('Not in browser environment, skipping FCM token generation');
       return null;
     }
 
     // Check if service worker is supported
     if (!('serviceWorker' in navigator)) {
-      console.log('Service worker not supported, FCM not available');
+      //console.log('Service worker not supported, FCM not available');
       return null;
     }
 
@@ -30,10 +30,10 @@ export const getFCMToken = async (): Promise<string | null> => {
     });
 
     if (token) {
-      console.log('✅ FCM token generated:', token);
+      //console.log('✅ FCM token generated:', token);
       return token;
     } else {
-      console.log('⚠️ No registration token available');
+      //console.log('⚠️ No registration token available');
       return null;
     }
   } catch (error) {
@@ -65,7 +65,7 @@ export const sendFCMtokenToBackend = async (fcmToken: string, deviceType: string
       }
 
       const result = await response.json();
-      console.log('✅ FCM token sent to backend successfully');
+      //console.log('✅ FCM token sent to backend successfully');
       return result;
     } catch (error) {
       console.error('❌ Error sending FCM token:', error);
@@ -97,7 +97,7 @@ export const registerFCMToken = async (deviceType: string = 'web'): Promise<bool
 
     // Send token to backend
     await sendFCMtokenToBackend(fcmToken, deviceType);
-    console.log('✅ FCM token registered successfully');
+    //console.log('✅ FCM token registered successfully');
     return true;
   } catch (error) {
     console.error('❌ Error registering FCM token:', error);
@@ -118,7 +118,7 @@ export const setupFCMMessageListener = (onMessageReceived: (payload: any) => voi
     const messaging = getMessaging(app);
     
     onMessage(messaging, (payload) => {
-      console.log('📩 Foreground message received:', payload);
+      //console.log('📩 Foreground message received:', payload);
       onMessageReceived(payload);
     });
   } catch (error) {

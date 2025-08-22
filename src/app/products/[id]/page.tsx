@@ -69,7 +69,7 @@ export default function ProductDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
-      console.log(`🔍 Fetching product with ID: ${id}`);
+      //console.log(`🔍 Fetching product with ID: ${id}`);
 
       const productData = await getProductById(id);
 
@@ -812,9 +812,9 @@ export default function ProductDetailPage() {
                     ? parseInt(relatedProduct.stock, 10)
                     : relatedProduct.stock ?? 0;
                 const relatedIsInStock = stockValue > 0;
-                console.log(
-                  `🔍 Related product ${relatedProduct.productName}: stock=${relatedProduct.stock}, converted=${stockValue}, isInStock=${relatedIsInStock}`
-                );
+                //console.log(
+                //  `🔍 Related product ${relatedProduct.productName}: stock=${relatedProduct.stock}, converted=${stockValue}, isInStock=${relatedIsInStock}`
+                //);
                 const relatedCartItem = items.find(
                   (item) => item.product.id === relatedProduct.id
                 );

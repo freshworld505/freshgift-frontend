@@ -85,7 +85,7 @@ export function SalesChart() {
 
       // Get orders data and process it by month
       const orders = await getAllOrders();
-      console.log("📊 SalesChart: Fetched orders:", orders?.length || 0);
+      //console.log("📊 SalesChart: Fetched orders:", orders?.length || 0);
 
       // Process orders data to get monthly sales and orders
       const monthlyData = orders.reduce((acc: any, order: any) => {
@@ -120,7 +120,7 @@ export function SalesChart() {
           sales: Number(item.sales.toFixed(2)), // Round sales to 2 decimal places
         }));
 
-      console.log("📊 SalesChart: Processed data:", sortedData);
+      //console.log("📊 SalesChart: Processed data:", sortedData);
       setChartData(sortedData);
     } catch (error) {
       console.error("Error fetching sales data:", error);
@@ -217,7 +217,7 @@ export function RevenueChart() {
 
       // Get recent orders for the last week
       const orders = await getAllOrders();
-      console.log("📊 RevenueChart: Fetched orders:", orders?.length || 0);
+      //console.log("📊 RevenueChart: Fetched orders:", orders?.length || 0);
 
       // Process orders data to get daily revenue for the last 7 days
       const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -252,7 +252,7 @@ export function RevenueChart() {
         revenue: Number(day.revenue.toFixed(2)),
       }));
 
-      console.log("📊 RevenueChart: Processed data:", roundedData);
+      //console.log("📊 RevenueChart: Processed data:", roundedData);
       setChartData(roundedData);
     } catch (error) {
       console.error("Error fetching revenue data:", error);
@@ -361,7 +361,7 @@ export function CategoryChart() {
       });
 
       const categoryData = await Promise.all(categoryPromises);
-      console.log("📊 CategoryChart: Fetched category data:", categoryData);
+      //console.log("📊 CategoryChart: Fetched category data:", categoryData);
 
       // Filter out categories with no revenue and sort by value
       const filteredData = categoryData
@@ -369,7 +369,7 @@ export function CategoryChart() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 6); // Show top 6 categories
 
-      console.log("📊 CategoryChart: Processed data:", filteredData);
+      //console.log("📊 CategoryChart: Processed data:", filteredData);
       setChartData(filteredData);
     } catch (error) {
       console.error("Error fetching category data:", error);
@@ -465,7 +465,7 @@ export function OrdersChart() {
 
       // Get orders data and process it by month
       const orders = await getAllOrders();
-      console.log("📊 OrdersChart: Fetched orders:", orders?.length || 0);
+      //console.log("📊 OrdersChart: Fetched orders:", orders?.length || 0);
 
       // Process orders data to get monthly order counts
       const monthlyData = orders.reduce((acc: any, order: any) => {
@@ -516,7 +516,7 @@ export function OrdersChart() {
         orders: monthlyData[month]?.orders || 0,
       }));
 
-      console.log("📊 OrdersChart: Processed data:", chartData);
+      //console.log("📊 OrdersChart: Processed data:", chartData);
       setChartData(chartData);
     } catch (error) {
       console.error("Error fetching orders data:", error);

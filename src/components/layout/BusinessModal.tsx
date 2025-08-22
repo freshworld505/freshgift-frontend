@@ -143,7 +143,7 @@ export default function BusinessModal({
 
     setLoading(true);
     try {
-      console.log("Submitting business application with data:", formData);
+      //console.log("Submitting business application with data:", formData);
       await applyForBusinessUser(formData);
       toast({
         title: "Application Submitted!",

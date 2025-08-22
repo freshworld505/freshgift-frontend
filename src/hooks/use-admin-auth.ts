@@ -35,7 +35,7 @@ export function useAdminAuth() {
 
     const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
     
-    console.log('Admin check:', { email, isAdmin, adminEmails: ADMIN_EMAILS });
+    //console.log('Admin check:', { email, isAdmin, adminEmails: ADMIN_EMAILS });
     
     setAdminState({ 
       loading: false, 

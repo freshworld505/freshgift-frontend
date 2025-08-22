@@ -48,8 +48,7 @@ interface EditProductData {
   productImages?: string[];
 }
 
-//const API_BASE_URL = 'https://freshgiftbackend.onrender.com/api/products';
-const API_BASE_URL = 'http://localhost:5003/api/products';
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`;
 
 // Create a new product
 export async function createProduct(productData: any) {
@@ -411,13 +410,13 @@ export const editProduct = async (EditProductData: EditProductData): Promise<Pro
     });
 
     // Add more detailed logging to debug the request
-    console.log("📤 Sending edit product request:", {
-      url: `${API_BASE_URL}/edit`,
-      data: requestData,
-      productId: requestData.productId,
-      dataKeys: Object.keys(requestData),
-      dataStructure: JSON.stringify(requestData, null, 2)
-    });
+    //console.log("📤 Sending edit product request:", {
+    //  url: `${API_BASE_URL}/edit`,
+    //  data: requestData,
+    //  productId: requestData.productId,
+    //  dataKeys: Object.keys(requestData),
+    //  dataStructure: JSON.stringify(requestData, null, 2)
+    //});
 
     const response = await axios.put(`${API_BASE_URL}/edit`, requestData, {
       headers: {
@@ -430,7 +429,7 @@ export const editProduct = async (EditProductData: EditProductData): Promise<Pro
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Product updated successfully:", response.data);
+    //console.log("✅ Product updated successfully:", response.data);
     return response.data.product || response.data;
   } catch (error: any) {
     // Enhanced error logging to see the full backend response
@@ -486,7 +485,7 @@ export const uploadProductImages = async (imageFiles: File[]): Promise<string[]>
       throw new Error("No image URLs received from API");
     }
 
-    console.log("✅ Images uploaded successfully:", response.data);
+    //console.log("✅ Images uploaded successfully:", response.data);
     return response.data.urls;
   } catch (error: any) {
     console.error("❌ Error uploading images:", {
@@ -514,7 +513,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 
     const response = await axios.delete(`${API_BASE_URL}/delete/${productId}`);
 
-    console.log("✅ Product deleted successfully:", response.data);
+    //console.log("✅ Product deleted successfully:", response.data);
   } catch (error: any) {
     console.error("❌ Error deleting product:", {
       message: error.message,
@@ -545,7 +544,7 @@ export const getProductById = async (productId: string): Promise<Product> => {
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Product fetched successfully:", response.data);
+    //console.log("✅ Product fetched successfully:", response.data);
     
     // Handle the response format and convert to Product type
     const product = response.data.product || response.data;

@@ -1,10 +1,10 @@
 import { ensureAuthenticated } from './authTokenHelper';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5003/api/orders';
-const API_BASE_URL_FOR_SHIPPING = 'http://localhost:5003/api';
-const API_BASE_URL_FOR_RECURRING = 'http://localhost:5003/api/recurring';
-const API_BASE_URL_FOR_BALANCE = 'http://localhost:5003/api/orders/admin';
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders`;
+const API_BASE_URL_FOR_SHIPPING = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+const API_BASE_URL_FOR_RECURRING = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recurring`;
+const API_BASE_URL_FOR_BALANCE = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/admin`;
 
 // Valid refund status values
 type RefundStatus = 'Pending' | 'Approved' | 'Refunded';
@@ -105,7 +105,8 @@ export const approveRefund = async (orderId: string): Promise<void> => {
     
     if (response.status === 200) {
       //console.log(`✅ Refund for order ${orderId} approved successfully:`, response.data);
-      console.log(`✅ Refund for order ${orderId} approved successfully`);
+      //console.log(`✅ Refund for order ${orderId} approved successfully`);
+      console.log(`✅ Refund for order approved successfully`);
     } else {
       console.error("❌ Failed to approve refund:", response.data);
       throw new Error(response.data?.message || "Failed to approve refund");
@@ -165,7 +166,7 @@ export const updateOrderStatus = async (
     
     if (response.status === 200) {
       //console.log(`✅ Order ${orderId} updated successfully:`, response.data);
-      console.log(`✅ Order ${orderId} updated successfully`);
+      console.log(`✅ Order updated successfully`);
     } else {
       console.error("❌ Failed to update order:", response.data);
       throw new Error(response.data?.message || "Failed to update order");
@@ -247,8 +248,6 @@ export const getOrderById = async (orderId: string): Promise<any> => {
   }
 }
 
-// Admin apis for recurring orders
-//const API_BASE_URL_FOR_RECURRING = 'https://freshgiftbackend.onrender.com/api/recurring';
 
 // Get all recurring orders
 export const getAllRecurringOrders = async (): Promise<RecurringOrder[]> => {
@@ -304,7 +303,7 @@ export const updateShippingDetails = async (data: {
       throw new Error("No data received from API");
     }
 
-    console.log("✅ Shipping details updated successfully:", response.data);
+    //console.log("✅ Shipping details updated successfully:", response.data);
 
     return response.data;
   } catch (error) {
@@ -370,7 +369,7 @@ export const createStripePayout = async (amount: number, currency: string): Prom
     const response = await axios.post(`${API_BASE_URL_FOR_BALANCE}/stripe/manual-payout`, { amount, currency });
 
     if (response.status === 200) {
-      console.log(`✅ Stripe payout of ${amount} ${currency} created successfully`);
+      console.log(`✅ Stripe payout created successfully`);
     } else {
       console.error("❌ Failed to create Stripe payout:", response.data);
       throw new Error(response.data?.message || "Failed to create Stripe payout");

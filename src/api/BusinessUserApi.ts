@@ -97,7 +97,7 @@ export const getUserAddresses = async (): Promise<Address[]> => {
   return withAuthentication(async () => {
     try {
       const response = await axios.get<GetAddressesResponse>(`${API_BASE_URL}/address/my`);
-      console.log("✅ Successfully fetched user addresses");
+      //console.log("✅ Successfully fetched user addresses");
       
       // Map backend response to frontend Address type
       const addresses: Address[] = response.data.addresses.map((backendAddress: BackendAddress) => ({
@@ -136,7 +136,7 @@ export const createAddress = async (addressData: Omit<Address, 'id'>): Promise<A
       };
 
       const response = await axios.post<CreateAddressResponse>(`${API_BASE_URL}/address/add`, backendAddressData);
-      console.log("✅ Successfully created new address");
+      //console.log("✅ Successfully created new address");
       //console.log("🔍 Raw backend response:", response.data);
       //console.log("🔍 Backend response message:", response.data.message);
       //console.log("🔍 Backend address object:", response.data.address);
@@ -176,7 +176,7 @@ export const deleteAddress = async (addressId: string): Promise<void> => {
   return withAuthentication(async () => {
     try {
       await axios.delete(`${API_BASE_URL}/address/${addressId}`);
-      console.log("✅ Successfully deleted address");
+      //console.log("✅ Successfully deleted address");
     } catch (error) {
       console.error("Failed to delete address:", error);
       throw error;
@@ -194,7 +194,7 @@ export const updateAddress = async (addressId: string, addressLine: string)=> {
       }
 
       const response = await axios.put<UpdateAddressResponse>(`${API_BASE_URL}/address/${addressId}`, body);
-      console.log("✅ Successfully updated address");
+      //console.log("✅ Successfully updated address");
       
       // Map backend response to frontend Address type
       const updatedAddress: Address = {

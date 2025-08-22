@@ -243,7 +243,7 @@ export default function CheckoutForm() {
 
   const fetchShippingDetails = async () => {
     const details = await getShippingDetails();
-    console.log("🚀Shipping details fetched:", details);
+    //console.log("🚀Shipping details fetched:", details);
     setShippingDetails(details);
   };
 
@@ -288,7 +288,7 @@ export default function CheckoutForm() {
   const createAddressFromForm = async (
     values: z.infer<typeof checkoutSchema>
   ): Promise<Address> => {
-    console.log("🏠 Creating address from form values:", values);
+    //console.log("🏠 Creating address from form values:", values);
 
     // Validate required fields
     if (
@@ -309,14 +309,14 @@ export default function CheckoutForm() {
       isDefault: false,
     };
 
-    console.log("📝 Address data to be sent:", newAddressData);
+    //console.log("📝 Address data to be sent:", newAddressData);
 
     try {
       const createdAddress = await createAddress(newAddressData);
-      console.log("✅ Address created successfully:", createdAddress);
-      console.log("🔍 Address object keys:", Object.keys(createdAddress || {}));
-      console.log("🆔 Address ID value:", createdAddress?.id);
-      console.log("🆔 Address ID type:", typeof createdAddress?.id);
+      //console.log("✅ Address created successfully:", createdAddress);
+      //console.log("🔍 Address object keys:", Object.keys(createdAddress || {}));
+      //console.log("🆔 Address ID value:", createdAddress?.id);
+      //console.log("🆔 Address ID type:", typeof createdAddress?.id);
 
       // Validate that we received a proper address with ID
       if (!createdAddress || !createdAddress.id) {
@@ -338,14 +338,14 @@ export default function CheckoutForm() {
     values: z.infer<typeof checkoutSchema>,
     paymentMethod: PaymentMethod = "Cash"
   ) {
-    console.log("onSubmit called with:", {
-      values,
-      paymentMethod,
-      selectedAddress,
-    });
+    //console.log("onSubmit called with:", {
+    //  values,
+    //  paymentMethod,
+    //  selectedAddress,
+    //});
 
     if (!isAuthenticated || !user) {
-      console.log("onSubmit: Authentication check failed");
+      //console.log("onSubmit: Authentication check failed");
       toast({
         title: "Authentication required",
         description: "Please log in to place an order.",
@@ -365,9 +365,9 @@ export default function CheckoutForm() {
       // Update phone number if it has changed
       if (values.phoneNumber && values.phoneNumber !== user.phone) {
         try {
-          console.log("📞 Updating phone number:", values.phoneNumber);
+          //console.log("📞 Updating phone number:", values.phoneNumber);
           await updatePhoneNumber(values.phoneNumber);
-          console.log("✅ Phone number updated successfully");
+          //console.log("✅ Phone number updated successfully");
           toast({
             title: "Phone number updated",
             description: "Your contact information has been saved.",
@@ -434,13 +434,13 @@ export default function CheckoutForm() {
       if (hasValidSelectedAddress) {
         // Use existing selected address
         addressId = selectedAddress.id;
-        console.log("Using existing address:", addressId);
+        //console.log("Using existing address:", addressId);
       } else {
         // Create new address from form data
-        console.log("Creating new address from form data...");
-        console.log("selectedAddress is:", selectedAddress);
-        console.log("selectedAddress?.id is:", selectedAddress?.id);
-        console.log("hasValidSelectedAddress:", hasValidSelectedAddress);
+        //console.log("Creating new address from form data...");
+        //console.log("selectedAddress is:", selectedAddress);
+        //console.log("selectedAddress?.id is:", selectedAddress?.id);
+        //console.log("hasValidSelectedAddress:", hasValidSelectedAddress);
         toast({
           title: "Saving address...",
           description: "Creating your delivery address.",
@@ -449,11 +449,11 @@ export default function CheckoutForm() {
         try {
           const newAddress = await createAddressFromForm(values);
           addressId = newAddress.id;
-          console.log(
-            "✅ Successfully created new address with ID:",
-            addressId
-          );
-          console.log("New address details:", newAddress);
+          //console.log(
+          //  "✅ Successfully created new address with ID:",
+          //  addressId
+          //);
+          //console.log("New address details:", newAddress);
 
           // Add a small delay to ensure address is fully saved on backend
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -468,7 +468,7 @@ export default function CheckoutForm() {
         }
       }
 
-      console.log("📋 Preparing order data with addressId:", addressId);
+      //console.log("📋 Preparing order data with addressId:", addressId);
 
       const orderData: CreateOrderRequest = {
         addressId: addressId, // Always use addressId now
@@ -488,18 +488,18 @@ export default function CheckoutForm() {
         userInstructions: `Delivery to: ${values.fullName}, Phone: ${values.phoneNumber}`,
       };
 
-      console.log("📤 Sending order data to API:", orderData);
-      console.log("🛒 Current cart items:", items);
-      console.log("💰 Cart total:", totalAmount);
-      console.log("🎫 Applied coupon:", appliedCoupon);
-      console.log("💸 Discount amount:", discountAmount);
-      console.log("👤 Current user:", user);
-      console.log("🔐 Authentication status:", isAuthenticated);
+      //console.log("📤 Sending order data to API:", orderData);
+      //console.log("🛒 Current cart items:", items);
+      //console.log("💰 Cart total:", totalAmount);
+      //console.log("🎫 Applied coupon:", appliedCoupon);
+      //console.log("💸 Discount amount:", discountAmount);
+      //console.log("👤 Current user:", user);
+      //console.log("🔐 Authentication status:", isAuthenticated);
 
       // Create the order using the order store
-      console.log("🚀 Creating order...");
+      //console.log("🚀 Creating order...");
       const newOrder = await createOrder(orderData);
-      console.log("✅ Order created successfully:", newOrder);
+      //console.log("✅ Order created successfully:", newOrder);
 
       // Clear the cart after successful order
       clearCart();
@@ -538,8 +538,8 @@ export default function CheckoutForm() {
   const handleCashPayment = async () => {
     const values = form.getValues();
 
-    console.log("Cash payment clicked - Selected address:", selectedAddress);
-    console.log("Form values:", values);
+    //console.log("Cash payment clicked - Selected address:", selectedAddress);
+    //console.log("Form values:", values);
 
     // Check if we have a valid selected address with an ID
     const hasValidSelectedAddress =
@@ -555,14 +555,14 @@ export default function CheckoutForm() {
       const isPhoneValid = await form.trigger("phoneNumber");
       const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
 
-      console.log(
-        "Validation results - Name:",
-        isNameValid,
-        "Phone:",
-        isPhoneValid,
-        "Time slot:",
-        isTimeSlotValid
-      );
+      //console.log(
+      //  "Validation results - Name:",
+      //  isNameValid,
+      //  "Phone:",
+      //  isPhoneValid,
+      //  "Time slot:",
+      //  isTimeSlotValid
+      //);
 
       if (isNameValid && isPhoneValid && isTimeSlotValid) {
         await onSubmit(values, "Cash");
@@ -570,7 +570,7 @@ export default function CheckoutForm() {
     } else {
       // Validate all fields for manual address entry
       const isValid = await form.trigger();
-      console.log("Full form validation result:", isValid);
+      //console.log("Full form validation result:", isValid);
       if (isValid) {
         await onSubmit(values, "Cash");
       }
@@ -580,8 +580,8 @@ export default function CheckoutForm() {
   const handleCardPayment = async () => {
     const values = form.getValues();
 
-    console.log("Card payment clicked - Selected address:", selectedAddress);
-    console.log("Form values:", values);
+    //console.log("Card payment clicked - Selected address:", selectedAddress);
+    //console.log("Form values:", values);
 
     // Check if we have a valid selected address with an ID
     const hasValidSelectedAddress =
@@ -598,32 +598,32 @@ export default function CheckoutForm() {
       const isPhoneValid = await form.trigger("phoneNumber");
       const isTimeSlotValid = await form.trigger("deliveryTimeSlot");
       isValid = isNameValid && isPhoneValid && isTimeSlotValid;
-      console.log(
-        "Validation results - Name:",
-        isNameValid,
-        "Phone:",
-        isPhoneValid,
-        "Time slot:",
-        isTimeSlotValid
-      );
+      //console.log(
+      //  "Validation results - Name:",
+      //  isNameValid,
+      //  "Phone:",
+      //  isPhoneValid,
+      //  "Time slot:",
+      //  isTimeSlotValid
+      //);
     } else {
       // Validate all fields for manual address entry
       isValid = await form.trigger();
-      console.log("Full form validation result:", isValid);
+      //console.log("Full form validation result:", isValid);
     }
 
     if (!isValid) {
-      console.log("Validation failed, stopping payment process");
+      //console.log("Validation failed, stopping payment process");
       return;
     }
 
     if (!isAuthenticated || !user) {
-      console.log(
-        "Authentication check failed - isAuthenticated:",
-        isAuthenticated,
-        "user:",
-        user
-      );
+      //console.log(
+      //  "Authentication check failed - isAuthenticated:",
+      //  isAuthenticated,
+      //  "user:",
+      //  user
+      //);
       toast({
         title: "Authentication required",
         description: "Please log in to place an order.",
@@ -636,12 +636,12 @@ export default function CheckoutForm() {
       // Update phone number if it has changed
       if (values.phoneNumber && values.phoneNumber !== user.phone) {
         try {
-          console.log(
-            "📞 Updating phone number for card payment:",
-            values.phoneNumber
-          );
+          //console.log(
+          //  "📞 Updating phone number for card payment:",
+          //  values.phoneNumber
+          //);
           await updatePhoneNumber(values.phoneNumber);
-          console.log("✅ Phone number updated successfully");
+          //console.log("✅ Phone number updated successfully");
           toast({
             title: "Phone number updated",
             description: "Your contact information has been saved.",
@@ -708,13 +708,13 @@ export default function CheckoutForm() {
       if (hasValidSelectedAddress) {
         // Use existing selected address
         addressIdentifier = selectedAddress.id;
-        console.log("Using existing address for payment:", addressIdentifier);
+        //console.log("Using existing address for payment:", addressIdentifier);
       } else {
         // Create new address from form data
-        console.log("Creating new address for payment...");
-        console.log("selectedAddress is:", selectedAddress);
-        console.log("selectedAddress?.id is:", selectedAddress?.id);
-        console.log("hasValidSelectedAddress:", hasValidSelectedAddress);
+        //console.log("Creating new address for payment...");
+        //console.log("selectedAddress is:", selectedAddress);
+        //console.log("selectedAddress?.id is:", selectedAddress?.id);
+        //console.log("hasValidSelectedAddress:", hasValidSelectedAddress);
         toast({
           title: "Saving address...",
           description: "Creating your delivery address for payment.",
@@ -723,11 +723,11 @@ export default function CheckoutForm() {
         try {
           createdAddress = await createAddressFromForm(values);
           addressIdentifier = createdAddress.id;
-          console.log(
-            "✅ Successfully created new address for payment with ID:",
-            addressIdentifier
-          );
-          console.log("New address details:", createdAddress);
+          //console.log(
+          //  "✅ Successfully created new address for payment with ID:",
+          //  addressIdentifier
+          //);
+          //console.log("New address details:", createdAddress);
 
           // Add a small delay to ensure address is fully saved on backend
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -755,15 +755,15 @@ export default function CheckoutForm() {
         addressIdentifier, // Use addressId for payment intent
         appliedCoupon?.coupon.code // couponCode
       );
-      console.log("🚀✅🚀❤️Payment Intent Response:", paymentIntentResponse);
+      //console.log("🚀✅🚀❤️Payment Intent Response:", paymentIntentResponse);
 
       // Store the payment intent data and checkout data
       // Convert amount to pence for StripePaymentForm (it expects pence)
       const amountInPence = convertToPence(paymentIntentResponse.amount);
-      console.log("💰 Converting amount for Stripe:", {
-        originalAmount: paymentIntentResponse.amount,
-        amountInPence: amountInPence,
-      });
+      //console.log("💰 Converting amount for Stripe:", {
+      //  originalAmount: paymentIntentResponse.amount,
+      //  amountInPence: amountInPence,
+      //});
 
       setPaymentIntentData({
         ...paymentIntentResponse,
@@ -973,7 +973,7 @@ export default function CheckoutForm() {
         userInstructions: recurringOrderData.userInstructions,
       };
 
-      console.log("🔄 Creating recurring order with saved card...");
+      //console.log("🔄 Creating recurring order with saved card...");
       const newOrder = await createOrder(orderData);
 
       // Clear the cart after successful order

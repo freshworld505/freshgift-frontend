@@ -2,7 +2,7 @@ import { ensureAuthenticated } from './authTokenHelper';
 import axios from 'axios';
 
 
-const API_BASE_URL = 'http://localhost:5003/api/coupons';
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/coupons`;
 
 // Create a new coupon
 export const createCoupon = async (couponData: {
@@ -45,7 +45,7 @@ export const assignCouponToAllUsers = async (couponCode: string): Promise<any> =
 export const getAllCoupons = async (): Promise<any[]> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.get(`http://localhost:5003/api/coupons/admin/coupons/all`);
+    const response = await axios.get(`${API_BASE_URL}/admin/coupons/all`);
 
     // Check if response has the expected structure
     if (!response.data || !response.data.userCoupons || !Array.isArray(response.data.userCoupons)) {
@@ -68,7 +68,7 @@ export const getAllCoupons = async (): Promise<any[]> => {
 export const assignCouponToUserArray = async (userIds: string[], couponCode: string): Promise<any> => {
   try {
     await ensureAuthenticated();
-    const response = await axios.post(`http://localhost:5003/api/coupons/assign-multiple`, { userIds, couponCode });
+    const response = await axios.post(`${API_BASE_URL}/assign-multiple`, { userIds, couponCode });
     //console.log("✅ Coupon assigned to users successfully:", response.data);
     return response.data;
   } catch (error) {

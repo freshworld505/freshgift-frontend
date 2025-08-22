@@ -69,8 +69,8 @@ export default function AdminDashboard() {
     usersChange: Number(currentStats.usersChange) || 0,
   };
 
-  console.log("🎯 Current stats in dashboard:", currentStats);
-  console.log("🛡️ Safe stats in dashboard:", safeStats);
+  //console.log("🎯 Current stats in dashboard:", currentStats);
+  //console.log("🛡️ Safe stats in dashboard:", safeStats);
 
   // Handle refresh with toast notification
   const handleRefresh = async () => {

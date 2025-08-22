@@ -154,15 +154,6 @@ export default function AddProduct() {
         tags: formData.tags, // Keep as array, let the API handle the conversion
       };
 
-      console.log("🚀 Submitting product data:", {
-        ...productData,
-        productImages: productData.productImages.map((f) => ({
-          name: f.name,
-          size: f.size,
-          type: f.type,
-        })),
-      });
-
       // Create the product using the admin store
       await createProduct(productData);
 

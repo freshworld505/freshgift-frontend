@@ -36,7 +36,7 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
 
     // If on admin login page and user is authenticated admin, redirect to admin dashboard
     if (pathname === "/admin/login" && user && isAuthenticated && isAdmin) {
-      console.log("Redirecting authenticated admin to dashboard");
+      //console.log("Redirecting authenticated admin to dashboard");
       router.push("/admin");
       return;
     }
@@ -46,7 +46,7 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
       pathname !== "/admin/login" &&
       (!user || !isAuthenticated || !isAdmin)
     ) {
-      console.log("Redirecting non-admin user to admin login");
+      //console.log("Redirecting non-admin user to admin login");
       router.push("/admin/login");
       return;
     }
